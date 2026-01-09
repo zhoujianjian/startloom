@@ -1,0 +1,1219 @@
+// 天机喵 - 神秘星空主题 ✨
+// ================================
+
+// 主题色彩 - 深邃神秘
+$primary-purple: #7B5CF5;
+$secondary-purple: #9D4EDD;
+$primary-gold: #F5D547;
+$ancient-gold: #C9A227;
+$deep-space: #050510;
+$nebula-purple: #12122a;
+$void-black: #020208;
+$star-white: #f8f4ff;
+$mystic-blue: #5B8DEF;
+$cosmic-pink: #E056A0;
+$ethereal-cyan: #4ECDC4;
+$blood-moon: #8B0000;
+
+// 神秘渐变
+$gradient-cosmic: linear-gradient(135deg, #050510 0%, #12122a 40%, #1a0a2e 70%, #0d0d20 100%);
+$gradient-gold: linear-gradient(135deg, #F5D547 0%, #C9A227 50%, #8B6914 100%);
+$gradient-purple: linear-gradient(135deg, #7B5CF5 0%, #9D4EDD 50%, #6B3FA0 100%);
+$gradient-mystic: linear-gradient(180deg, rgba(123, 92, 245, 0.25) 0%, rgba(157, 78, 221, 0.08) 100%);
+$gradient-void: radial-gradient(ellipse at center, #12122a 0%, #050510 70%, #020208 100%);
+$gradient-aurora: linear-gradient(45deg, rgba(123, 92, 245, 0.3), rgba(78, 205, 196, 0.2), rgba(224, 86, 160, 0.3));
+$gradient-rune: linear-gradient(135deg, rgba(245, 213, 71, 0.1) 0%, rgba(201, 162, 39, 0.05) 100%);
+
+// 神秘动画效果
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes twinkle-slow {
+  0%, 100% { opacity: 0.1; }
+  25% { opacity: 0.6; }
+  50% { opacity: 0.3; }
+  75% { opacity: 0.8; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-8px) rotate(1deg); }
+  50% { transform: translateY(-15px) rotate(0deg); }
+  75% { transform: translateY(-8px) rotate(-1deg); }
+}
+
+@keyframes float-reverse {
+  0%, 100% { transform: translateY(-15px); }
+  50% { transform: translateY(0px); }
+}
+
+@keyframes glow {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(123, 92, 245, 0.4), 
+                0 0 10px rgba(123, 92, 245, 0.2);
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(123, 92, 245, 0.8), 
+                0 0 40px rgba(245, 213, 71, 0.3),
+                0 0 60px rgba(157, 78, 221, 0.2);
+  }
+}
+
+@keyframes glow-gold {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(245, 213, 71, 0.3);
+    filter: brightness(1);
+  }
+  50% { 
+    box-shadow: 0 0 15px rgba(245, 213, 71, 0.6), 
+                0 0 30px rgba(201, 162, 39, 0.4);
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes pulse-mystic {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotate-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes nebula-drift {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  33% { 
+    transform: translate(30px, -20px) scale(1.1);
+    opacity: 0.5;
+  }
+  66% { 
+    transform: translate(-20px, 30px) scale(0.9);
+    opacity: 0.4;
+  }
+}
+
+@keyframes rune-glow {
+  0%, 100% { 
+    text-shadow: 0 0 5px rgba(245, 213, 71, 0.5);
+    opacity: 0.7;
+  }
+  50% { 
+    text-shadow: 0 0 20px rgba(245, 213, 71, 0.9), 
+                 0 0 40px rgba(245, 213, 71, 0.5);
+    opacity: 1;
+  }
+}
+
+@keyframes constellation-connect {
+  0% { stroke-dashoffset: 100; opacity: 0; }
+  50% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0.6; }
+}
+
+@keyframes portal-spin {
+  0% { 
+    transform: rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+  100% { 
+    transform: rotate(360deg);
+    filter: hue-rotate(360deg);
+  }
+}
+
+@keyframes energy-flow {
+  0% { 
+    background-position: 0% 50%;
+  }
+  50% { 
+    background-position: 100% 50%;
+  }
+  100% { 
+    background-position: 0% 50%;
+  }
+}
+
+// 星空背景容器 - 增强版
+.stars-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  background: $gradient-void;
+}
+
+// 星云效果层
+.nebula-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+      radial-gradient(ellipse at 20% 30%, rgba(123, 92, 245, 0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 70%, rgba(157, 78, 221, 0.1) 0%, transparent 40%),
+      radial-gradient(ellipse at 60% 20%, rgba(78, 205, 196, 0.08) 0%, transparent 35%);
+    animation: nebula-drift 60s ease-in-out infinite;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(ellipse at 70% 80%, rgba(224, 86, 160, 0.08) 0%, transparent 45%),
+      radial-gradient(ellipse at 30% 60%, rgba(91, 141, 239, 0.06) 0%, transparent 40%);
+    animation: nebula-drift 45s ease-in-out infinite reverse;
+  }
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  animation: twinkle 3s infinite;
+  
+  &.large {
+    width: 4px;
+    height: 4px;
+    box-shadow: 
+      0 0 8px rgba(255, 255, 255, 0.9),
+      0 0 15px rgba(123, 92, 245, 0.5);
+    animation: twinkle-slow 5s infinite;
+  }
+  
+  &.medium {
+    width: 2px;
+    height: 2px;
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.7);
+  }
+  
+  &.golden {
+    background: $primary-gold;
+    box-shadow: 
+      0 0 6px rgba(245, 213, 71, 0.8),
+      0 0 12px rgba(201, 162, 39, 0.4);
+    animation: glow-gold 4s infinite;
+  }
+  
+  &.purple {
+    background: $primary-purple;
+    box-shadow: 0 0 8px rgba(123, 92, 245, 0.6);
+  }
+}
+
+// 流星效果
+.shooting-star {
+  position: absolute;
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.8), transparent);
+  border-radius: 50%;
+  animation: shooting 3s linear infinite;
+  opacity: 0;
+  
+  @keyframes shooting {
+    0% {
+      transform: translateX(0) translateY(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(-500px) translateY(300px);
+      opacity: 0;
+    }
+  }
+}
+
+// 神秘卡片样式 - 增强版
+.mystic-card {
+  background: linear-gradient(145deg, rgba(18, 18, 42, 0.95) 0%, rgba(5, 5, 16, 0.9) 100%);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(123, 92, 245, 0.25);
+  border-radius: 20px;
+  padding: 24px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  
+  // 神秘符文边框
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(135deg, 
+      rgba(123, 92, 245, 0.5) 0%, 
+      rgba(245, 213, 71, 0.3) 25%,
+      rgba(157, 78, 221, 0.4) 50%,
+      rgba(78, 205, 196, 0.3) 75%,
+      rgba(123, 92, 245, 0.5) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  
+  // 角落装饰
+  &::after {
+    content: '✧';
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 16px;
+    color: rgba(245, 213, 71, 0.4);
+    animation: rune-glow 3s infinite;
+  }
+  
+  &:hover {
+    border-color: rgba(123, 92, 245, 0.5);
+    box-shadow: 
+      0 8px 32px rgba(123, 92, 245, 0.25),
+      0 0 60px rgba(157, 78, 221, 0.1),
+      inset 0 0 30px rgba(123, 92, 245, 0.05);
+    transform: translateY(-4px);
+    
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+// 古老卷轴卡片
+.scroll-card {
+  background: 
+    linear-gradient(145deg, rgba(18, 18, 42, 0.9) 0%, rgba(10, 10, 26, 0.95) 100%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L30 60M0 30L60 30' stroke='%237B5CF5' stroke-width='0.5' opacity='0.05'/%3E%3C/svg%3E");
+  border: 1px solid rgba(201, 162, 39, 0.2);
+  border-radius: 4px;
+  padding: 20px;
+  position: relative;
+  
+  // 卷轴顶部装饰
+  &::before {
+    content: '═══════════════════════════════';
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    color: rgba(201, 162, 39, 0.3);
+    letter-spacing: -2px;
+  }
+  
+  &::after {
+    content: '═══════════════════════════════';
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    color: rgba(201, 162, 39, 0.3);
+    letter-spacing: -2px;
+  }
+}
+
+// 神秘按钮 - 增强版
+.mystic-btn {
+  background: $gradient-purple;
+  border: none;
+  border-radius: 30px;
+  padding: 14px 35px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 4px 15px rgba(123, 92, 245, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    transition: left 0.6s;
+  }
+  
+  &::after {
+    content: '✦';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: all 0.3s;
+    font-size: 12px;
+  }
+  
+  &:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 
+      0 8px 25px rgba(123, 92, 245, 0.5),
+      0 0 40px rgba(157, 78, 221, 0.3);
+    
+    &::before {
+      left: 100%;
+    }
+    
+    &::after {
+      opacity: 1;
+      right: 12px;
+    }
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// 金色神秘按钮
+.mystic-btn-gold {
+  @extend .mystic-btn;
+  background: $gradient-gold;
+  color: #1a0a2e;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 4px 15px rgba(245, 213, 71, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  
+  &:hover {
+    box-shadow: 
+      0 8px 25px rgba(245, 213, 71, 0.5),
+      0 0 40px rgba(201, 162, 39, 0.3);
+  }
+}
+
+// 幽灵按钮
+.mystic-btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(123, 92, 245, 0.5);
+  border-radius: 30px;
+  padding: 12px 30px;
+  color: $primary-purple;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: $gradient-purple;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: -1;
+  }
+  
+  &:hover {
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 0 20px rgba(123, 92, 245, 0.4);
+    
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+// 金色高亮文字 - 增强版
+.golden-text {
+  background: linear-gradient(135deg, #F5D547 0%, #C9A227 40%, #F5D547 60%, #8B6914 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  font-weight: bold;
+  animation: shimmer 4s linear infinite;
+  filter: drop-shadow(0 0 8px rgba(245, 213, 71, 0.3));
+}
+
+// 神秘紫色文字
+.mystic-text {
+  background: linear-gradient(135deg, #7B5CF5 0%, #9D4EDD 50%, #7B5CF5 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shimmer 5s linear infinite;
+}
+
+// 符文文字效果
+.rune-text {
+  font-family: 'Times New Roman', serif;
+  letter-spacing: 2px;
+  color: $primary-gold;
+  text-shadow: 
+    0 0 10px rgba(245, 213, 71, 0.5),
+    0 0 20px rgba(245, 213, 71, 0.3);
+  animation: rune-glow 3s infinite;
+}
+
+// 发光边框 - 增强版
+.glow-border {
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: conic-gradient(
+      from 0deg,
+      rgba(123, 92, 245, 0.8),
+      rgba(245, 213, 71, 0.6),
+      rgba(157, 78, 221, 0.8),
+      rgba(78, 205, 196, 0.6),
+      rgba(123, 92, 245, 0.8)
+    );
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.4s;
+    animation: rotate-slow 8s linear infinite;
+    filter: blur(8px);
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    background: inherit;
+    border-radius: inherit;
+    z-index: -1;
+  }
+  
+  &:hover::before {
+    opacity: 1;
+  }
+}
+
+// 能量流动边框
+.energy-border {
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(90deg, 
+      $primary-purple, 
+      $primary-gold, 
+      $secondary-purple, 
+      $ethereal-cyan,
+      $primary-purple);
+    background-size: 300% 100%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: energy-flow 4s linear infinite;
+  }
+}
+
+// 神秘输入框 - 增强版
+.mystic-input {
+  background: linear-gradient(145deg, rgba(5, 5, 16, 0.8) 0%, rgba(18, 18, 42, 0.6) 100%);
+  border: 1px solid rgba(123, 92, 245, 0.25);
+  border-radius: 16px;
+  padding: 16px 22px;
+  color: $star-white;
+  font-size: 14px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  
+  &::placeholder {
+    color: rgba(248, 244, 255, 0.35);
+    font-style: italic;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: rgba(123, 92, 245, 0.6);
+    box-shadow: 
+      0 0 20px rgba(123, 92, 245, 0.25),
+      0 0 40px rgba(157, 78, 221, 0.1),
+      inset 0 0 20px rgba(123, 92, 245, 0.05);
+    background: linear-gradient(145deg, rgba(5, 5, 16, 0.9) 0%, rgba(18, 18, 42, 0.7) 100%);
+  }
+}
+
+// 占卜结果卡片 - 增强版
+.divination-result {
+  background: 
+    linear-gradient(145deg, rgba(18, 18, 42, 0.95) 0%, rgba(26, 10, 46, 0.9) 100%),
+    $gradient-rune;
+  border: 1px solid rgba(245, 213, 71, 0.15);
+  border-radius: 24px;
+  padding: 30px;
+  position: relative;
+  overflow: hidden;
+  
+  // 神秘光晕
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(245, 213, 71, 0.08) 0%, transparent 50%);
+    animation: pulse-mystic 4s ease-in-out infinite;
+  }
+  
+  // 装饰符号
+  &::after {
+    content: '✧ ✦ ✧';
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 14px;
+    color: rgba(245, 213, 71, 0.5);
+    letter-spacing: 5px;
+    animation: float 4s ease-in-out infinite;
+  }
+}
+
+// 星座图标容器 - 增强版
+.zodiac-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: $gradient-purple;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  position: relative;
+  animation: glow 3s infinite;
+  
+  // 外圈光环
+  &::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 50%;
+    border: 2px solid rgba(245, 213, 71, 0.3);
+    animation: rotate-slow 20s linear infinite;
+  }
+  
+  // 内圈装饰
+  &::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border-radius: 50%;
+    border: 1px dashed rgba(123, 92, 245, 0.3);
+    animation: rotate-reverse 15s linear infinite;
+  }
+}
+
+// 神秘水晶球加载动画 - 增强版
+.mystic-loading {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: 
+    radial-gradient(circle at 30% 30%, rgba(248, 244, 255, 0.3) 0%, transparent 30%),
+    radial-gradient(circle at center, rgba(123, 92, 245, 0.8) 0%, rgba(157, 78, 221, 0.4) 50%, rgba(26, 10, 46, 0.9) 100%);
+  animation: float 2.5s ease-in-out infinite, glow 2s infinite;
+  position: relative;
+  box-shadow: 
+    0 10px 30px rgba(123, 92, 245, 0.4),
+    inset 0 -5px 20px rgba(157, 78, 221, 0.3);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 15px;
+    width: 15px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    filter: blur(3px);
+  }
+  
+  &::after {
+    content: '🔮';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 28px;
+    filter: drop-shadow(0 0 10px rgba(123, 92, 245, 0.5));
+  }
+}
+
+// 神秘分割线 - 增强版
+.mystic-divider {
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(123, 92, 245, 0.3) 15%,
+    rgba(245, 213, 71, 0.5) 50%, 
+    rgba(123, 92, 245, 0.3) 85%,
+    transparent 100%);
+  margin: 25px 0;
+  position: relative;
+  
+  &::before {
+    content: '◆';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(245, 213, 71, 0.6);
+    font-size: 10px;
+    background: $deep-space;
+    padding: 0 10px;
+  }
+}
+
+// 闪烁文字效果 - 增强版
+.shimmer-text {
+  background: linear-gradient(90deg, 
+    #7B5CF5 0%, 
+    #F5D547 25%, 
+    #9D4EDD 50%, 
+    #F5D547 75%, 
+    #7B5CF5 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shimmer 3s linear infinite;
+  font-weight: 600;
+}
+
+// ================================
+// 新增神秘元素
+// ================================
+
+// 神秘门户效果
+.mystic-portal {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    border-top-color: $primary-purple;
+    border-right-color: $primary-gold;
+    animation: portal-spin 3s linear infinite;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-bottom-color: $secondary-purple;
+    border-left-color: $ethereal-cyan;
+    animation: portal-spin 2s linear infinite reverse;
+  }
+}
+
+// 塔罗牌样式
+.tarot-card {
+  background: linear-gradient(145deg, #1a0a2e 0%, #0d0d20 100%);
+  border: 2px solid rgba(201, 162, 39, 0.4);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  // 卡牌花纹
+  &::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border: 1px solid rgba(201, 162, 39, 0.2);
+    border-radius: 8px;
+    pointer-events: none;
+  }
+  
+  // 角落装饰
+  &::after {
+    content: '☆';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-size: 12px;
+    color: rgba(201, 162, 39, 0.5);
+  }
+  
+  &:hover {
+    transform: translateY(-10px) rotateX(5deg);
+    box-shadow: 
+      0 20px 40px rgba(0, 0, 0, 0.4),
+      0 0 30px rgba(201, 162, 39, 0.2);
+    border-color: rgba(201, 162, 39, 0.6);
+  }
+}
+
+// 星座连线效果
+.constellation-line {
+  stroke: rgba(123, 92, 245, 0.6);
+  stroke-width: 1;
+  stroke-dasharray: 5, 5;
+  animation: constellation-connect 3s ease-in-out infinite;
+}
+
+// 神秘烟雾效果
+.mystic-smoke {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(ellipse at 50% 100%, rgba(123, 92, 245, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+  animation: nebula-drift 20s ease-in-out infinite;
+}
+
+// 古老符文装饰
+.rune-decoration {
+  position: relative;
+  
+  &::before,
+  &::after {
+    font-family: 'Times New Roman', serif;
+    color: rgba(201, 162, 39, 0.3);
+    font-size: 20px;
+    animation: rune-glow 4s infinite;
+  }
+  
+  &::before {
+    content: '☽';
+    position: absolute;
+    left: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  &::after {
+    content: '☾';
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+// 神秘徽章
+.mystic-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, rgba(123, 92, 245, 0.2) 0%, rgba(157, 78, 221, 0.1) 100%);
+  border: 1px solid rgba(123, 92, 245, 0.3);
+  border-radius: 20px;
+  font-size: 12px;
+  color: $star-white;
+  
+  &::before {
+    content: '✧';
+    color: $primary-gold;
+    animation: twinkle 2s infinite;
+  }
+}
+
+// 能量条
+.energy-bar {
+  height: 6px;
+  background: rgba(5, 5, 16, 0.8);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  
+  .energy-fill {
+    height: 100%;
+    background: linear-gradient(90deg, $primary-purple, $primary-gold, $secondary-purple);
+    background-size: 200% 100%;
+    border-radius: 3px;
+    animation: energy-flow 2s linear infinite;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 20px;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4));
+      animation: shimmer 1.5s infinite;
+    }
+  }
+}
+
+// 神秘提示框
+.mystic-tooltip {
+  background: linear-gradient(145deg, rgba(18, 18, 42, 0.98) 0%, rgba(5, 5, 16, 0.95) 100%);
+  border: 1px solid rgba(123, 92, 245, 0.3);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: $star-white;
+  font-size: 13px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(123, 92, 245, 0.15);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 12px;
+    height: 12px;
+    background: rgba(18, 18, 42, 0.98);
+    border-right: 1px solid rgba(123, 92, 245, 0.3);
+    border-bottom: 1px solid rgba(123, 92, 245, 0.3);
+  }
+}
+
+
+// ================================
+// 全局神秘效果增强
+// ================================
+
+// 神秘选择框
+.mystic-select {
+  background: linear-gradient(145deg, rgba(5, 5, 16, 0.9) 0%, rgba(18, 18, 42, 0.7) 100%);
+  border: 1px solid rgba(123, 92, 245, 0.25);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: $star-white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  
+  &:focus {
+    outline: none;
+    border-color: rgba(123, 92, 245, 0.5);
+    box-shadow: 0 0 20px rgba(123, 92, 245, 0.2);
+  }
+  
+  option {
+    background: $deep-space;
+    color: $star-white;
+  }
+}
+
+// 神秘复选框
+.mystic-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(123, 92, 245, 0.4);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  
+  &:checked {
+    background: $gradient-purple;
+    border-color: $primary-purple;
+    
+    &::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 12px;
+    }
+  }
+  
+  &:hover {
+    border-color: rgba(123, 92, 245, 0.6);
+    box-shadow: 0 0 10px rgba(123, 92, 245, 0.2);
+  }
+}
+
+// 神秘标签
+.mystic-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: rgba(123, 92, 245, 0.15);
+  border: 1px solid rgba(123, 92, 245, 0.3);
+  border-radius: 15px;
+  font-size: 12px;
+  color: $star-white;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(123, 92, 245, 0.25);
+    box-shadow: 0 0 10px rgba(123, 92, 245, 0.2);
+  }
+  
+  &.gold {
+    background: rgba(245, 213, 71, 0.15);
+    border-color: rgba(245, 213, 71, 0.3);
+    color: $primary-gold;
+  }
+}
+
+// 神秘进度指示器
+.mystic-progress {
+  width: 100%;
+  height: 8px;
+  background: rgba(5, 5, 16, 0.8);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, $primary-purple, $primary-gold, $secondary-purple);
+    background-size: 200% 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+    animation: energy-flow 3s linear infinite;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 30px;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3));
+    }
+  }
+}
+
+// 神秘通知
+.mystic-notification {
+  background: linear-gradient(145deg, rgba(18, 18, 42, 0.98) 0%, rgba(5, 5, 16, 0.95) 100%);
+  border: 1px solid rgba(123, 92, 245, 0.3);
+  border-radius: 16px;
+  padding: 16px 20px;
+  color: $star-white;
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(123, 92, 245, 0.15);
+  position: relative;
+  
+  &::before {
+    content: '✧';
+    position: absolute;
+    top: -8px;
+    left: 20px;
+    font-size: 16px;
+    color: $primary-gold;
+    animation: twinkle 2s infinite;
+  }
+  
+  &.success {
+    border-color: rgba(78, 205, 196, 0.4);
+    
+    &::before {
+      color: $ethereal-cyan;
+    }
+  }
+  
+  &.warning {
+    border-color: rgba(245, 213, 71, 0.4);
+  }
+  
+  &.error {
+    border-color: rgba(224, 86, 160, 0.4);
+    
+    &::before {
+      color: $cosmic-pink;
+    }
+  }
+}
+
+// 神秘模态框背景
+.mystic-modal-overlay {
+  background: rgba(2, 2, 8, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+// 神秘模态框
+.mystic-modal {
+  background: linear-gradient(145deg, rgba(18, 18, 42, 0.98) 0%, rgba(5, 5, 16, 0.95) 100%);
+  border: 1px solid rgba(123, 92, 245, 0.25);
+  border-radius: 24px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(123, 92, 245, 0.1);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+      transparent, 
+      rgba(123, 92, 245, 0.5), 
+      rgba(245, 213, 71, 0.3), 
+      rgba(123, 92, 245, 0.5), 
+      transparent);
+  }
+}
+
+// 星座符号装饰
+.zodiac-decoration {
+  &::before {
+    content: '☆ ✧ ★';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: rgba(245, 213, 71, 0.4);
+    letter-spacing: 10px;
+    animation: twinkle 3s infinite;
+  }
+}
+
+// 神秘文字阴影
+.mystic-text-shadow {
+  text-shadow: 
+    0 0 10px rgba(123, 92, 245, 0.5),
+    0 0 20px rgba(123, 92, 245, 0.3),
+    0 0 30px rgba(157, 78, 221, 0.2);
+}
+
+// 金色文字阴影
+.gold-text-shadow {
+  text-shadow: 
+    0 0 10px rgba(245, 213, 71, 0.5),
+    0 0 20px rgba(201, 162, 39, 0.3);
+}
+
+// 悬浮卡片效果
+.hover-lift {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 
+      0 20px 40px rgba(0, 0, 0, 0.3),
+      0 0 40px rgba(123, 92, 245, 0.15);
+  }
+}
+
+// 脉冲效果
+.pulse-effect {
+  animation: pulse-mystic 2s ease-in-out infinite;
+}
+
+// 旋转光环
+.rotating-halo {
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border: 2px dashed rgba(123, 92, 245, 0.3);
+    border-radius: 50%;
+    animation: rotate-slow 20s linear infinite;
+  }
+}

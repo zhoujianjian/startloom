@@ -1,7 +1,9 @@
-  @font-face {
-    font-family: Alimama-DongFangDaKai;
-    src: url('./Alimama_DongFangDaKai_Regular.ttf');
-  }
+@import './theme.scss';
+
+@font-face {
+  font-family: Alimama-DongFangDaKai;
+  src: url('./Alimama_DongFangDaKai_Regular.ttf');
+}
   
 body,ul,ol,li,p,h1,h2,h3,h4,h5,h6,form,fieldset,table,td,img,div{margin:0;padding:0;border:0;box-sizing: border-box;} 
 body{
@@ -61,31 +63,38 @@ a{
 }
 .language-popover{
     border: none!important;
-    background: rgba(0,0,0,0.85) !important;
+    background: rgba(26, 26, 62, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
     border-radius: .185rem !important;
     width: 2rem !important;
+    border: 1px solid rgba(107, 78, 230, 0.3) !important;
     .list{
         text-align: center;
         line-height: .6rem;
-        // border: 1px solid transparent;
         border-radius: .35rem;
         color: #DED1BB;
         font-size: .259rem;
         cursor: pointer;
+        transition: all 0.3s ease;
+        &:hover {
+            background: rgba(107, 78, 230, 0.2);
+        }
         &.active{
-            border: 1px solid #686968;
+            border: 1px solid rgba(107, 78, 230, 0.5);
             color: #ffffff;
+            background: rgba(107, 78, 230, 0.3);
         }
     }
 }
 .user-popover{
     border: none!important;
-    // background: #130A00 !important;
     border-radius: .4rem !important;
     width: 5.8rem !important;
     font-size: 0.22rem !important;
     min-width: auto !important;
-    background: linear-gradient(180deg, #FFFBF5 0%, #FFF0D9 100%)!important;
+    background: linear-gradient(180deg, rgba(26, 26, 62, 0.98) 0%, rgba(10, 10, 26, 0.98) 100%)!important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(107, 78, 230, 0.3) !important;
     .account{
         color: #DED1BB;
         padding-bottom: 0.1rem;

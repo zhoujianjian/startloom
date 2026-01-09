@@ -469,22 +469,46 @@ export default {
 
 <style scoped lang='scss'>
 .header {
-  background: url(/@/assets/images/header-heng.svg) no-repeat 100% 100%;
+  background: linear-gradient(180deg, rgba(18, 18, 42, 0.95) 0%, rgba(5, 5, 16, 0.85) 100%);
+  backdrop-filter: blur(20px);
   height: 1.2rem;
   opacity: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  // border-radius: 30px 30px 0px 0px;
   padding-right: 1rem;
   z-index: 11;
+  border-bottom: 1px solid rgba(123, 92, 245, 0.15);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3), 0 0 40px rgba(123, 92, 245, 0.05);
+  position: relative;
+  
+  // 底部光线装饰
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(123, 92, 245, 0.4) 20%,
+      rgba(245, 213, 71, 0.3) 50%, 
+      rgba(123, 92, 245, 0.4) 80%,
+      transparent 100%);
+  }
+  
   .left {
-    // display: flex;
-    // align-items: center;
     cursor: pointer;
     .logo {
       width: 6rem;
       margin-right: 0.1rem;
+      filter: drop-shadow(0 0 15px rgba(123, 92, 245, 0.4));
+      transition: filter 0.3s ease;
+      
+      &:hover {
+        filter: drop-shadow(0 0 20px rgba(123, 92, 245, 0.6)) drop-shadow(0 0 30px rgba(245, 213, 71, 0.3));
+      }
     }
   }
   .right {
@@ -493,38 +517,54 @@ export default {
     .func-icon {
       margin-right: 0.4rem;
       font-family: Alimama-DongFangDaKai;
-      color: #ded1bb;
+      color: #f8f4ff;
       text-align: center;
       .lang,
       .login {
-        // margin-right: .4rem;
         border-radius: 10px;
         cursor: pointer;
-        // width: 2rem;
-        background: #140800;
+        background: rgba(123, 92, 245, 0.2);
+        border: 1px solid rgba(123, 92, 245, 0.4);
         height: 0.7rem;
         line-height: 0.7rem;
         padding: 0 0.1rem;
         white-space: nowrap;
+        transition: all 0.3s ease;
+        &:hover {
+          background: rgba(123, 92, 245, 0.4);
+          box-shadow: 0 0 20px rgba(123, 92, 245, 0.4), 0 0 40px rgba(123, 92, 245, 0.2);
+          transform: translateY(-1px);
+        }
       }
       .lang {
         width: 0.7rem;
-        // padding: 0 0.15rem;
         border-radius: 50%;
       }
       .login {
         border-radius: 0.5rem;
         padding: 0 0.3rem;
+        background: linear-gradient(135deg, #7B5CF5 0%, #9D4EDD 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 15px rgba(123, 92, 245, 0.3);
+        &:hover {
+          transform: scale(1.05) translateY(-2px);
+          box-shadow: 0 6px 25px rgba(123, 92, 245, 0.5), 0 0 40px rgba(157, 78, 221, 0.3);
+        }
       }
       .signout {
-        // margin-right: .4rem;
         cursor: pointer;
-        // width: 2rem;
-        background: #140800;
+        background: rgba(224, 86, 160, 0.15);
+        border: 1px solid rgba(224, 86, 160, 0.3);
         border-radius: 10px;
         height: 0.6rem;
         line-height: 0.6rem;
         padding: 0 0.3rem;
+        transition: all 0.3s ease;
+        &:hover {
+          background: rgba(224, 86, 160, 0.3);
+          box-shadow: 0 0 15px rgba(224, 86, 160, 0.3);
+        }
       }
     }
     .chooseModelBox {
@@ -537,51 +577,41 @@ export default {
       line-height: 0.7rem;
       border-radius: 0.2rem;
       font-weight: 400;
+      transition: all 0.3s ease;
     }
     .baseType {
-      background: #c0ffd1;
-      color: #007636;
+      background: linear-gradient(135deg, #4ECDC4 0%, #2EAF7D 100%);
+      color: #ffffff;
       white-space: nowrap;
+      box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
     }
     .plusType {
-      background: linear-gradient(270deg, #fffbf5 0%, #ffe8c4 100%);
-      color: #c37600;
+      background: linear-gradient(135deg, #F5D547 0%, #C9A227 100%);
+      color: #1a0a2e;
       white-space: nowrap;
+      box-shadow: 0 0 15px rgba(245, 213, 71, 0.4);
+      animation: glow-gold 3s infinite;
     }
     .userAccount {
       display: flex;
-      // justify-content: space-around;
       align-items: center;
       padding: 0 0.2rem;
       cursor: default;
+      color: #f8f4ff;
       img {
         width: 0.6rem;
         height: 0.6rem;
         margin-right: 0.2rem;
+        border-radius: 50%;
+        border: 2px solid rgba(123, 92, 245, 0.4);
+        box-shadow: 0 0 10px rgba(123, 92, 245, 0.3);
       }
     }
-    // .user-info{
-    //     display: flex;
-    //     align-items: center;
-    //     .img{
-    //         width: .6rem;
-    //         height: .6rem;
-    //         background: #f39c13;
-    //         margin-right: .15rem;
-    //         border-radius: 100px;
-    //     }
-    //     .text{
-    //         font-size: .256rem;
-    //         color: #FFFFFF;
-    //         cursor: pointer;
-    //     }
-    // }
   }
   &.m {
     height: 1.2rem;
     padding-right: 0.2rem;
     .left {
-      // width: 25%;
       img {
         width: 100%;
         height: 1.2rem;
@@ -597,6 +627,12 @@ export default {
     }
   }
 }
+
+@keyframes glow-gold {
+  0%, 100% { box-shadow: 0 0 15px rgba(245, 213, 71, 0.4); }
+  50% { box-shadow: 0 0 25px rgba(245, 213, 71, 0.7), 0 0 40px rgba(201, 162, 39, 0.3); }
+}
+
 .mb-header {
   display: flex;
   align-items: center;
@@ -604,53 +640,97 @@ export default {
     width: 0.8rem;
     margin-right: 0.5rem;
   }
-  .account {
-    // color: #FFC772;
-    // border-radius: 50%;
-  }
 }
+
 .mb-menu {
   width: 2rem;
   height: 0.7rem;
-  background: linear-gradient(180deg, #ffe2b0 0%, #bf7a00 100%);
+  background: linear-gradient(135deg, #7B5CF5 0%, #9D4EDD 100%);
   border-radius: 0.8rem;
   display: flex;
-  // justify-content: space-between;
   align-items: center;
+  box-shadow: 0 4px 20px rgba(123, 92, 245, 0.4), 0 0 30px rgba(157, 78, 221, 0.2);
+  transition: all 0.3s ease;
+  &:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 6px 30px rgba(123, 92, 245, 0.5), 0 0 40px rgba(157, 78, 221, 0.3);
+  }
   img {
     width: 0.8rem;
     margin-right: 0.2rem;
   }
   .menu {
     font-family: Alimama-DongFangDaKai;
-    color: #000000;
+    color: #ffffff;
   }
 }
 
 :deep(.el-drawer) {
-  background: #29170d !important;
+  background: linear-gradient(180deg, #12122a 0%, #050510 100%) !important;
 }
 
 .sloganBox {
   padding: 0.2rem 0 0;
   text-align: center;
+  position: relative;
+  
+  &::before {
+    content: '✧';
+    position: absolute;
+    left: 20%;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(245, 213, 71, 0.3);
+    font-size: 12px;
+    animation: twinkle 2s infinite;
+  }
+  
+  &::after {
+    content: '✧';
+    position: absolute;
+    right: 20%;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(245, 213, 71, 0.3);
+    font-size: 12px;
+    animation: twinkle 2s infinite 0.5s;
+  }
+  
   .content {
     .zhPart {
       display: flex;
       justify-content: center;
       font-size: 0.45rem;
       align-items: center;
-      color: #fff6f1;
+      color: #f8f4ff;
       .text_zh {
         font-family: Alimama-DongFangDaKai;
+        text-shadow: 0 0 30px rgba(123, 92, 245, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
         span {
-          color: #ffb840;
+          background: linear-gradient(135deg, #F5D547 0%, #C9A227 50%, #F5D547 100%);
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          font-weight: bold;
+          animation: shimmer 3s linear infinite;
         }
       }
     }
     .enPart {
-      color: #9c7d6e;
+      color: rgba(157, 78, 221, 0.6);
+      font-size: 0.24rem;
+      text-shadow: 0 0 10px rgba(157, 78, 221, 0.3);
     }
   }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
 }
 </style>

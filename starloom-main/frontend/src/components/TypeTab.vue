@@ -406,25 +406,31 @@ export default {
     width: 100%;
     display: flex;
     height: .8888rem;
-    background: #443228;
-    box-shadow: 0px 4px 20px -6px rgba(0,0,0,0.15);
-    border-radius: .3rem;;
+    background: linear-gradient(145deg, rgba(18, 18, 42, 0.9) 0%, rgba(5, 5, 16, 0.8) 100%);
+    backdrop-filter: blur(15px);
+    box-shadow: 0px 4px 25px rgba(0,0,0,0.3), inset 0 1px 0 rgba(123, 92, 245, 0.1);
+    border-radius: .3rem;
+    border: 1px solid rgba(123, 92, 245, 0.2);
     .item{
         border-radius: .3rem;
         font-size: .296rem;
         font-family: Alimama-DongFangDaKai;
-        color: #FFFFFF;
+        color: rgba(248, 244, 255, 0.7);
         flex: 1;
         display: flex;
         justify-content: center;
         align-items: center;
         cursor: pointer;
+        transition: all 0.3s ease;
+        &:hover {
+            color: #f8f4ff;
+            background: rgba(123, 92, 245, 0.15);
+        }
         &.active{
-            background: #ffcd55;
-            box-shadow: 0px 4px 20px 0px rgba(0,0,0,0.15);
-            opacity: 1;
-            border-image: linear-gradient(180deg, rgba(220, 180, 84, 1), rgba(254, 254, 158, 1)) 1 1;
-            color: #443228;
+            background: linear-gradient(135deg, #F5D547 0%, #C9A227 100%);
+            box-shadow: 0px 4px 20px rgba(245, 213, 71, 0.3), 0 0 30px rgba(201, 162, 39, 0.2);
+            color: #1a0a2e;
+            font-weight: 600;
         }
     }
 }
@@ -436,16 +442,24 @@ export default {
         border: none;
         width: 100%;
         height: .9rem;                     
-        background: #130A00;
-        box-shadow: 0px 4px 20px -6px rgba(0,0,0,0.15);
-        opacity: 1;
-        border: 1px solid #5E5342;
+        background: linear-gradient(145deg, rgba(5, 5, 16, 0.9) 0%, rgba(18, 18, 42, 0.7) 100%);
+        box-shadow: 0px 4px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(123, 92, 245, 0.05);
+        border: 1px solid rgba(123, 92, 245, 0.2);
         border-radius: .3rem;
         font-size: .296rem;
-        color: #FFFFFF;
+        color: #f8f4ff;
         outline: none;
         box-sizing: border-box;
         padding: 0 .3rem 0 .9rem;
+        transition: all 0.3s ease;
+        &::placeholder {
+            color: rgba(248, 244, 255, 0.35);
+            font-style: italic;
+        }
+        &:focus {
+            border-color: rgba(123, 92, 245, 0.5);
+            box-shadow: 0 0 20px rgba(123, 92, 245, 0.2), inset 0 0 15px rgba(123, 92, 245, 0.05);
+        }
     }
     .search-icon{
         position: absolute;
@@ -454,6 +468,7 @@ export default {
         width: .38rem;
         top: 50%;
         margin-top: -.19rem;
+        opacity: 0.6;
     }
 }
 .coin-list{
@@ -464,19 +479,21 @@ export default {
     padding-bottom: 1rem;
     overflow: hidden;
     overflow-y: auto;
-    background: rgba(0,0,0,0.39);
-    box-shadow: 0px 4px 20px -6px rgba(0,0,0,0.15);
-    border: 1px solid #6B5C44;
+    background: linear-gradient(145deg, rgba(5, 5, 16, 0.85) 0%, rgba(18, 18, 42, 0.7) 100%);
+    backdrop-filter: blur(15px);
+    box-shadow: 0px 4px 25px rgba(0,0,0,0.3), inset 0 1px 0 rgba(123, 92, 245, 0.05);
+    border: 1px solid rgba(123, 92, 245, 0.15);
     &::-webkit-scrollbar {
-        width: 2px; /* 滚动条的宽度 */
-        height: 5px; /* 滚动条的高度 */
+        width: 4px;
+        height: 5px;
     }
     &::-webkit-scrollbar-track {
-        background-color: #888; /* 滚动条轨道的背景颜色 */
+        background-color: rgba(123, 92, 245, 0.1);
+        border-radius: 4px;
     }
     &::-webkit-scrollbar-thumb {
-        background-color: #333333; /* 滚动条拇指的颜色 */
-        border-radius: 2px; /* 拇指的边框半径 */
+        background: linear-gradient(180deg, #7B5CF5 0%, #9D4EDD 100%);
+        border-radius: 4px;
     }
     li{
         margin-top: 0.2rem;
@@ -486,37 +503,36 @@ export default {
         padding: .1rem 0.2rem;
         border-radius: .37rem;
         font-family: Alimama-DongFangDaKai;
-        color: #FFFFFF;
+        color: rgba(248, 244, 255, 0.8);
         height: 1.111rem;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+        &:hover {
+            background: rgba(123, 92, 245, 0.15);
+            border-color: rgba(123, 92, 245, 0.2);
+        }
         &.active{
-          background: linear-gradient(360deg, #D8A01C 0%, #FFE29B 100%);
+          background: linear-gradient(135deg, rgba(245, 213, 71, 0.9) 0%, rgba(201, 162, 39, 0.95) 100%);
           border-radius: 15px;
-          opacity: 1;
-          color: #0A0600;
-          border-image: linear-gradient(180deg, rgba(255, 238, 195, 1), rgba(255, 184, 0, 1)) 1 1;
+          color: #1a0a2e;
+          font-weight: 600;
+          box-shadow: 0 4px 20px rgba(245, 213, 71, 0.3), 0 0 30px rgba(201, 162, 39, 0.2);
+          border-color: rgba(245, 213, 71, 0.5);
         }  
         &:first-child{
             margin-top: 0;
         }    
-        // img{
-        //     width: 1rem;
-        //     height: 1rem;
-        // }
-        // .activeimg{
-        //   width: 0.8rem;
-        //   height: 0.8rem;
-        // }
         .mid{
             flex: 1;
             margin-left: .4rem;
             .coin-name{
                 font-size: .296rem;
-                color: #FFFFFF;
+                color: #f8f4ff;
             }
             .coin-text{
                 margin-top: .12rem;
                 font-size: 12px;
-                color: #a3adb1;
+                color: rgba(248, 244, 255, 0.5);
             }
         }
     }
@@ -535,9 +551,9 @@ export default {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    background: rgba(0,0,0,0.39);
-    opacity: 1;
-    border: 1px solid #6B5C44;
+    background: rgba(26, 26, 62, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(107, 78, 230, 0.3);
     .setting{
         padding-bottom: .3rem;
         display: flex;
@@ -547,15 +563,21 @@ export default {
             height: .37rem;
             cursor: pointer;
             margin-right: .3rem;
+            transition: all 0.3s ease;
+            &:hover {
+                transform: scale(1.1);
+            }
         }
         .check{
             width: .37rem;
             height: .37rem;
             border-radius: 100px;
-            border: 1px solid rgba(255,255,255,.5);
+            border: 1px solid rgba(107, 78, 230, 0.5);
             margin-right: .2rem;
+            transition: all 0.3s ease;
             &.select{
-                border: 1px solid #ffffff;
+                border: 1px solid #6B4EE6;
+                background: linear-gradient(135deg, #6B4EE6 0%, #9D4EDD 100%);
                 color: #ffffff;
                 font-size: 12px;
                 text-align: center;
@@ -568,15 +590,16 @@ export default {
         overflow: hidden;
         overflow-y: auto;
         &::-webkit-scrollbar {
-            width: 2px; /* 滚动条的宽度 */
-            height: 5px; /* 滚动条的高度 */
+            width: 4px;
+            height: 5px;
         }
         &::-webkit-scrollbar-track {
-            background-color: #888; /* 滚动条轨道的背景颜色 */
+            background-color: rgba(107, 78, 230, 0.1);
+            border-radius: 2px;
         }
         &::-webkit-scrollbar-thumb {
-            background-color: #333333; /* 滚动条拇指的颜色 */
-            border-radius: 2px; /* 拇指的边框半径 */
+            background: linear-gradient(135deg, #6B4EE6 0%, #9D4EDD 100%);
+            border-radius: 2px;
         }
     }
     li{
@@ -589,18 +612,22 @@ export default {
         position: relative;
         font-size: .256rem;
         font-family: Inter-Medium, Inter;
-        color: #FFFFFF;
+        color: #ded1bb;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
         &:hover,&.active{
-            background: rgba(63,63,63,0.5);
+            background: rgba(107, 78, 230, 0.2);
+            border-color: rgba(107, 78, 230, 0.3);
         }
         .check{
             width: .37rem;
             height: .37rem;
             border-radius: 100px;
-            border: 1px solid rgba(255,255,255,.5);
+            border: 1px solid rgba(107, 78, 230, 0.5);
             margin-right: .2rem;
             &.select{
-                border: 1px solid #ffffff;
+                border: 1px solid #6B4EE6;
+                background: linear-gradient(135deg, #6B4EE6 0%, #9D4EDD 100%);
                 color: #ffffff;
                 font-size: 12px;
                 text-align: center;
@@ -624,14 +651,42 @@ export default {
     justify-content: center;
     align-items: center;
     font-size: .296rem;
-    color: #CEBA98;
+    color: #f8f4ff;
     border-radius: .3rem;
-    background: rgba(0,0,0,0.25);
-    box-shadow: 0px 4px 20px -6px rgba(0,0,0,0.15);
-    opacity: 1;
-    border: 1px solid #6B5C44;
+    background: linear-gradient(145deg, rgba(123, 92, 245, 0.25) 0%, rgba(157, 78, 221, 0.2) 100%);
+    box-shadow: 0px 4px 20px rgba(0,0,0,0.2);
+    border: 1px solid rgba(123, 92, 245, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '✦';
+      position: absolute;
+      left: 20%;
+      opacity: 0;
+      transition: opacity 0.3s;
+      color: rgba(245, 213, 71, 0.6);
+    }
+    
+    &::after {
+      content: '✦';
+      position: absolute;
+      right: 20%;
+      opacity: 0;
+      transition: opacity 0.3s;
+      color: rgba(245, 213, 71, 0.6);
+    }
+    
     &:hover{
-      box-shadow: 0 2px 12px 0 rgba(255,255,255,.1);
+      background: linear-gradient(145deg, rgba(123, 92, 245, 0.4) 0%, rgba(157, 78, 221, 0.3) 100%);
+      box-shadow: 0 4px 25px rgba(123, 92, 245, 0.3), 0 0 40px rgba(157, 78, 221, 0.15);
+      border-color: rgba(123, 92, 245, 0.5);
+      transform: translateY(-2px);
+      
+      &::before, &::after {
+        opacity: 1;
+      }
     }
 }
 </style>
