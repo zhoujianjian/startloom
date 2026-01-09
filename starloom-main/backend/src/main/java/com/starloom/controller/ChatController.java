@@ -3,7 +3,7 @@ package com.starloom.controller;
 import com.starloom.common.Result;
 import com.starloom.entity.ChatGroup;
 import com.starloom.service.ChatService;
-import com.starloom.service.OpenAiService;
+import com.starloom.service.LlmStreamService;
 import com.starloom.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,9 +13,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @RestController
@@ -23,7 +23,7 @@ import java.util.Map;
 public class ChatController {
 
     private final ChatService chatService;
-    private final OpenAiService openAiService;
+    private final LlmStreamService llmStreamService;
     private final JwtUtil jwtUtil;
 
     @GetMapping("/api/chat/getMsgGroupList")
@@ -55,61 +55,50 @@ public class ChatController {
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Cache-Control", "no-cache");
         response.setHeader("Connection", "keep-alive");
+        response.setHeader("X-Accel-Buffering", "no");  // 禁用 nginx 缓冲
         
         PrintWriter writer = response.getWriter();
         
-        // 从 messages 数组中提取用户消息
         String message = extractMessage(params);
         if (message == null || message.trim().isEmpty()) {
-            sendSSEMessage(writer, "消息内容不能为空", true, String.valueOf(System.currentTimeMillis()));
-            sendSSEDone(writer);
+            sendError(writer, "消息内容不能为空");
             return;
         }
         
         String module = (String) params.getOrDefault("module", "general");
         String msggroup = params.get("msggroup") != null ? params.get("msggroup").toString() : null;
-
         String systemPrompt = getSystemPrompt(module);
-        String responseContent = openAiService.chat(systemPrompt, message);
-
-        // 生成消息ID
         String msgId = String.valueOf(System.currentTimeMillis());
         
-        // 模拟流式输出
-        boolean isFirst = true;
-        for (int i = 0; i < responseContent.length(); i += 5) {
-            int end = Math.min(i + 5, responseContent.length());
-            String chunk = responseContent.substring(i, end);
-            sendSSEMessage(writer, chunk, isFirst, msgId);
-            isFirst = false;
-            writer.flush();
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-
-        // 发送结束标记
-        sendSSEDone(writer);
-        writer.flush();
-        writer.close();
-
-        // 保存聊天记录
-        if (token != null && jwtUtil.validateToken(token)) {
-            try {
-                Long userId = jwtUtil.getUserId(token);
-                Long groupId = msggroup != null ? Long.valueOf(msggroup) : null;
-                if (groupId == null) {
-                    ChatGroup group = chatService.createGroup(userId, message.substring(0, Math.min(20, message.length())), module);
-                    groupId = group.getId();
+        // 用于保存完整响应
+        AtomicReference<String> fullResponse = new AtomicReference<>("");
+        final String finalMessage = message;
+        final String finalMsggroup = msggroup;
+        final String finalModule = module;
+        
+        // 真正的流式输出
+        llmStreamService.chatStream(systemPrompt, message, writer, msgId, (responseContent) -> {
+            fullResponse.set(responseContent);
+            
+            // 流式完成后保存聊天记录
+            if (token != null && jwtUtil.validateToken(token)) {
+                try {
+                    Long userId = jwtUtil.getUserId(token);
+                    Long groupId = finalMsggroup != null ? Long.valueOf(finalMsggroup) : null;
+                    if (groupId == null) {
+                        ChatGroup group = chatService.createGroup(userId, 
+                                finalMessage.substring(0, Math.min(20, finalMessage.length())), finalModule);
+                        groupId = group.getId();
+                    }
+                    chatService.saveMessage(groupId, userId, "user", finalMessage);
+                    chatService.saveMessage(groupId, userId, "assistant", responseContent);
+                } catch (Exception e) {
+                    log.error("保存聊天记录失败", e);
                 }
-                chatService.saveMessage(groupId, userId, "user", message);
-                chatService.saveMessage(groupId, userId, "assistant", responseContent);
-            } catch (Exception e) {
-                log.error("保存聊天记录失败", e);
             }
-        }
+        });
+        
+        writer.close();
     }
 
     @PostMapping(value = "/v1/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -124,7 +113,6 @@ public class ChatController {
         if (messagesObj instanceof List) {
             List<?> messages = (List<?>) messagesObj;
             String lastUserMessage = null;
-            // 遍历所有消息，取最后一个用户消息（即最新的问题）
             for (Object msg : messages) {
                 if (msg instanceof Map) {
                     Map<?, ?> msgMap = (Map<?, ?>) msg;
@@ -137,7 +125,6 @@ public class ChatController {
                 return lastUserMessage;
             }
         }
-        // 兼容其他参数名
         if (params.get("message") != null) {
             return (String) params.get("message");
         }
@@ -147,25 +134,13 @@ public class ChatController {
         return null;
     }
 
-    private void sendSSEMessage(PrintWriter writer, String content, boolean isFirst, String msgId) {
-        // 构建前端期望的JSON格式，type 用 gpt 才能流式显示
+    private void sendError(PrintWriter writer, String error) {
+        String msgId = String.valueOf(System.currentTimeMillis());
         String json = String.format("{\"type\":\"gpt\",\"content\":\"%s\",\"modelType\":\"f\",\"msg_answer_id\":\"%s\",\"islike\":false}", 
-                escapeJson(content), msgId);
+                error, msgId);
         writer.write("data: " + json + "\n\n");
-    }
-
-    private void sendSSEDone(PrintWriter writer) {
-        // 发送JSON格式的DONE信号，与前端obj.type == '[DONE]'匹配
         writer.write("data: {\"type\":\"[DONE]\"}\n\n");
-    }
-    
-    private String escapeJson(String text) {
-        if (text == null) return "";
-        return text.replace("\\", "\\\\")
-                   .replace("\"", "\\\"")
-                   .replace("\n", "\\n")
-                   .replace("\r", "\\r")
-                   .replace("\t", "\\t");
+        writer.flush();
     }
 
     private String getSystemPrompt(String type) {

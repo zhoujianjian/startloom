@@ -2,40 +2,18 @@ server:
   port: 8080
 
 spring:
+  profiles:
+    active: dev
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
-  datasource:
-    url: jdbc:mysql://192.168.110.58:3307/starloom?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: DP123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  mail:
-    host: smtp.qq.com
-    port: 587
-    username: your-email@qq.com
-    password: your-smtp-password
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
 
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
   configuration:
     map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 # JWT配置
 jwt:
   secret: starloom-ai-secret-key-2024-very-long-secret-key-for-jwt-token
   expiration: 604800000  # 7天
-
-# DeepSeek配置
-openai:
-  api-key: sk-ea6d2510726144df9754c1155cd2433d
-  api-url: https://api.deepseek.com/v1/chat/completions
-  model: deepseek-chat

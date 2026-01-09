@@ -1,0 +1,85 @@
+spring:
+  datasource:
+    url: jdbc:mysql://192.168.110.58:3307/starloom?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: DP123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: mr_zhouzhou@163.com
+    password: Zj7178266123
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# LLM 多厂商配置
+llm:
+  # 默认使用的提供商
+  default-provider: dashscope
+  # 启用负载均衡 (轮询多个提供商)
+  load-balance: false
+  # 失败时自动切换到备用提供商
+  fallback-enabled: true
+  
+  providers:
+    # 阿里云 DashScope (通义千问官方API) - 推荐，稳定快速
+    dashscope:
+      enabled: true
+      url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
+      api-key: YOUR_DASHSCOPE_API_KEY
+      model: qwen-plus
+      timeout: 60
+      priority: 1
+    
+    # ModelScope (需要 SDK Token)
+    modelscope:
+      enabled: false
+      url: https://api-inference.modelscope.cn/v1/chat/completions
+      api-key: 4005f439-8ddc-4e26-8876-51f6281e99af
+      model: Qwen/Qwen2.5-72B-Instruct
+      timeout: 60
+      priority: 2
+    
+    # DeepSeek
+    deepseek:
+      enabled: true
+      url: https://api.deepseek.com/v1/chat/completions
+      api-key: sk-ea6d2510726144df9754c1155cd2433d
+      model: deepseek-chat
+      timeout: 120
+      priority: 3
+    
+    # 智谱 GLM (国产，速度快)
+    zhipu:
+      enabled: false
+      url: https://open.bigmodel.cn/api/paas/v4/chat/completions
+      api-key: YOUR_ZHIPU_API_KEY
+      model: glm-4-flash
+      timeout: 60
+      priority: 4
+    
+    # 月之暗面 Kimi
+    moonshot:
+      enabled: false
+      url: https://api.moonshot.cn/v1/chat/completions
+      api-key: YOUR_MOONSHOT_API_KEY
+      model: moonshot-v1-8k
+      timeout: 60
+      priority: 5
+    
+    # OpenAI GPT (需要代理)
+    gpt:
+      enabled: false
+      url: https://api.openai.com/v1/chat/completions
+      api-key: sk-dPdIN0I5Tor1ezj5uqukHtf2kP8hYDwSJJ5_9ikXE6T3BlbkFJJiEDyehM9kBfBDPhoAVAu_3v9Yz2RnLTP-MlL2PnQA
+      model: gpt-4.1
+      timeout: 60
+      priority: 6
