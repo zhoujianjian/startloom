@@ -1739,8 +1739,9 @@ export default {
               // 第一次返回： text|tem
             // 如果 是tem ，第二次返回整个json字符串；如果是text，第二次，到第N次按照流输出一个字一个字的，遇到[DONE]结束
               console.log('1111,',event.data)
+              // 跳过纯[DONE]字符串（兼容旧格式）
               if(event.data === '[DONE]') {
-                eventSource.close()
+                console.info('收到纯[DONE]信号，跳过')
                 return
               }
               const obj = JSON.parse(event.data)
@@ -1749,7 +1750,7 @@ export default {
                   role: 'assistant',
                   // content:result.data.data,
                   showtype: obj.type,
-                  submodel: obj.modelType,  //a-1
+                  submodel: isSubmodule ? submodel_current : navQueryType.value.module,  // 使用正确的submodel，与用户消息保持一致
                   msggroup:time.value,
                   msgId: obj.msg_answer_id,
                   islike: obj.islike,
@@ -1889,7 +1890,7 @@ export default {
                         role: 'assistant',
                         // content:result.data.data,
                         showtype: 'dateTime',
-                        submodel: obj.modelType,  //a-1
+                        submodel: isSubmodule ? submodel_current : navQueryType.value.module,  // 使用正确的submodel
                         msggroup:time.value,
                         msgId: obj.msg_answer_id,
                         islike: obj.islike,
@@ -2110,7 +2111,7 @@ export default {
                   role: 'assistant',
                   // content:result.data.data,
                   showtype: obj.type,
-                  submodel: obj.modelType,  //a-1
+                  submodel: isSubmodule ? submodel_current : navQueryType.value.module,  // 使用正确的submodel
                   msggroup:time.value,
                   msgId: obj.msg_answer_id,
                   islike: obj.islike,
@@ -2204,7 +2205,7 @@ export default {
                         role: 'assistant',
                         // content:result.data.data,
                         showtype: 'dateTime',
-                        submodel: obj.modelType,
+                        submodel: isSubmodule ? submodel_current : navQueryType.value.module,  // 使用正确的submodel
                         msggroup:time.value,
                         msgId: obj.msg_answer_id,
                         islike: obj.islike,
@@ -2344,7 +2345,7 @@ export default {
                   role: 'assistant',
                   // content:result.data.data,
                   showtype: obj.type,
-                  submodel: obj.modelType,  //a-1
+                  submodel: isSubmodule ? submodel_current : navQueryType.value.module,  // 使用正确的submodel
                   msggroup:time.value,
                   msgId: obj.msg_answer_id,
                   islike: obj.islike,
@@ -3705,7 +3706,7 @@ export default {
           content: text,
           copyText: text,
           showtype: obj.type,
-          submodel: obj.modelType,  //a-7
+          submodel: self.navQueryType.module,  // Use current module for filtering
           msggroup: obj.msggroup,
       }
       if(self.navQueryType.module == 'a'){

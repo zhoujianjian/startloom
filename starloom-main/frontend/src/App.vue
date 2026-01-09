@@ -370,6 +370,10 @@ export default {
     .chatBg{
       width: 100%;
       height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
     }
     .right{
       overflow: hidden;
@@ -379,11 +383,13 @@ export default {
       height: 100%;
       position: absolute;
       top: 0px;
+      z-index: 1;
     }
     .router-content{
       flex: 1;
       overflow: hidden;
-     position: relative;
+      position: relative;
+      height: 100%;
     }
   }
 }

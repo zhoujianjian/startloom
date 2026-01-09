@@ -16,6 +16,8 @@
             </div>
         </div>
       <template v-for="(item,index) in chatList" :key="index">
+          <!-- 调试信息 -->
+          <!-- {{ console.log('Rendering item:', item) }} -->
           <!-- 文字对话 -->
           <!-- v-if="item.type  == 'text' || item.role == 'user'" -->
           <template  v-if="(item.showtype  == 'text' || item.showtype  == 'gpt' || item.type  == 'text' || item.role == 'user') && !item.islike">
@@ -545,7 +547,7 @@
             // 如果 是tem ，第二次返回整个json字符串；如果是text，第二次，到第N次按照流输出一个字一个字的，遇到[DONE]结束
               console.log('1111,',event.data)
               if(event.data === '[DONE]') {
-                eventSource.close()
+                console.info('收到纯[DONE]信号，跳过')
                 return
               }
               const obj = JSON.parse(event.data)
@@ -828,7 +830,7 @@
             eventSource.onmessage = function(event) {
               console.log('1111,',event.data)
               if(event.data === '[DONE]') {
-                eventSource.close()
+                console.info('收到纯[DONE]信号，跳过')
                 return
               }
               const obj = JSON.parse(event.data)
@@ -953,7 +955,7 @@
 
       //新旧对话框 判断并获取记录
       const getChatHistory = async(id) =>{
-      
+          console.log('getChatHistory called with id:', id)
           chatList.value = []
 
         if(route.query.type == 'newChat'){
@@ -992,7 +994,10 @@
             chatList.value = list
             return
         }
-        if(!localStorage.getItem('starloomAI-token')) return
+        if(!localStorage.getItem('starloomAI-token')) {
+          console.log('No token found, skipping chat history fetch')
+          return
+        }
           const res = await getMessageList({
               msggroup: id
           })
@@ -1458,7 +1463,7 @@
           // 如果 是tem ，第二次返回整个json字符串；如果是text，第二次，到第N次按照流输出一个字一个字的，遇到[DONE]结束
             console.log('1111,',event.data)
             if(event.data === '[DONE]') {
-              eventSource.close()
+              console.info('收到纯[DONE]信号，跳过')
               return
             }
             // if(n==2) return

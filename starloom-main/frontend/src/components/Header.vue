@@ -25,94 +25,6 @@
         <div class="func-icon" v-if="loginStatus==false" @click="showLoginHandle">
           <div class="login">{{ $t('logInAndRegister') }}</div>
         </div>
-        <!-- v-if="loginStatus" -->
-        <div class="chooseModelBox">
-          <el-popover v-model:visible="userPopover" placement="bottom-end" trigger="click" :show-arrow="false" popper-class="user-popover">
-            <template #reference>
-              <!-- <img class="userimg" src="/@/assets/images/user.png" alt=""> -->
-              <div v-if="userModel=='3.5'" class="typeTab baseType">{{ $t('basic') }}</div>
-              <div v-if="userModel=='4'" class="typeTab plusType">{{ $t('plus') }}</div>
-            </template>
-            <template #default>
-              <div v-if="loginStatus && screenWidth<=900" class="account">
-                <div class="userPicture"></div> {{ account }}
-              </div>
-              <div class="chooseModel">
-                <div class="plusBox" :class="userModel=='4'?'acivePlus':''">
-                  <div class="part1">
-                    <img v-if="userModel=='4'" src="/@/assets/images/headerChoose_black.svg" alt="" srcset="">
-                    <img v-else src="/@/assets/images/headerChoose_grey.svg" alt="" srcset="">
-                    <div class="xianmian">{{ $t('limitedTimeFree') }}</div>
-                    {{ $t('basic') }}
-                  </div>
-                </div>
-                <!-- <div class="baseBox" @click="changeMosel('3.5')" :class="userModel=='3.5'?'aciveBase':''">
-                          <div class="part1">
-                            <img v-if="userModel=='3.5'" src="/@/assets/images/headerChoose_black.svg" alt="" srcset="">
-                            <img v-else src="/@/assets/images/headerChoose_grey.svg" alt="" srcset="">
-                            <div class="timefree">{{ $t('limitedTimeFree') }}</div>
-                            {{ $t('basic') }}
-                          </div>
-                        </div> -->
-                <!-- <div class="plusBox" @click="changeMosel('4')" :class="userModel=='4'?'acivePlus':''">
-                          <div class="part1">
-                            <img v-if="userModel=='4'" src="/@/assets/images/headerChoose_black.svg" alt="" srcset="">
-                            <img v-else  src="/@/assets/images/headerChoose_grey.svg" alt="" srcset="">
-                            {{ $t('plus') }}
-                          </div>
-                          <template v-if="accountInfo.user_account">
-                            <div class="timestime" v-if=" accountInfo.user_account.terminable_time ">
-                              <div class="times"><div class="allcishu"><span class="fontbold">{{ accountInfo.user_account?.terminable_time }}</span>
-                                <el-tooltip
-                                    class="box-item"
-                                    effect="dark"
-                                    :content="$t('PLUS2timesGiven')"
-                                    placement="top-start"
-                                    v-if="accountInfo.user_account.terminable_time && accountInfo.allowance_num"
-                                  >
-                                    <div class="add2">+{{ accountInfo.allowance_num }}</div>
-                                  </el-tooltip> 
-                                </div>
-                                 /{{ accountInfo.user_account.terminable_time_history_total }}</div>
-                              <div class="time"> {{ $t('expired') }}：{{ accountInfo.user_account.due_date.split(" ")[0] }}</div>
-                            </div>
-                            <div class="timestime" v-if="accountInfo.user_account.un_terminable_time"  >
-                              <div class="times"><div class="allcishu"><span class="fontbold">{{ accountInfo.user_account.un_terminable_time }} </span>
-                                  <el-tooltip
-                                    class="box-item"
-                                    effect="dark"
-                                    :content="$t('PLUS2timesGiven')"
-                                    placement="top-start"
-                                    v-if="!accountInfo.user_account.terminable_time && accountInfo.allowance_num"
-                                  >
-                                    <div class="add2">+{{ accountInfo.allowance_num }}</div>
-                                  </el-tooltip> 
-                                </div>
-                                /{{ accountInfo.user_account.un_terminable_time_history_total }}</div>
-                              <div class="time">{{ $t('unlimited') }}</div>
-                            </div>
-                          </template>
-                          
-                          <div class="timestime" v-if="!accountInfo.user_account?.terminable_time && !accountInfo.user_account?.un_terminable_time ">
-                            <el-tooltip
-                              class="box-item"
-                              effect="dark"
-                              :content="$t('PLUS2timesFree')"
-                              placement="top-start"
-                            >
-                              <div v-if="!loginStatus" class="xianmian">{{ $t('limited2Free') }}</div>
-                              <div v-else class="xianmian">{{ $t('limitedNFree',{num: accountInfo.allowance_num}) }}</div>
-                            </el-tooltip>
-                           
-                            <div class="time">{{ $t('expired') }}：{{ expirationTime }}</div>
-                          </div>
-                          <div v-if="userModel=='4'"  class="bottomBtn" @click="goSubscribe">{{ accountInfo?.user_account?  $t('renewal'): $t('subscribe') }}</div>
-                        </div> -->
-                <div class="signout-mb" v-if="loginStatus && screenWidth<=900" @click="logout">{{ $t('logout') }}</div>
-              </div>
-            </template>
-          </el-popover>
-        </div>
         <template v-if="screenWidth>900">
           <div class="userAccount" v-if="loginStatus">
             <img src="/@/assets/images/user.png" alt="">
@@ -570,28 +482,7 @@ export default {
     .chooseModelBox {
       cursor: pointer;
     }
-    .typeTab {
-      font-size: 0.32rem;
-      padding: 0 0.2rem;
-      margin-right: 0.3rem;
-      line-height: 0.7rem;
-      border-radius: 0.2rem;
-      font-weight: 400;
-      transition: all 0.3s ease;
-    }
-    .baseType {
-      background: linear-gradient(135deg, #4ECDC4 0%, #2EAF7D 100%);
-      color: #ffffff;
-      white-space: nowrap;
-      box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
-    }
-    .plusType {
-      background: linear-gradient(135deg, #F5D547 0%, #C9A227 100%);
-      color: #1a0a2e;
-      white-space: nowrap;
-      box-shadow: 0 0 15px rgba(245, 213, 71, 0.4);
-      animation: glow-gold 3s infinite;
-    }
+
     .userAccount {
       display: flex;
       align-items: center;

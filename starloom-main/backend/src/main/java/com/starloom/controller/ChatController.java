@@ -150,7 +150,8 @@ public class ChatController {
     }
 
     private void sendSSEDone(PrintWriter writer) {
-        writer.write("data: [DONE]\n\n");
+        // 发送JSON格式的DONE信号，与前端obj.type == '[DONE]'匹配
+        writer.write("data: {\"type\":\"[DONE]\"}\n\n");
     }
     
     private String escapeJson(String text) {
