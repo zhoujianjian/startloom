@@ -123,13 +123,18 @@ public class ChatController {
         Object messagesObj = params.get("messages");
         if (messagesObj instanceof List) {
             List<?> messages = (List<?>) messagesObj;
+            String lastUserMessage = null;
+            // 遍历所有消息，取最后一个用户消息（即最新的问题）
             for (Object msg : messages) {
                 if (msg instanceof Map) {
                     Map<?, ?> msgMap = (Map<?, ?>) msg;
                     if ("user".equals(msgMap.get("type"))) {
-                        return (String) msgMap.get("content");
+                        lastUserMessage = (String) msgMap.get("content");
                     }
                 }
+            }
+            if (lastUserMessage != null) {
+                return lastUserMessage;
             }
         }
         // 兼容其他参数名
