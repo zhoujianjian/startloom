@@ -39,8 +39,20 @@ CREATE TABLE IF NOT EXISTS t_chat_message (
     user_id BIGINT NOT NULL COMMENT '用户ID',
     role VARCHAR(20) NOT NULL COMMENT '角色(user/assistant)',
     content TEXT COMMENT '内容',
+    type VARCHAR(20) DEFAULT 'gpt' COMMENT '消息类型(user/text/gpt/tem)',
+    sub_module VARCHAR(20) COMMENT '子模块类型(如a-5,k-1)',
+    base64_type INT DEFAULT 0 COMMENT '内容类型(0-文本,1-图片,2-语音)',
+    base64_content MEDIUMTEXT COMMENT 'base64内容',
+    gen_by_gpt TEXT COMMENT '语音转文字内容',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     deleted INT DEFAULT 0 COMMENT '是否删除',
     KEY idx_group_id (group_id),
     KEY idx_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='聊天消息表';
+
+-- 如果表已存在，添加新字段
+ALTER TABLE t_chat_message ADD COLUMN IF NOT EXISTS type VARCHAR(20) DEFAULT 'gpt' COMMENT '消息类型';
+ALTER TABLE t_chat_message ADD COLUMN IF NOT EXISTS sub_module VARCHAR(20) COMMENT '子模块类型';
+ALTER TABLE t_chat_message ADD COLUMN IF NOT EXISTS base64_type INT DEFAULT 0 COMMENT '内容类型';
+ALTER TABLE t_chat_message ADD COLUMN IF NOT EXISTS base64_content MEDIUMTEXT COMMENT 'base64内容';
+ALTER TABLE t_chat_message ADD COLUMN IF NOT EXISTS gen_by_gpt TEXT COMMENT '语音转文字内容';

@@ -34,17 +34,29 @@ public class ChatController {
 
     @GetMapping("/api/chat/getMessageList")
     public Result<?> getMessageList(@RequestHeader("Authorization") String token,
-                                    @RequestParam Long groupId) {
+                                    @RequestParam(required = false) Long groupId,
+                                    @RequestParam(required = false) String msggroup) {
         Long userId = jwtUtil.getUserId(token);
-        return chatService.getMessageList(groupId, userId);
+        // 兼容两种参数名
+        Long gid = groupId != null ? groupId : (msggroup != null ? Long.valueOf(msggroup) : null);
+        if (gid == null) {
+            return Result.error("groupId 不能为空");
+        }
+        return chatService.getMessageList(gid, userId);
     }
 
     @PostMapping("/api/chat/delMsgGroupList")
     public Result<?> delMsgGroupList(@RequestHeader("Authorization") String token,
-                                     @RequestBody Map<String, Long> params) {
+                                     @RequestBody Map<String, Object> params) {
         Long userId = jwtUtil.getUserId(token);
-        Long groupId = params.get("groupId");
-        return chatService.delMsgGroupList(groupId, userId);
+        // 前端传的是 msggroup 数组
+        Object msggroupObj = params.get("msggroup");
+        if (msggroupObj instanceof List) {
+            @SuppressWarnings("unchecked")
+            List<String> msggroups = (List<String>) msggroupObj;
+            return chatService.delMsgGroupList(msggroups, userId);
+        }
+        return Result.error("参数错误");
     }
 
     @PostMapping(value = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -55,7 +67,7 @@ public class ChatController {
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Cache-Control", "no-cache");
         response.setHeader("Connection", "keep-alive");
-        response.setHeader("X-Accel-Buffering", "no");  // 禁用 nginx 缓冲
+        response.setHeader("X-Accel-Buffering", "no");
         
         PrintWriter writer = response.getWriter();
         
@@ -65,33 +77,33 @@ public class ChatController {
             return;
         }
         
-        String module = (String) params.getOrDefault("module", "general");
+        String module = (String) params.getOrDefault("module", "0");
         String msggroup = params.get("msggroup") != null ? params.get("msggroup").toString() : null;
         String systemPrompt = getSystemPrompt(module);
         String msgId = String.valueOf(System.currentTimeMillis());
         
-        // 用于保存完整响应
         AtomicReference<String> fullResponse = new AtomicReference<>("");
         final String finalMessage = message;
         final String finalMsggroup = msggroup;
         final String finalModule = module;
         
-        // 真正的流式输出
         llmStreamService.chatStream(systemPrompt, message, writer, msgId, (responseContent) -> {
             fullResponse.set(responseContent);
             
-            // 流式完成后保存聊天记录
+            // 保存聊天记录
             if (token != null && jwtUtil.validateToken(token)) {
                 try {
                     Long userId = jwtUtil.getUserId(token);
-                    Long groupId = finalMsggroup != null ? Long.valueOf(finalMsggroup) : null;
-                    if (groupId == null) {
-                        ChatGroup group = chatService.createGroup(userId, 
-                                finalMessage.substring(0, Math.min(20, finalMessage.length())), finalModule);
-                        groupId = group.getId();
-                    }
-                    chatService.saveMessage(groupId, userId, "user", finalMessage);
-                    chatService.saveMessage(groupId, userId, "assistant", responseContent);
+                    // 获取或创建聊天组
+                    ChatGroup group = chatService.getOrCreateGroup(userId, finalMsggroup, 
+                            finalMessage.substring(0, Math.min(20, finalMessage.length())), finalModule);
+                    Long groupId = group.getId();
+                    
+                    // 保存用户消息和AI回复
+                    chatService.saveMessage(groupId, userId, "user", finalMessage, "user", null, 0);
+                    chatService.saveMessage(groupId, userId, "assistant", responseContent, "gpt", null, 0);
+                    
+                    log.info("聊天记录已保存, groupId: {}, userId: {}", groupId, userId);
                 } catch (Exception e) {
                     log.error("保存聊天记录失败", e);
                 }
