@@ -208,7 +208,7 @@
             </div>
             <div class="form-group"><label>出生地址</label><input v-model="paipanForm.birthPlace" placeholder="省/市" /></div>
           </div>
-          <button class="submit-btn paipan-btn" @click="handlePaipan" :disabled="paipanLoading">{{ paipanLoading ? '排盘中...' : '开始排盘' }}</button>
+          <button type="button" class="submit-btn paipan-btn" @click="handlePaipan" :disabled="paipanLoading">{{ paipanLoading ? '排盘中...' : '开始排盘' }}</button>
         </div>
         <div class="paipan-result" v-if="paipanResult">
           <h3>排盘结果</h3>
@@ -276,7 +276,7 @@
               </div>
             </div>
           </div>
-          <button class="submit-btn" @click="handleHepan" :disabled="hepanLoading">{{ hepanLoading ? '合盘中...' : '开始合盘' }}</button>
+          <button type="button" class="submit-btn" @click="handleHepan" :disabled="hepanLoading">{{ hepanLoading ? '合盘中...' : '开始合盘' }}</button>
         </div>
         <div class="hepan-result" v-if="hepanResult">
           <h3>合盘结果</h3>
@@ -521,12 +521,17 @@ const hepanForm = reactive({ maleName: '', maleYear: '', maleMonth: '', maleDay:
 
 // 年份选项 (1920-当前年份)
 const currentYear = new Date().getFullYear()
-const yearOptions = Array.from({ length: currentYear - 1920 + 1 }, (_, i) => currentYear - i)
+const yearOptions = []
+for (let y = currentYear; y >= 1920; y--) {
+  yearOptions.push(y)
+}
 
 // 计算每月天数
 const daysInMonth = (year, month) => {
   if (!year || !month) return 31
-  return new Date(year, month, 0).getDate()
+  const y = parseInt(year)
+  const m = parseInt(month)
+  return new Date(y, m, 0).getDate()
 }
 
 const hourOptions = [
@@ -655,13 +660,19 @@ const handlePaipan = async () => {
   paipanLoading.value = true
   paipanResult.value = ''
   const birthDate = `${paipanForm.birthYear}年${paipanForm.birthMonth}月${paipanForm.birthDay}日`
-  const prompt = `请为以下信息进行八字排盘分析：姓名：${paipanForm.name}，性别：${paipanForm.gender}，历法：${paipanForm.calendar}，出生日期：${birthDate}，出生时辰：${paipanForm.birthHour}，出生地点：${paipanForm.birthPlace || '未知'}。请详细分析四柱八字、五行分析、十神分析、格局判断、大运流年、综合建议。`
   try {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
-    const response = await fetch(`${baseUrl}/chat`, {
+    const response = await fetch(`${baseUrl}/xingzuo/stream/paipan`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('starloomAI-token') || '' },
-      body: JSON.stringify({ message: prompt, stream: true })
+      body: JSON.stringify({ 
+        name: paipanForm.name, 
+        gender: paipanForm.gender, 
+        calendar: paipanForm.calendar, 
+        birthDate: birthDate, 
+        birthHour: paipanForm.birthHour, 
+        birthPlace: paipanForm.birthPlace || '未知' 
+      })
     })
     await handleStreamResponse(response, (content) => { paipanResult.value = content })
   } catch (e) { ElMessage.error('排盘失败，请重试') }
@@ -676,13 +687,19 @@ const handleHepan = async () => {
   hepanResult.value = ''
   const maleBirthDate = `${hepanForm.maleYear}年${hepanForm.maleMonth}月${hepanForm.maleDay}日`
   const femaleBirthDate = `${hepanForm.femaleYear}年${hepanForm.femaleMonth}月${hepanForm.femaleDay}日`
-  const prompt = `请进行八字合盘分析：男方：${hepanForm.maleName}，出生日期：${maleBirthDate}，时辰：${hepanForm.maleBirthHour}。女方：${hepanForm.femaleName}，出生日期：${femaleBirthDate}，时辰：${hepanForm.femaleBirthHour}。请分析双方八字、五行互补、日柱配对、婚姻宫分析、综合评分与建议。`
   try {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
-    const response = await fetch(`${baseUrl}/chat`, {
+    const response = await fetch(`${baseUrl}/xingzuo/stream/hepan`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('starloomAI-token') || '' },
-      body: JSON.stringify({ message: prompt, stream: true })
+      body: JSON.stringify({ 
+        maleName: hepanForm.maleName, 
+        maleBirthDate: maleBirthDate, 
+        maleBirthHour: hepanForm.maleBirthHour,
+        femaleName: hepanForm.femaleName, 
+        femaleBirthDate: femaleBirthDate, 
+        femaleBirthHour: hepanForm.femaleBirthHour 
+      })
     })
     await handleStreamResponse(response, (content) => { hepanResult.value = content })
   } catch (e) { ElMessage.error('合盘失败，请重试') }
@@ -846,25 +863,56 @@ const queryBirthday = async (type) => {
 }
 
 const handleStreamResponse = async (response, onUpdate) => {
+  // 检查是否支持 ReadableStream
+  if (!response.body || typeof response.body.getReader !== 'function') {
+    // 降级处理：直接读取完整响应
+    try {
+      const text = await response.text()
+      const lines = text.split('\n')
+      let fullContent = ''
+      for (const line of lines) {
+        if (line.startsWith('data:')) {
+          const data = line.slice(5).trim()
+          if (data && !data.includes('[DONE]')) {
+            try {
+              const json = JSON.parse(data)
+              if (json.content) { fullContent += json.content }
+            } catch { /* ignore */ }
+          }
+        }
+      }
+      onUpdate(fullContent)
+      return
+    } catch (e) {
+      console.error('Stream fallback error:', e)
+      return
+    }
+  }
+  
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
   let fullContent = ''
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) break
-    const text = decoder.decode(value)
-    const lines = text.split('\n')
-    for (const line of lines) {
-      if (line.startsWith('data:')) {
-        const data = line.slice(5).trim()
-        if (data && !data.includes('[DONE]')) {
-          try {
-            const json = JSON.parse(data)
-            if (json.content) { fullContent += json.content; onUpdate(fullContent) }
-          } catch { /* ignore */ }
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      const text = decoder.decode(value, { stream: true })
+      const lines = text.split('\n')
+      for (const line of lines) {
+        if (line.startsWith('data:')) {
+          const data = line.slice(5).trim()
+          if (data && !data.includes('[DONE]')) {
+            try {
+              const json = JSON.parse(data)
+              if (json.content) { fullContent += json.content; onUpdate(fullContent) }
+            } catch { /* ignore */ }
+          }
         }
       }
     }
+  } catch (e) {
+    console.error('Stream read error:', e)
+    if (fullContent) onUpdate(fullContent)
   }
 }
 
@@ -1744,6 +1792,42 @@ onMounted(() => {
   .birthday-btn { padding: 8px 15px; font-size: 13px; }
   .chat-messages { height: 300px; padding: 15px; }
   .chat-input-area { padding: 12px; }
+  /* 移动端日期选择器和按钮优化 */
+  .date-selects {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    width: 100%;
+  }
+  .date-selects select {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 4px;
+    font-size: 14px;
+    text-align: center;
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 8px;
+  }
+  .date-selects .year-select { flex: 1.2; }
+  .date-selects .month-select { flex: 0.9; }
+  .date-selects .day-select { flex: 0.9; }
+  .submit-btn {
+    display: block;
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 16px;
+    margin-top: 15px;
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    cursor: pointer;
+  }
+  .submit-btn:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
 }
 
 /* 国学雅韵主题移动端特殊样式 */

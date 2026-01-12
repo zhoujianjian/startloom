@@ -84,6 +84,32 @@ public class XingzuoController {
         streamResponse(prompt, response);
     }
 
+    @PostMapping("/stream/paipan")
+    public void paipanStream(@RequestBody Map<String, String> params, HttpServletResponse response) throws Exception {
+        String name = params.getOrDefault("name", "");
+        String gender = params.getOrDefault("gender", "男");
+        String calendar = params.getOrDefault("calendar", "公历");
+        String birthDate = params.getOrDefault("birthDate", "");
+        String birthHour = params.getOrDefault("birthHour", "未知");
+        String birthPlace = params.getOrDefault("birthPlace", "未知");
+        String prompt = String.format("请为以下信息进行八字排盘分析：姓名：%s，性别：%s，历法：%s，出生日期：%s，出生时辰：%s，出生地点：%s。请详细分析四柱八字、五行分析、十神分析、格局判断、大运流年、综合建议。", 
+            name, gender, calendar, birthDate, birthHour, birthPlace);
+        streamResponse(prompt, response);
+    }
+
+    @PostMapping("/stream/hepan")
+    public void hepanStream(@RequestBody Map<String, String> params, HttpServletResponse response) throws Exception {
+        String maleName = params.getOrDefault("maleName", "");
+        String maleBirthDate = params.getOrDefault("maleBirthDate", "");
+        String maleBirthHour = params.getOrDefault("maleBirthHour", "未知");
+        String femaleName = params.getOrDefault("femaleName", "");
+        String femaleBirthDate = params.getOrDefault("femaleBirthDate", "");
+        String femaleBirthHour = params.getOrDefault("femaleBirthHour", "未知");
+        String prompt = String.format("请进行八字合盘分析：男方：%s，出生日期：%s，时辰：%s。女方：%s，出生日期：%s，时辰：%s。请分析双方八字、五行互补、日柱配对、婚姻宫分析、综合评分与建议。",
+            maleName, maleBirthDate, maleBirthHour, femaleName, femaleBirthDate, femaleBirthHour);
+        streamResponse(prompt, response);
+    }
+
     private void streamResponse(String prompt, HttpServletResponse response) throws Exception {
         response.setContentType("text/event-stream");
         response.setCharacterEncoding("UTF-8");
