@@ -182,7 +182,23 @@
             <div class="form-group"><label>历法</label>
               <select v-model="paipanForm.calendar"><option value="公历">公历</option><option value="农历">农历</option></select>
             </div>
-            <div class="form-group"><label>出生日期</label><input type="date" v-model="paipanForm.birthDate" /></div>
+            <div class="form-group">
+              <label>出生日期</label>
+              <div class="date-selects">
+                <select v-model="paipanForm.birthYear" class="year-select">
+                  <option value="">年</option>
+                  <option v-for="y in yearOptions" :key="y" :value="y">{{ y }}年</option>
+                </select>
+                <select v-model="paipanForm.birthMonth" class="month-select">
+                  <option value="">月</option>
+                  <option v-for="m in 12" :key="m" :value="m">{{ m }}月</option>
+                </select>
+                <select v-model="paipanForm.birthDay" class="day-select">
+                  <option value="">日</option>
+                  <option v-for="d in daysInMonth(paipanForm.birthYear, paipanForm.birthMonth)" :key="d" :value="d">{{ d }}日</option>
+                </select>
+              </div>
+            </div>
           </div>
           <div class="form-row">
             <div class="form-group"><label>出生时辰</label>
@@ -208,7 +224,23 @@
             <h4>男方信息</h4>
             <div class="form-row">
               <div class="form-group"><label>姓名</label><input v-model="hepanForm.maleName" placeholder="男方姓名" /></div>
-              <div class="form-group"><label>出生日期</label><input type="date" v-model="hepanForm.maleBirthDate" /></div>
+              <div class="form-group">
+                <label>出生日期</label>
+                <div class="date-selects">
+                  <select v-model="hepanForm.maleYear" class="year-select">
+                    <option value="">年</option>
+                    <option v-for="y in yearOptions" :key="y" :value="y">{{ y }}年</option>
+                  </select>
+                  <select v-model="hepanForm.maleMonth" class="month-select">
+                    <option value="">月</option>
+                    <option v-for="m in 12" :key="m" :value="m">{{ m }}月</option>
+                  </select>
+                  <select v-model="hepanForm.maleDay" class="day-select">
+                    <option value="">日</option>
+                    <option v-for="d in daysInMonth(hepanForm.maleYear, hepanForm.maleMonth)" :key="d" :value="d">{{ d }}日</option>
+                  </select>
+                </div>
+              </div>
               <div class="form-group"><label>时辰</label>
                 <select v-model="hepanForm.maleBirthHour">
                   <option v-for="h in hourOptions" :key="h.value" :value="h.value">{{ h.label }}</option>
@@ -220,7 +252,23 @@
             <h4>女方信息</h4>
             <div class="form-row">
               <div class="form-group"><label>姓名</label><input v-model="hepanForm.femaleName" placeholder="女方姓名" /></div>
-              <div class="form-group"><label>出生日期</label><input type="date" v-model="hepanForm.femaleBirthDate" /></div>
+              <div class="form-group">
+                <label>出生日期</label>
+                <div class="date-selects">
+                  <select v-model="hepanForm.femaleYear" class="year-select">
+                    <option value="">年</option>
+                    <option v-for="y in yearOptions" :key="y" :value="y">{{ y }}年</option>
+                  </select>
+                  <select v-model="hepanForm.femaleMonth" class="month-select">
+                    <option value="">月</option>
+                    <option v-for="m in 12" :key="m" :value="m">{{ m }}月</option>
+                  </select>
+                  <select v-model="hepanForm.femaleDay" class="day-select">
+                    <option value="">日</option>
+                    <option v-for="d in daysInMonth(hepanForm.femaleYear, hepanForm.femaleMonth)" :key="d" :value="d">{{ d }}日</option>
+                  </select>
+                </div>
+              </div>
               <div class="form-group"><label>时辰</label>
                 <select v-model="hepanForm.femaleBirthHour">
                   <option v-for="h in hourOptions" :key="h.value" :value="h.value">{{ h.label }}</option>
@@ -239,16 +287,32 @@
       <!-- AI问卦 -->
       <div v-if="currentTab === 'divination'" class="tab-content divination-tab">
         <h2>AI智能问卦</h2>
-        <div class="divination-grid">
-          <div class="divination-card main-chat" @click="activeDiv = 'chat'"><div class="div-icon">🤖</div><h3>AI命理问答</h3><p>智能AI解答您的命理疑问</p></div>
-          <div class="divination-card" @click="activeDiv = 'horoscope'"><div class="div-icon">⭐</div><h3>星座运势</h3><p>每日/每周/每月运势</p></div>
-          <div class="divination-card" @click="activeDiv = 'zodiac'"><div class="div-icon">🐲</div><h3>生肖运势</h3><p>十二生肖运势分析</p></div>
-          <div class="divination-card" @click="activeDiv = 'lottery'"><div class="div-icon">🎋</div><h3>抽签算命</h3><p>观音灵签、月老灵签</p></div>
-          <div class="divination-card" @click="activeDiv = 'constellation'"><div class="div-icon">♈</div><h3>星座查询</h3><p>星座性格、配对分析</p></div>
-          <div class="divination-card" @click="activeDiv = 'birthday'"><div class="div-icon">🎂</div><h3>生日密码</h3><p>生日书、生日花</p></div>
+        <!-- 功能标签栏 - 横向滚动 -->
+        <div class="div-tabs-wrapper">
+          <div class="div-tabs">
+            <div class="div-tab" :class="{ active: activeDiv === 'chat' }" @click="activeDiv = 'chat'">
+              <span class="tab-icon">🤖</span><span class="tab-name">AI问答</span>
+            </div>
+            <div class="div-tab" :class="{ active: activeDiv === 'horoscope' }" @click="activeDiv = 'horoscope'">
+              <span class="tab-icon">⭐</span><span class="tab-name">星座运势</span>
+            </div>
+            <div class="div-tab" :class="{ active: activeDiv === 'zodiac' }" @click="activeDiv = 'zodiac'">
+              <span class="tab-icon">🐲</span><span class="tab-name">生肖运势</span>
+            </div>
+            <div class="div-tab" :class="{ active: activeDiv === 'lottery' }" @click="activeDiv = 'lottery'">
+              <span class="tab-icon">🎋</span><span class="tab-name">抽签算命</span>
+            </div>
+            <div class="div-tab" :class="{ active: activeDiv === 'constellation' }" @click="activeDiv = 'constellation'">
+              <span class="tab-icon">♈</span><span class="tab-name">星座查询</span>
+            </div>
+            <div class="div-tab" :class="{ active: activeDiv === 'birthday' }" @click="activeDiv = 'birthday'">
+              <span class="tab-icon">🎂</span><span class="tab-name">生日密码</span>
+            </div>
+          </div>
         </div>
+        
         <!-- AI对话 -->
-        <div class="chat-section" v-if="activeDiv === 'chat'">
+        <div class="div-content" v-if="activeDiv === 'chat'">
           <div class="chat-container">
             <div class="chat-messages" ref="chatMessagesRef">
               <div v-for="(msg, idx) in chatMessages" :key="idx" :class="['chat-msg', msg.role]">
@@ -261,70 +325,73 @@
             </div>
           </div>
         </div>
+        
         <!-- 星座运势 -->
-        <div class="divination-section" v-if="activeDiv === 'horoscope'">
-          <h3>星座运势查询</h3>
-          <div class="constellation-select">
-            <div class="const-item" v-for="c in constellations" :key="c.name" :class="{ active: selectedConstellation === c.name }" @click="selectConstellation(c.name)">
-              <span class="const-icon">{{ c.icon }}</span><span class="const-name">{{ c.name }}</span>
+        <div class="div-content" v-if="activeDiv === 'horoscope'">
+          <div class="select-grid constellation-select">
+            <div class="select-item" v-for="c in constellations" :key="c.name" :class="{ active: selectedConstellation === c.name }" @click="selectConstellation(c.name)">
+              <span class="item-icon">{{ c.icon }}</span><span class="item-name">{{ c.name }}</span>
             </div>
           </div>
-          <div class="action-area" ref="horoscopeAction" v-if="selectedConstellation">
-            <div class="selected-hint">已选择：{{ selectedConstellation }}</div>
+          <div class="action-bar" v-if="selectedConstellation">
             <div class="time-tabs">
               <span :class="{ active: fortuneType === 'today' }" @click="fortuneType = 'today'">今日</span>
               <span :class="{ active: fortuneType === 'week' }" @click="fortuneType = 'week'">本周</span>
               <span :class="{ active: fortuneType === 'month' }" @click="fortuneType = 'month'">本月</span>
             </div>
-            <button class="query-btn" @click="queryHoroscope" :disabled="horoscopeLoading">{{ horoscopeLoading ? '查询中...' : '查询运势' }}</button>
+            <button class="action-btn" @click="queryHoroscope" :disabled="horoscopeLoading">{{ horoscopeLoading ? '查询中...' : '查询 ' + selectedConstellation + ' 运势' }}</button>
           </div>
-          <div class="fortune-result" v-if="horoscopeResult">{{ horoscopeResult }}</div>
+          <div class="result-box" v-if="horoscopeResult">{{ horoscopeResult }}</div>
         </div>
+        
         <!-- 生肖运势 -->
-        <div class="divination-section" v-if="activeDiv === 'zodiac'">
-          <h3>生肖运势查询</h3>
-          <div class="zodiac-select">
-            <div class="zodiac-item" v-for="z in zodiacList" :key="z.name" :class="{ active: selectedZodiac === z.name }" @click="selectZodiac(z.name)">
-              <span class="zodiac-icon">{{ z.icon }}</span><span class="zodiac-name">{{ z.name }}</span>
+        <div class="div-content" v-if="activeDiv === 'zodiac'">
+          <div class="select-grid zodiac-select">
+            <div class="select-item" v-for="z in zodiacList" :key="z.name" :class="{ active: selectedZodiac === z.name }" @click="selectZodiac(z.name)">
+              <span class="item-icon">{{ z.icon }}</span><span class="item-name">{{ z.name }}</span>
             </div>
           </div>
-          <div class="action-area" ref="zodiacAction" v-if="selectedZodiac">
-            <div class="selected-hint">已选择：{{ selectedZodiac }}</div>
-            <button class="query-btn" @click="queryZodiac" :disabled="zodiacLoading">{{ zodiacLoading ? '查询中...' : '查询运势' }}</button>
+          <div class="action-bar" v-if="selectedZodiac">
+            <button class="action-btn" @click="queryZodiac" :disabled="zodiacLoading">{{ zodiacLoading ? '查询中...' : '查询 ' + selectedZodiac + ' 运势' }}</button>
           </div>
-          <div class="fortune-result" v-if="zodiacResult">{{ zodiacResult }}</div>
+          <div class="result-box" v-if="zodiacResult">{{ zodiacResult }}</div>
         </div>
+        
         <!-- 抽签 -->
-        <div class="divination-section" v-if="activeDiv === 'lottery'">
-          <h3>抽签算命</h3>
-          <div class="lottery-types">
-            <div class="lottery-card" @click="drawLottery('guanyin')"><span class="lottery-icon">🙏</span><span>观音灵签</span></div>
-            <div class="lottery-card" @click="drawLottery('yuelao')"><span class="lottery-icon">💕</span><span>月老灵签</span></div>
-            <div class="lottery-card" @click="drawLottery('caishen')"><span class="lottery-icon">💰</span><span>财神灵签</span></div>
+        <div class="div-content" v-if="activeDiv === 'lottery'">
+          <div class="lottery-grid">
+            <div class="lottery-item" @click="drawLottery('guanyin')"><span class="lottery-icon">🙏</span><span class="lottery-name">观音灵签</span></div>
+            <div class="lottery-item" @click="drawLottery('yuelao')"><span class="lottery-icon">💕</span><span class="lottery-name">月老灵签</span></div>
+            <div class="lottery-item" @click="drawLottery('caishen')"><span class="lottery-icon">💰</span><span class="lottery-name">财神灵签</span></div>
           </div>
-          <div class="fortune-result" v-if="lotteryResult">{{ lotteryResult }}</div>
+          <div class="result-box" v-if="lotteryResult">{{ lotteryResult }}</div>
         </div>
+        
         <!-- 星座查询 -->
-        <div class="divination-section" v-if="activeDiv === 'constellation'">
-          <h3>星座详细查询</h3>
-          <div class="constellation-select">
-            <div class="const-item" v-for="c in constellations" :key="c.name" :class="{ active: selectedConstellation === c.name }" @click="selectedConstellation = c.name">
-              <span class="const-icon">{{ c.icon }}</span><span class="const-name">{{ c.name }}</span>
+        <div class="div-content" v-if="activeDiv === 'constellation'">
+          <div class="select-grid constellation-select">
+            <div class="select-item" v-for="c in constellations" :key="c.name" :class="{ active: selectedConstellation === c.name }" @click="selectedConstellation = c.name">
+              <span class="item-icon">{{ c.icon }}</span><span class="item-name">{{ c.name }}</span>
             </div>
           </div>
-          <button class="query-btn" @click="queryConstellation" :disabled="!selectedConstellation || constLoading">{{ constLoading ? '查询中...' : '查询星座' }}</button>
-          <div class="fortune-result" v-if="constResult">{{ constResult }}</div>
-        </div>
-        <!-- 生日密码 -->
-        <div class="divination-section" v-if="activeDiv === 'birthday'">
-          <h3>生日密码查询</h3>
-          <div class="birthday-form"><div class="form-group"><label>选择生日</label><input type="date" v-model="birthdayDate" /></div></div>
-          <div class="birthday-types">
-            <button @click="queryBirthday('password')" :disabled="!birthdayDate || birthdayLoading">生日密码</button>
-            <button @click="queryBirthday('book')" :disabled="!birthdayDate || birthdayLoading">生日书</button>
-            <button @click="queryBirthday('flower')" :disabled="!birthdayDate || birthdayLoading">生日花</button>
+          <div class="action-bar" v-if="selectedConstellation">
+            <button class="action-btn" @click="queryConstellation" :disabled="constLoading">{{ constLoading ? '查询中...' : '查询 ' + selectedConstellation + ' 详情' }}</button>
           </div>
-          <div class="fortune-result" v-if="birthdayResult">{{ birthdayResult }}</div>
+          <div class="result-box" v-if="constResult">{{ constResult }}</div>
+        </div>
+        
+        <!-- 生日密码 -->
+        <div class="div-content" v-if="activeDiv === 'birthday'">
+          <div class="birthday-input">
+            <label>选择您的生日</label>
+            <input type="date" v-model="birthdayDate" />
+          </div>
+          <div class="birthday-btns" v-if="birthdayDate">
+            <button class="birthday-btn" @click="queryBirthday('password')" :disabled="birthdayLoading">🔮 生日密码</button>
+            <button class="birthday-btn" @click="queryBirthday('book')" :disabled="birthdayLoading">📖 生日书</button>
+            <button class="birthday-btn" @click="queryBirthday('flower')" :disabled="birthdayLoading">🌸 生日花</button>
+          </div>
+          <div class="result-box" v-if="birthdayResult">{{ birthdayResult }}</div>
         </div>
       </div>
 
@@ -449,8 +516,18 @@ const birthdayResult = ref('')
 const loginForm = reactive({ account: '', password: '' })
 const registerForm = reactive({ phone: '', email: '', wechat: '', password: '', confirmPassword: '' })
 const feedbackForm = reactive({ nickname: '', contact: '', content: '' })
-const paipanForm = reactive({ name: '', gender: '男', calendar: '公历', birthDate: '', birthHour: '子时', birthPlace: '' })
-const hepanForm = reactive({ maleName: '', maleBirthDate: '', maleBirthHour: '子时', femaleName: '', femaleBirthDate: '', femaleBirthHour: '子时' })
+const paipanForm = reactive({ name: '', gender: '男', calendar: '公历', birthYear: '', birthMonth: '', birthDay: '', birthHour: '子时', birthPlace: '' })
+const hepanForm = reactive({ maleName: '', maleYear: '', maleMonth: '', maleDay: '', maleBirthHour: '子时', femaleName: '', femaleYear: '', femaleMonth: '', femaleDay: '', femaleBirthHour: '子时' })
+
+// 年份选项 (1920-当前年份)
+const currentYear = new Date().getFullYear()
+const yearOptions = Array.from({ length: currentYear - 1920 + 1 }, (_, i) => currentYear - i)
+
+// 计算每月天数
+const daysInMonth = (year, month) => {
+  if (!year || !month) return 31
+  return new Date(year, month, 0).getDate()
+}
 
 const hourOptions = [
   { value: '子时', label: '子时 (23:00-01:00)' }, { value: '丑时', label: '丑时 (01:00-03:00)' },
@@ -572,10 +649,13 @@ const handleSubmitFeedback = async () => {
 }
 
 const handlePaipan = async () => {
-  if (!paipanForm.name || !paipanForm.birthDate) { ElMessage.warning('请填写姓名和出生日期'); return }
+  if (!paipanForm.name || !paipanForm.birthYear || !paipanForm.birthMonth || !paipanForm.birthDay) { 
+    ElMessage.warning('请填写姓名和完整出生日期'); return 
+  }
   paipanLoading.value = true
   paipanResult.value = ''
-  const prompt = `请为以下信息进行八字排盘分析：姓名：${paipanForm.name}，性别：${paipanForm.gender}，历法：${paipanForm.calendar}，出生日期：${paipanForm.birthDate}，出生时辰：${paipanForm.birthHour}，出生地点：${paipanForm.birthPlace || '未知'}。请详细分析四柱八字、五行分析、十神分析、格局判断、大运流年、综合建议。`
+  const birthDate = `${paipanForm.birthYear}年${paipanForm.birthMonth}月${paipanForm.birthDay}日`
+  const prompt = `请为以下信息进行八字排盘分析：姓名：${paipanForm.name}，性别：${paipanForm.gender}，历法：${paipanForm.calendar}，出生日期：${birthDate}，出生时辰：${paipanForm.birthHour}，出生地点：${paipanForm.birthPlace || '未知'}。请详细分析四柱八字、五行分析、十神分析、格局判断、大运流年、综合建议。`
   try {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
     const response = await fetch(`${baseUrl}/chat`, {
@@ -589,10 +669,14 @@ const handlePaipan = async () => {
 }
 
 const handleHepan = async () => {
-  if (!hepanForm.maleName || !hepanForm.maleBirthDate || !hepanForm.femaleName || !hepanForm.femaleBirthDate) { ElMessage.warning('请填写完整信息'); return }
+  if (!hepanForm.maleName || !hepanForm.maleYear || !hepanForm.femaleName || !hepanForm.femaleYear) { 
+    ElMessage.warning('请填写完整信息'); return 
+  }
   hepanLoading.value = true
   hepanResult.value = ''
-  const prompt = `请进行八字合盘分析：男方：${hepanForm.maleName}，出生日期：${hepanForm.maleBirthDate}，时辰：${hepanForm.maleBirthHour}。女方：${hepanForm.femaleName}，出生日期：${hepanForm.femaleBirthDate}，时辰：${hepanForm.femaleBirthHour}。请分析双方八字、五行互补、日柱配对、婚姻宫分析、综合评分与建议。`
+  const maleBirthDate = `${hepanForm.maleYear}年${hepanForm.maleMonth}月${hepanForm.maleDay}日`
+  const femaleBirthDate = `${hepanForm.femaleYear}年${hepanForm.femaleMonth}月${hepanForm.femaleDay}日`
+  const prompt = `请进行八字合盘分析：男方：${hepanForm.maleName}，出生日期：${maleBirthDate}，时辰：${hepanForm.maleBirthHour}。女方：${hepanForm.femaleName}，出生日期：${femaleBirthDate}，时辰：${hepanForm.femaleBirthHour}。请分析双方八字、五行互补、日柱配对、婚姻宫分析、综合评分与建议。`
   try {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
     const response = await fetch(`${baseUrl}/chat`, {
@@ -943,6 +1027,20 @@ onMounted(() => {
   -webkit-appearance: none;
   appearance: none;
 }
+/* 年月日选择器样式 */
+.date-selects {
+  display: flex;
+  gap: 8px;
+}
+.date-selects select {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 8px;
+  text-align: center;
+}
+.date-selects .year-select { flex: 1.3; }
+.date-selects .month-select { flex: 0.9; }
+.date-selects .day-select { flex: 0.9; }
 /* 日期输入框优化 */
 .form-group input[type="date"] {
   min-height: 48px;
@@ -1045,49 +1143,219 @@ onMounted(() => {
 .divination-tab h2 { 
   background: var(--primaryGradient, linear-gradient(90deg, #f093fb, #f5576c)); 
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-  text-align: center; margin-bottom: 35px; font-size: 28px;
+  text-align: center; margin-bottom: 25px; font-size: 26px;
 }
-.divination-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
-.divination-card { 
-  background: var(--bgCard, rgba(255,255,255,0.06)); 
-  backdrop-filter: blur(10px);
-  border-radius: 20px; padding: 28px; text-align: center; cursor: pointer; 
-  border: 2px solid transparent; 
-  transition: all 0.4s; 
-}
-.divination-card:hover { 
-  border-color: var(--borderHover, rgba(240,147,251,0.5)); 
-  background: var(--bgCardHover, rgba(240,147,251,0.12)); 
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px var(--shadow, rgba(240,147,251,0.2));
-}
-.divination-card.main-chat { 
-  grid-column: span 3; 
-  background: var(--bgCardHover, linear-gradient(135deg, rgba(240,147,251,0.15), rgba(245,87,108,0.15))); 
-  border: 1px solid var(--border, rgba(240,147,251,0.3));
-}
-.div-icon { font-size: 44px; margin-bottom: 12px; display: block; }
-.divination-card h3 { 
-  background: var(--primaryGradient, linear-gradient(90deg, #f5a5c8, #c8a5d9)); 
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-  margin-bottom: 10px; font-size: 18px; 
-}
-.divination-card p { color: var(--textMuted, #a89cc8); font-size: 13px; }
 
-.chat-section { margin-top: 25px; }
-.chat-container { 
-  background: var(--bgCard, rgba(255,255,255,0.06)); 
+/* ========== AI问卦标签页样式 ========== */
+.div-tabs-wrapper {
+  overflow-x: auto;
+  margin-bottom: 20px;
+  -webkit-overflow-scrolling: touch;
+}
+.div-tabs-wrapper::-webkit-scrollbar { display: none; }
+.div-tabs {
+  display: flex;
+  gap: 10px;
+  padding: 5px;
+  min-width: max-content;
+}
+.div-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: var(--bgCard, rgba(255,255,255,0.06));
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.div-tab:hover {
+  background: var(--bgCardHover, rgba(240,147,251,0.12));
+}
+.div-tab.active {
+  background: var(--primaryGradient, linear-gradient(135deg, #f093fb, #f5576c));
+  color: #fff;
+  box-shadow: 0 4px 15px var(--shadow, rgba(240,147,251,0.4));
+}
+.tab-icon { font-size: 18px; }
+.tab-name { font-size: 14px; font-weight: 500; color: var(--textSecondary, #e8d5f2); }
+.div-tab.active .tab-name { color: #fff; }
+
+.div-content {
+  background: var(--bgCard, rgba(255,255,255,0.06));
   backdrop-filter: blur(15px);
-  border-radius: 20px; overflow: hidden; 
+  border-radius: 16px;
+  padding: 20px;
   border: 1px solid var(--border, rgba(200,165,217,0.2));
 }
-.chat-messages { height: 400px; overflow-y: auto; padding: 25px; }
+
+/* 选择网格 */
+.select-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+.select-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 8px;
+  background: var(--bgInput, rgba(255,255,255,0.08));
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+}
+.select-item:hover {
+  background: var(--bgCardHover, rgba(240,147,251,0.12));
+}
+.select-item.active {
+  border-color: var(--primary, #f093fb);
+  background: var(--bgCardHover, rgba(240,147,251,0.15));
+  box-shadow: 0 0 15px var(--shadow, rgba(240,147,251,0.2));
+}
+.item-icon { font-size: 24px; margin-bottom: 4px; }
+.item-name { font-size: 12px; color: var(--textSecondary, #e8d5f2); }
+
+/* 操作栏 */
+.action-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background: var(--bgCardHover, rgba(240,147,251,0.08));
+  border-radius: 12px;
+  margin-top: 15px;
+}
+.action-btn {
+  padding: 12px 30px;
+  background: var(--primaryGradient, linear-gradient(135deg, #f093fb, #f5576c));
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px var(--shadow, rgba(240,147,251,0.4));
+}
+.action-btn:hover { transform: translateY(-2px); }
+.action-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* 时间标签 */
+.time-tabs {
+  display: flex;
+  gap: 10px;
+}
+.time-tabs span {
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  background: var(--bgInput, rgba(255,255,255,0.08));
+  color: var(--textMuted, #a89cc8);
+  transition: all 0.3s;
+  font-size: 13px;
+}
+.time-tabs span.active {
+  background: var(--bgCard, rgba(255,255,255,0.15));
+  color: var(--accent, #f5a5c8);
+}
+
+/* 抽签网格 */
+.lottery-grid {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.lottery-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 25px;
+  background: var(--bgInput, rgba(255,255,255,0.08));
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+}
+.lottery-item:hover {
+  border-color: var(--borderHover, rgba(240,147,251,0.5));
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px var(--shadow, rgba(240,147,251,0.2));
+}
+.lottery-icon { font-size: 36px; margin-bottom: 8px; }
+.lottery-name { font-size: 14px; color: var(--textSecondary, #e8d5f2); font-weight: 500; }
+
+/* 生日输入 */
+.birthday-input {
+  text-align: center;
+  margin-bottom: 15px;
+}
+.birthday-input label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--textSecondary, #e8d5f2);
+  font-size: 14px;
+}
+.birthday-input input {
+  padding: 12px 20px;
+  border: 1px solid var(--border, rgba(200,165,217,0.3));
+  border-radius: 12px;
+  background: var(--bgInput, rgba(255,255,255,0.08));
+  color: var(--textPrimary, #fff);
+  font-size: 16px;
+  min-width: 200px;
+}
+.birthday-btns {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.birthday-btn {
+  padding: 10px 20px;
+  background: var(--bgInput, rgba(255,255,255,0.08));
+  color: var(--textSecondary, #e8d5f2);
+  border: 1px solid var(--border, rgba(200,165,217,0.3));
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+.birthday-btn:hover {
+  background: var(--primaryGradient, linear-gradient(135deg, #f093fb, #f5576c));
+  color: #fff;
+  border-color: transparent;
+}
+.birthday-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* 结果框 */
+.result-box {
+  margin-top: 15px;
+  padding: 15px;
+  background: var(--bgInput, rgba(255,255,255,0.05));
+  border-radius: 12px;
+  color: var(--textSecondary, #e8d5f2);
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+/* 聊天容器 */
+.chat-container { 
+  border-radius: 16px; overflow: hidden; 
+  border: 1px solid var(--border, rgba(200,165,217,0.2));
+}
+.chat-messages { height: 350px; overflow-y: auto; padding: 20px; background: var(--bgInput, rgba(255,255,255,0.03)); }
 .chat-messages::-webkit-scrollbar { width: 6px; }
 .chat-messages::-webkit-scrollbar-thumb { background: var(--shadow, rgba(240,147,251,0.3)); border-radius: 3px; }
-.chat-msg { margin-bottom: 18px; display: flex; }
+.chat-msg { margin-bottom: 15px; display: flex; }
 .chat-msg.user { justify-content: flex-end; }
 .chat-msg.assistant { justify-content: flex-start; }
-.msg-content { max-width: 80%; padding: 14px 20px; border-radius: 18px; line-height: 1.7; }
+.msg-content { max-width: 80%; padding: 12px 16px; border-radius: 16px; line-height: 1.6; font-size: 14px; }
 .chat-msg.user .msg-content { 
   background: var(--primaryGradient, linear-gradient(135deg, #f093fb, #f5576c)); 
   color: #fff; 
@@ -1098,37 +1366,26 @@ onMounted(() => {
   color: var(--textSecondary, #e8d5f2); 
   border-bottom-left-radius: 4px;
 }
-.chat-input-area { display: flex; gap: 12px; padding: 18px; background: rgba(0,0,0,0.2); }
+.chat-input-area { display: flex; gap: 10px; padding: 15px; background: rgba(0,0,0,0.15); }
 .chat-input-area input { 
-  flex: 1; padding: 14px 20px; 
+  flex: 1; padding: 12px 18px; 
   border: 1px solid var(--border, rgba(200,165,217,0.3)); 
   border-radius: 25px; 
   background: var(--bgInput, rgba(255,255,255,0.08)); 
   color: var(--textPrimary, #fff); 
-  transition: all 0.3s;
+  font-size: 14px;
 }
-.chat-input-area input:focus { border-color: var(--primary, #f093fb); box-shadow: 0 0 15px var(--shadow, rgba(240,147,251,0.2)); }
+.chat-input-area input:focus { border-color: var(--primary, #f093fb); outline: none; }
 .chat-input-area button { 
-  padding: 14px 28px; 
+  padding: 12px 24px; 
   background: var(--primaryGradient, linear-gradient(135deg, #f093fb, #f5576c)); 
   color: #fff; border: none; border-radius: 25px; 
   font-weight: bold; cursor: pointer; 
-  transition: all 0.3s;
+  font-size: 14px;
 }
-.chat-input-area button:hover { transform: scale(1.05); }
 
-.divination-section { 
-  background: var(--bgCard, rgba(255,255,255,0.06)); 
-  backdrop-filter: blur(15px);
-  border-radius: 20px; padding: 35px; margin-top: 25px; 
-  border: 1px solid var(--border, rgba(200,165,217,0.2));
-}
-.divination-section h3 { 
-  background: var(--primaryGradient, linear-gradient(90deg, #f5a5c8, #c8a5d9)); 
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-  text-align: center; margin-bottom: 25px; font-size: 20px;
-}
-.constellation-select, .zodiac-select { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 25px; }
+/* 保留旧样式兼容 */
+.constellation-select, .zodiac-select { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
 .const-item, .zodiac-item { 
   background: var(--bgCard, rgba(255,255,255,0.06)); 
   border-radius: 16px; padding: 16px 10px; text-align: center; cursor: pointer; 
@@ -1431,6 +1688,19 @@ onMounted(() => {
   background: #1a1a1a;
   box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
+.theme-guoxue .div-tab.active {
+  background: #1a1a1a;
+  color: #d4a574;
+}
+.theme-guoxue .div-content,
+.theme-guoxue .action-bar {
+  border: 1px solid #e8e0d5;
+}
+.theme-guoxue .action-btn,
+.theme-guoxue .birthday-btn:hover {
+  background: #1a1a1a;
+  color: #d4a574;
+}
 
 @media (max-width: 768px) {
   .header-center, .header-right { display: none; }
@@ -1440,18 +1710,7 @@ onMounted(() => {
   .hero-section h1 { font-size: 28px; }
   .hero-section { padding: 40px 15px; }
   .form-row { grid-template-columns: 1fr; }
-  .divination-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .divination-card { padding: 15px 10px; }
-  .divination-card.main-chat { grid-column: span 2; }
-  .div-icon { font-size: 28px; margin-bottom: 8px; }
-  .divination-card h3 { font-size: 14px; }
-  .divination-card p { font-size: 11px; }
-  .constellation-select, .zodiac-select { grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .const-item, .zodiac-item { padding: 10px 5px; }
-  .const-icon, .zodiac-icon { font-size: 22px; }
-  .const-name, .zodiac-name { font-size: 11px; }
   .plans-grid { grid-template-columns: 1fr; }
-  .lottery-types { flex-wrap: wrap; gap: 10px; }
   .theme-panel { top: 60px; right: 10px; width: 150px; }
   .theme-panel .theme-option { padding: 8px 10px; font-size: 12px; }
   .mobile-nav .nav-item { font-size: 15px; }
@@ -1463,12 +1722,28 @@ onMounted(() => {
   .features-section { gap: 15px; margin: 30px 0; }
   .feature-card { padding: 25px 15px; }
   .feature-icon { font-size: 40px; margin-bottom: 12px; }
-  /* 操作区域移动端优化 */
-  .action-area { padding: 15px; margin: 15px 0; }
-  .time-tabs { gap: 8px; }
-  .time-tabs span { padding: 8px 16px; font-size: 13px; }
-  .query-btn { padding: 12px 35px; font-size: 14px; }
-  .selected-hint { font-size: 14px; }
+  /* AI问卦移动端优化 */
+  .divination-tab h2 { font-size: 22px; margin-bottom: 15px; }
+  .div-tabs { gap: 8px; }
+  .div-tab { padding: 8px 12px; }
+  .tab-icon { font-size: 16px; }
+  .tab-name { font-size: 12px; }
+  .div-content { padding: 15px; }
+  .select-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .select-item { padding: 10px 5px; }
+  .item-icon { font-size: 20px; }
+  .item-name { font-size: 11px; }
+  .action-bar { padding: 12px; gap: 10px; }
+  .action-btn { padding: 10px 25px; font-size: 14px; }
+  .time-tabs span { padding: 6px 14px; font-size: 12px; }
+  .lottery-grid { gap: 10px; }
+  .lottery-item { padding: 15px 20px; }
+  .lottery-icon { font-size: 28px; }
+  .lottery-name { font-size: 13px; }
+  .birthday-btns { gap: 8px; }
+  .birthday-btn { padding: 8px 15px; font-size: 13px; }
+  .chat-messages { height: 300px; padding: 15px; }
+  .chat-input-area { padding: 12px; }
 }
 
 /* 国学雅韵主题移动端特殊样式 */
