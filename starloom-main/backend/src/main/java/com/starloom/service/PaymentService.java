@@ -43,13 +43,15 @@ public class PaymentService {
         data.put("mode", mode);
         
         if ("qrcode".equals(mode)) {
-            // 个人收款码模式
+            // 个人收款码模式 - 只要启用就显示，让用户可以选择
             Map<String, Object> qrcode = new HashMap<>();
             if ("true".equals(configs.get("qrcode_enabled_wechat"))) {
-                qrcode.put("wechat", configs.get("qrcode_wechat"));
+                String wechatUrl = configs.get("qrcode_wechat");
+                qrcode.put("wechat", wechatUrl != null && !wechatUrl.isEmpty() ? wechatUrl : "enabled");
             }
             if ("true".equals(configs.get("qrcode_enabled_alipay"))) {
-                qrcode.put("alipay", configs.get("qrcode_alipay"));
+                String alipayUrl = configs.get("qrcode_alipay");
+                qrcode.put("alipay", alipayUrl != null && !alipayUrl.isEmpty() ? alipayUrl : "enabled");
             }
             data.put("qrcode", qrcode);
         } else {
