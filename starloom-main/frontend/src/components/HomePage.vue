@@ -1,9 +1,6 @@
 <template>
   <div class="home-page" :class="'theme-' + currentTheme">
-    <!-- 主题切换按钮 -->
-    <div class="theme-switcher" @click="showThemePanel = !showThemePanel">
-      <span class="theme-icon">{{ themeList.find(t => t.key === currentTheme)?.icon || '🎨' }}</span>
-    </div>
+    <!-- 主题面板 -->
     <div class="theme-panel" v-if="showThemePanel">
       <div class="theme-panel-header">选择主题</div>
       <div class="theme-option" v-for="t in themeList" :key="t.key" :class="{ active: currentTheme === t.key }" @click="changeTheme(t.key)">
@@ -34,12 +31,24 @@
           <span class="user-info">{{ userNickname }}</span>
           <span class="logout-btn" @click="handleLogout">退出</span>
         </template>
+        <span class="theme-btn" @click="showThemePanel = !showThemePanel">{{ themeList.find(t => t.key === currentTheme)?.icon || '🎨' }}</span>
       </div>
-      <div class="mobile-menu-btn" @click="showMobileMenu = !showMobileMenu">☰</div>
+      <div class="mobile-header-right">
+        <span class="theme-btn-mobile" @click="showThemePanel = !showThemePanel">{{ themeList.find(t => t.key === currentTheme)?.icon || '🎨' }}</span>
+        <span class="mobile-menu-btn" @click="showMobileMenu = !showMobileMenu">☰</span>
+      </div>
     </div>
 
     <!-- 移动端导航 -->
     <div class="mobile-nav" v-if="showMobileMenu">
+      <div class="mobile-user-section" v-if="isLoggedIn">
+        <span class="mobile-user-name">👤 {{ userNickname }}</span>
+        <span class="mobile-logout" @click="handleLogout">退出</span>
+      </div>
+      <div class="mobile-user-section" v-else>
+        <span class="mobile-login" @click="showLoginModal = true; showMobileMenu = false">登录</span>
+        <span class="mobile-register" @click="showRegisterModal = true; showMobileMenu = false">注册</span>
+      </div>
       <div class="nav-item" @click="switchTab('home')">排盘首页</div>
       <div class="nav-item" @click="switchTab('paipan')">八字排盘</div>
       <div class="nav-item" @click="switchTab('hepan')">八字合盘</div>
@@ -151,7 +160,7 @@
           <button class="cta-btn" @click="currentTab = 'paipan'">立即排盘</button>
         </div>
         <div class="features-section">
-          <div class="feature-card" v-for="item in features" :key="item.title">
+          <div class="feature-card" v-for="item in features" :key="item.title" @click="switchTab(item.tab)">
             <div class="feature-icon">{{ item.icon }}</div>
             <h3>{{ item.title }}</h3>
             <p>{{ item.desc }}</p>
@@ -256,27 +265,33 @@
         <div class="divination-section" v-if="activeDiv === 'horoscope'">
           <h3>星座运势查询</h3>
           <div class="constellation-select">
-            <div class="const-item" v-for="c in constellations" :key="c.name" :class="{ active: selectedConstellation === c.name }" @click="selectedConstellation = c.name">
+            <div class="const-item" v-for="c in constellations" :key="c.name" :class="{ active: selectedConstellation === c.name }" @click="selectConstellation(c.name)">
               <span class="const-icon">{{ c.icon }}</span><span class="const-name">{{ c.name }}</span>
             </div>
           </div>
-          <div class="time-tabs">
-            <span :class="{ active: fortuneType === 'today' }" @click="fortuneType = 'today'">今日</span>
-            <span :class="{ active: fortuneType === 'week' }" @click="fortuneType = 'week'">本周</span>
-            <span :class="{ active: fortuneType === 'month' }" @click="fortuneType = 'month'">本月</span>
+          <div class="action-area" ref="horoscopeAction" v-if="selectedConstellation">
+            <div class="selected-hint">已选择：{{ selectedConstellation }}</div>
+            <div class="time-tabs">
+              <span :class="{ active: fortuneType === 'today' }" @click="fortuneType = 'today'">今日</span>
+              <span :class="{ active: fortuneType === 'week' }" @click="fortuneType = 'week'">本周</span>
+              <span :class="{ active: fortuneType === 'month' }" @click="fortuneType = 'month'">本月</span>
+            </div>
+            <button class="query-btn" @click="queryHoroscope" :disabled="horoscopeLoading">{{ horoscopeLoading ? '查询中...' : '查询运势' }}</button>
           </div>
-          <button class="query-btn" @click="queryHoroscope" :disabled="!selectedConstellation || horoscopeLoading">{{ horoscopeLoading ? '查询中...' : '查询运势' }}</button>
           <div class="fortune-result" v-if="horoscopeResult">{{ horoscopeResult }}</div>
         </div>
         <!-- 生肖运势 -->
         <div class="divination-section" v-if="activeDiv === 'zodiac'">
           <h3>生肖运势查询</h3>
           <div class="zodiac-select">
-            <div class="zodiac-item" v-for="z in zodiacList" :key="z.name" :class="{ active: selectedZodiac === z.name }" @click="selectedZodiac = z.name">
+            <div class="zodiac-item" v-for="z in zodiacList" :key="z.name" :class="{ active: selectedZodiac === z.name }" @click="selectZodiac(z.name)">
               <span class="zodiac-icon">{{ z.icon }}</span><span class="zodiac-name">{{ z.name }}</span>
             </div>
           </div>
-          <button class="query-btn" @click="queryZodiac" :disabled="!selectedZodiac || zodiacLoading">{{ zodiacLoading ? '查询中...' : '查询运势' }}</button>
+          <div class="action-area" ref="zodiacAction" v-if="selectedZodiac">
+            <div class="selected-hint">已选择：{{ selectedZodiac }}</div>
+            <button class="query-btn" @click="queryZodiac" :disabled="zodiacLoading">{{ zodiacLoading ? '查询中...' : '查询运势' }}</button>
+          </div>
           <div class="fortune-result" v-if="zodiacResult">{{ zodiacResult }}</div>
         </div>
         <!-- 抽签 -->
@@ -419,9 +434,11 @@ const selectedConstellation = ref('')
 const fortuneType = ref('today')
 const horoscopeLoading = ref(false)
 const horoscopeResult = ref('')
+const horoscopeAction = ref(null)
 const selectedZodiac = ref('')
 const zodiacLoading = ref(false)
 const zodiacResult = ref('')
+const zodiacAction = ref(null)
 const lotteryResult = ref('')
 const constLoading = ref(false)
 const constResult = ref('')
@@ -445,10 +462,10 @@ const hourOptions = [
 ]
 
 const features = [
-  { icon: '🔮', title: '八字排盘', desc: '精准排出四柱八字，分析命理格局' },
-  { icon: '💑', title: '八字合盘', desc: '男女八字配对，分析婚姻缘分' },
-  { icon: '📚', title: '命理学习', desc: '系统学习八字命理知识' },
-  { icon: '🧙', title: '大师解盘', desc: '资深命理师深度解析命盘' }
+  { icon: '🔮', title: '八字排盘', desc: '精准排出四柱八字，分析命理格局', tab: 'paipan' },
+  { icon: '💑', title: '八字合盘', desc: '男女八字配对，分析婚姻缘分', tab: 'hepan' },
+  { icon: '📚', title: '命理学习', desc: '系统学习八字命理知识', tab: 'learn' },
+  { icon: '🧙', title: '大师解盘', desc: '资深命理师深度解析命盘', tab: 'member' }
 ]
 
 const constellations = [
@@ -483,6 +500,26 @@ const vipLevelName = computed(() => {
 const switchTab = (tab) => { currentTab.value = tab; showMobileMenu.value = false }
 const goToMember = () => { currentTab.value = 'member'; loadVipData() }
 const formatDate = (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString('zh-CN') : ''
+
+// 选择星座并滚动到操作区
+const selectConstellation = (name) => {
+  selectedConstellation.value = name
+  nextTick(() => {
+    if (horoscopeAction.value) {
+      horoscopeAction.value.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  })
+}
+
+// 选择生肖并滚动到操作区
+const selectZodiac = (name) => {
+  selectedZodiac.value = name
+  nextTick(() => {
+    if (zodiacAction.value) {
+      zodiacAction.value.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  })
+}
 
 const handleLogin = async () => {
   if (!loginForm.account || !loginForm.password) { ElMessage.warning('请填写账号和密码'); return }
@@ -755,21 +792,25 @@ onMounted(() => {
 
 
 <style scoped>
-/* ========== 主题切换器样式 ========== */
-.theme-switcher {
-  position: fixed; top: 80px; right: 20px; z-index: 101;
-  width: 45px; height: 45px;
-  background: var(--primaryGradient, linear-gradient(135deg, #f093fb, #f5576c));
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
+/* ========== 主题切换按钮样式（在header中） ========== */
+.theme-btn {
+  font-size: 20px;
   cursor: pointer;
-  box-shadow: 0 4px 20px var(--shadow, rgba(240,147,251,0.4));
-  transition: all 0.3s;
+  margin-left: 15px;
+  transition: transform 0.3s;
 }
-.theme-switcher:hover { transform: scale(1.1); }
-.theme-icon { font-size: 22px; }
+.theme-btn:hover { transform: scale(1.2); }
+.mobile-header-right {
+  display: none;
+  align-items: center;
+  gap: 12px;
+}
+.theme-btn-mobile {
+  font-size: 20px;
+  cursor: pointer;
+}
 .theme-panel {
-  position: fixed; top: 130px; right: 20px; z-index: 101;
+  position: fixed; top: 70px; right: 20px; z-index: 1001;
   background: var(--bgModal, linear-gradient(145deg, rgba(48,43,99,0.95), rgba(36,36,62,0.95)));
   backdrop-filter: blur(20px);
   border-radius: 16px;
@@ -862,7 +903,20 @@ onMounted(() => {
 .user-info { color: var(--accent, #f5a5c8); }
 .mobile-menu-btn { display: none; font-size: 24px; cursor: pointer; color: var(--accent, #f5a5c8); }
 .mobile-nav { display: none; background: var(--bgMobileNav, rgba(15,12,41,0.95)); backdrop-filter: blur(20px); padding: 20px; }
-.mobile-nav .nav-item { padding: 15px; border-bottom: 1px solid var(--borderLight, rgba(255,255,255,0.1)); color: var(--textSecondary, #e8d5f2); }
+.mobile-nav .nav-item { padding: 15px; border-bottom: 1px solid var(--borderLight, rgba(255,255,255,0.1)); color: var(--textSecondary, #e8d5f2); cursor: pointer; }
+.mobile-user-section {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 15px; margin-bottom: 10px;
+  background: var(--bgCard, rgba(255,255,255,0.06));
+  border-radius: 12px;
+}
+.mobile-user-name { color: var(--accent, #f5a5c8); font-weight: 500; }
+.mobile-logout { color: var(--textMuted, #a89cc8); cursor: pointer; font-size: 14px; }
+.mobile-login, .mobile-register {
+  padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: 14px;
+}
+.mobile-login { border: 1px solid var(--accent, #f5a5c8); color: var(--accent, #f5a5c8); }
+.mobile-register { background: var(--primaryGradient, linear-gradient(135deg, #f093fb, #f5576c)); color: #fff; }
 
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,12,41,0.85); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
 .modal-content { 
@@ -885,6 +939,23 @@ onMounted(() => {
   background: var(--bgInput, rgba(255,255,255,0.08)); 
   color: var(--textPrimary, #fff); box-sizing: border-box; 
   transition: all 0.3s;
+  font-size: 16px; /* 防止iOS自动缩放 */
+  -webkit-appearance: none;
+  appearance: none;
+}
+/* 日期输入框优化 */
+.form-group input[type="date"] {
+  min-height: 48px;
+  line-height: 1.2;
+}
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+  cursor: pointer;
+  padding: 4px;
+}
+.theme-guoxue .form-group input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: none;
+  opacity: 0.6;
 }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { 
   border-color: var(--primary, #f093fb); 
@@ -933,6 +1004,7 @@ onMounted(() => {
   border-radius: 20px; padding: 35px 25px; text-align: center; 
   border: 1px solid var(--border, rgba(200,165,217,0.2)); 
   transition: all 0.4s;
+  cursor: pointer;
 }
 .feature-card:hover { 
   transform: translateY(-8px); 
@@ -1070,7 +1142,29 @@ onMounted(() => {
 }
 .const-icon, .zodiac-icon { font-size: 26px; display: block; margin-bottom: 6px; }
 .const-name, .zodiac-name { font-size: 12px; color: var(--accentLight, #c8a5d9); }
-.time-tabs { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; }
+
+/* 操作区域样式 */
+.action-area {
+  background: var(--bgCard, rgba(255,255,255,0.06));
+  border-radius: 16px;
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid var(--borderHover, rgba(240,147,251,0.3));
+  animation: fadeInUp 0.3s ease;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.selected-hint {
+  text-align: center;
+  color: var(--accent, #f5a5c8);
+  font-size: 15px;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.time-tabs { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
 .time-tabs span { 
   padding: 10px 24px; border-radius: 25px; cursor: pointer; 
   background: var(--bgInput, rgba(255,255,255,0.08)); color: var(--textMuted, #a89cc8); 
@@ -1082,7 +1176,7 @@ onMounted(() => {
   box-shadow: 0 0 15px var(--shadow, rgba(240,147,251,0.2));
 }
 .query-btn { 
-  display: block; margin: 0 auto 25px; padding: 14px 45px; 
+  display: block; margin: 0 auto; padding: 14px 45px; 
   background: var(--primaryGradient, linear-gradient(135deg, #f093fb, #f5576c)); 
   color: #fff; border: none; border-radius: 25px; 
   font-weight: bold; cursor: pointer; 
@@ -1327,10 +1421,12 @@ onMounted(() => {
   background: linear-gradient(135deg, rgba(26,26,26,0.05), rgba(139,90,43,0.08));
   border: 1px solid #d4c4b0;
 }
-.theme-guoxue .theme-switcher {
-  background: #1a1a1a;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+.theme-guoxue .theme-panel {
+  background: #fffef9;
+  border: 1px solid rgba(139,90,43,0.2);
 }
+.theme-guoxue .theme-panel-header { color: #8b5a2b; }
+.theme-guoxue .theme-opt-name { color: #555; }
 .theme-guoxue .floating-feedback {
   background: #1a1a1a;
   box-shadow: 0 4px 20px rgba(0,0,0,0.2);
@@ -1338,20 +1434,41 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .header-center, .header-right { display: none; }
-  .mobile-menu-btn { display: block; }
+  .mobile-header-right { display: flex; }
+  .mobile-menu-btn { display: block; font-size: 24px; cursor: pointer; color: var(--accent, #f5a5c8); }
   .mobile-nav { display: block; }
-  .hero-section h1 { font-size: 32px; }
-  .hero-section { padding: 50px 20px; }
+  .hero-section h1 { font-size: 28px; }
+  .hero-section { padding: 40px 15px; }
   .form-row { grid-template-columns: 1fr; }
-  .divination-grid { grid-template-columns: repeat(2, 1fr); }
+  .divination-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .divination-card { padding: 15px 10px; }
   .divination-card.main-chat { grid-column: span 2; }
-  .constellation-select, .zodiac-select { grid-template-columns: repeat(4, 1fr); }
+  .div-icon { font-size: 28px; margin-bottom: 8px; }
+  .divination-card h3 { font-size: 14px; }
+  .divination-card p { font-size: 11px; }
+  .constellation-select, .zodiac-select { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .const-item, .zodiac-item { padding: 10px 5px; }
+  .const-icon, .zodiac-icon { font-size: 22px; }
+  .const-name, .zodiac-name { font-size: 11px; }
   .plans-grid { grid-template-columns: 1fr; }
-  .lottery-types { flex-wrap: wrap; }
-  .theme-switcher { top: 70px; right: 10px; width: 40px; height: 40px; }
-  .theme-panel { top: 115px; right: 10px; width: 160px; }
-  .theme-panel .theme-option { padding: 10px 12px; font-size: 13px; }
+  .lottery-types { flex-wrap: wrap; gap: 10px; }
+  .theme-panel { top: 60px; right: 10px; width: 150px; }
+  .theme-panel .theme-option { padding: 8px 10px; font-size: 12px; }
   .mobile-nav .nav-item { font-size: 15px; }
+  /* 移动端表单优化 */
+  .paipan-form, .hepan-form { padding: 20px; margin: 0 10px; }
+  .form-group input, .form-group select { padding: 12px 14px; font-size: 16px; }
+  .form-group input[type="date"] { min-height: 50px; }
+  .form-group label { font-size: 14px; margin-bottom: 6px; }
+  .features-section { gap: 15px; margin: 30px 0; }
+  .feature-card { padding: 25px 15px; }
+  .feature-icon { font-size: 40px; margin-bottom: 12px; }
+  /* 操作区域移动端优化 */
+  .action-area { padding: 15px; margin: 15px 0; }
+  .time-tabs { gap: 8px; }
+  .time-tabs span { padding: 8px 16px; font-size: 13px; }
+  .query-btn { padding: 12px 35px; font-size: 14px; }
+  .selected-hint { font-size: 14px; }
 }
 
 /* 国学雅韵主题移动端特殊样式 */
@@ -1363,4 +1480,10 @@ onMounted(() => {
   color: #333;
   border-bottom-color: rgba(139,90,43,0.15);
 }
+.theme-guoxue .mobile-user-section {
+  background: rgba(139,90,43,0.08);
+}
+.theme-guoxue .mobile-user-name { color: #8b5a2b; }
+.theme-guoxue .mobile-logout { color: #888; }
+.theme-guoxue .mobile-login { border-color: #8b5a2b; color: #8b5a2b; }
 </style>
