@@ -14,7 +14,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${spring.mail.username}")
+    @Value("${spring.mail.username:}")
     private String from;
 
     public void sendVerifyCode(String to, String code, String language) {
@@ -35,6 +35,24 @@ public class EmailService {
             log.info("验证码邮件发送成功: {}", to);
         } catch (Exception e) {
             log.error("邮件发送失败: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * 发送简单邮件
+     */
+    public void sendSimpleMail(String to, String subject, String content) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(from);
+            message.setTo(to);
+            message.setSubject(subject);
+            message.setText(content);
+            mailSender.send(message);
+            log.info("邮件发送成功: {} -> {}", subject, to);
+        } catch (Exception e) {
+            log.error("邮件发送失败: {}", e.getMessage());
+            throw new RuntimeException("邮件发送失败", e);
         }
     }
 }

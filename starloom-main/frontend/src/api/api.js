@@ -230,3 +230,42 @@ export const getFeedbackList = async (data) => {
 export const deleteFeedback = async (data) => {
   return await request({ method: 'post', url: '/api/feedback/delete', data: data });
 };
+
+// ============ 支付相关接口 ============
+
+// 获取支付选项
+export const getPaymentOptions = async () => {
+  return await request({ method: 'get', url: '/api/payment/options' });
+};
+
+// 创建支付订单
+export const createPayOrder = async (data) => {
+  return await request({ method: 'post', url: '/api/payment/create', data: data });
+};
+
+// 用户确认已支付
+export const confirmPayment = async (data) => {
+  return await request({ method: 'post', url: '/api/payment/confirm', data: data });
+};
+
+// ============ 支付管理接口（管理员） ============
+
+// 获取待确认订单
+export const getPendingOrders = async () => {
+  return await request({ method: 'get', url: '/api/payment/admin/pending' });
+};
+
+// 管理员确认订单
+export const adminConfirmOrder = async (data) => {
+  return await request({ method: 'post', url: '/api/payment/admin/confirm', data: data });
+};
+
+// 获取支付配置
+export const getPaymentConfig = async () => {
+  return await request({ method: 'get', url: '/api/payment/admin/config' });
+};
+
+// 更新支付配置
+export const updatePaymentConfig = async (data) => {
+  return await request({ method: 'post', url: '/api/payment/admin/config', data: data });
+};

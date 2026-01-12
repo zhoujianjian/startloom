@@ -17,9 +17,16 @@ public class Order {
     private String planName;
     private BigDecimal amount;
     private String payMethod;
+    private String payType;      // 支付类型(wechat/alipay)
+    private String payMode;      // 支付模式(qrcode/official)
+    private String tradeNo;      // 第三方交易号
     private LocalDateTime payTime;
-    private Integer status; // 0待支付/1已支付/2已取消/3已退款
+    private LocalDateTime confirmTime;  // 确认时间
+    private String confirmBy;    // 确认人(admin/system)
+    private Integer status;      // 0待支付/1已支付/2已取消/3已退款/10待确认
     private String remark;
+    private String userRemark;   // 用户备注(如转账备注)
+    private String adminRemark;  // 管理员备注
     
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
