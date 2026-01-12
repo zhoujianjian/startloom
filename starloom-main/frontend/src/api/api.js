@@ -8,9 +8,14 @@ export const checkLogin = async (data) => {
   return await request({ method: 'get', url: '/api/checkLogin' ,params: data});
 };
 
-// 用户登录
+// 用户登录 - 支持手机号/邮箱/微信号
 export const userLogin = async (data) => {
   return await request({ method: 'post', url: '/api/userLogin' ,data: data});
+};
+
+// 简化注册 - 不需要验证码
+export const simpleRegister = async (data) => {
+  return await request({ method: 'post', url: '/api/simpleRegister' ,data: data});
 };
 
 // 获取邮件验证码
@@ -175,4 +180,53 @@ export const payAccount  = async (data) => {
 //  chat接口改造
 export const v1chat  = async (data) => {
   return await request({ method: 'post', url: '/v1/chat' ,data: data});
+};
+
+// ============ VIP会员相关接口 ============
+
+// 获取会员套餐列表
+export const getVipPlans = async () => {
+  return await request({ method: 'get', url: '/api/vip/plans' });
+};
+
+// 获取会员权益对比表
+export const getVipBenefits = async () => {
+  return await request({ method: 'get', url: '/api/vip/benefits' });
+};
+
+// 获取用户会员信息
+export const getVipInfo = async () => {
+  return await request({ method: 'get', url: '/api/vip/info' });
+};
+
+// 创建VIP订单
+export const createVipOrder = async (data) => {
+  return await request({ method: 'post', url: '/api/vip/order/create', data: data });
+};
+
+// 支付VIP订单
+export const payVipOrder = async (data) => {
+  return await request({ method: 'post', url: '/api/vip/order/pay', data: data });
+};
+
+// 获取用户订单列表
+export const getVipOrders = async () => {
+  return await request({ method: 'get', url: '/api/vip/orders' });
+};
+
+// ============ 用户留言相关接口 ============
+
+// 提交留言
+export const submitFeedback = async (data) => {
+  return await request({ method: 'post', url: '/api/feedback/submit', data: data });
+};
+
+// 获取用户留言列表
+export const getFeedbackList = async (data) => {
+  return await request({ method: 'get', url: '/api/feedback/list', params: data });
+};
+
+// 删除留言
+export const deleteFeedback = async (data) => {
+  return await request({ method: 'post', url: '/api/feedback/delete', data: data });
 };

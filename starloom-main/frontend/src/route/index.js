@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from "vue-router"
 
+const HomePage = () => import("../components/HomePage.vue")
 const Index = () => import("../page/Index.vue")
 const Crypto = () => import("../page/Crypto.vue")
 const Chat = () => import("../page/Chat.vue")
@@ -10,6 +11,11 @@ const Cancel = () => import("../components/ChatComponent/Cancel.vue")
 const routes = [
   {
     path: "/",
+    name: "home",
+    component: HomePage
+  },
+  {
+    path: "/ai",
     name: "index",
     component: Index
   },

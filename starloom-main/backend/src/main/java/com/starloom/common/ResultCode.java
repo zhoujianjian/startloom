@@ -8,4 +8,6 @@ public class ResultCode {
     public static final int CAPTCHA_ERROR = 2004;
     public static final int TOKEN_INVALID = 4001;
     public static final int CODE_ERROR = 2009;
+    public static final int PARAM_ERROR = 2019;
+
 }

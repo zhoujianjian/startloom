@@ -236,4 +236,11 @@ export default {
     notInstallMetamask:
         'No provider was found, please use dApp browser or install {wallet}',
     AuthorizationSuccessful: 'Authorization Successful',
+    
+    // Brand Showcase
+    brandTitle: 'Starloom AI · Fortune Big Data',
+    whyChooseUs: 'Why Choose Starloom AI',
+    userTestimonials: 'Real User Feedback',
+    learnAdvantages: 'Learn about Starloom AI advantages',
+    collapseSection: 'Collapse',
 }

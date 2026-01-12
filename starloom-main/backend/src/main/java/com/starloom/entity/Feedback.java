@@ -5,28 +5,21 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("t_user")
-public class User {
+@TableName("t_feedback")
+public class Feedback {
     @TableId(type = IdType.AUTO)
     private Long id;
     
-    private String email;
-    
-    private String phone;
-    
-    private String wechat;
-    
-    private String password;
-    
-    private String walletAddress;
-    
+    private Long userId;
     private String nickname;
-    
-    private String avatar;
-    
-    private Integer vipLevel;
-    
-    private LocalDateTime vipExpireTime;
+    private String contact;
+    private String content;
+    private String images;
+    private String type; // feedback/suggestion/bug
+    private Integer status; // 0待处理/1已处理/2已回复
+    private String reply;
+    private LocalDateTime replyTime;
+    private Long replyBy;
     
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

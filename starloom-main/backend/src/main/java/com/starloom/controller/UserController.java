@@ -16,6 +16,7 @@ public class UserController {
 
     @PostMapping("/userLogin")
     public Result<?> login(@RequestBody Map<String, String> params) {
+        String account = params.get("account"); // 支持手机号/邮箱/微信号
         String email = params.get("email");
         String password = params.get("password");
         String walletAddress = params.get("wallet_address");
@@ -25,7 +26,22 @@ public class UserController {
         if (walletAddress != null && signature != null) {
             return userService.walletLogin(walletAddress, signature, timestamp);
         }
-        return userService.login(email, password);
+        
+        // 优先使用account字段，兼容旧的email字段
+        String loginAccount = account != null ? account : email;
+        return userService.login(loginAccount, password);
+    }
+
+    /**
+     * 简化注册 - 不需要验证码
+     */
+    @PostMapping("/simpleRegister")
+    public Result<?> simpleRegister(@RequestBody Map<String, String> params) {
+        String phone = params.get("phone");
+        String email = params.get("email");
+        String wechat = params.get("wechat");
+        String password = params.get("password");
+        return userService.simpleRegister(phone, email, wechat, password);
     }
 
     @PostMapping("/sendEmailCode")

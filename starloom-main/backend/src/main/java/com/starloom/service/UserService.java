@@ -30,20 +30,129 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     private static final String CODE_PREFIX = "email:code:";
     private static final String RESET_CODE_PREFIX = "email:reset:code:";
 
-    public Result<?> login(String email, String password) {
-        User user = getOne(new LambdaQueryWrapper<User>().eq(User::getEmail, email));
+    /**
+     * 简化登录 - 支持手机号/邮箱/微信号 + 密码
+     */
+    public Result<?> login(String account, String password) {
+        if (account == null || account.trim().isEmpty()) {
+            return Result.error(ResultCode.PARAM_ERROR, "账号不能为空");
+        }
+        if (password == null || password.trim().isEmpty()) {
+            return Result.error(ResultCode.PARAM_ERROR, "密码不能为空");
+        }
+        
+        // 根据账号类型查询用户（手机号/邮箱/微信号）
+        User user = findUserByAccount(account.trim());
+        
         if (user == null) {
             return Result.error(ResultCode.ACCOUNT_NOT_EXIST, "账号不存在");
         }
         if (!BCrypt.checkpw(password, user.getPassword())) {
             return Result.error(ResultCode.PASSWORD_ERROR, "密码错误");
         }
-        String token = jwtUtil.generateToken(user.getId(), user.getEmail());
+        
+        String token = jwtUtil.generateToken(user.getId(), getAccountIdentifier(user));
         Map<String, Object> data = new HashMap<>();
         data.put("user_token", token);
         data.put("user_id", user.getId());
-        data.put("account", user.getEmail());
+        data.put("account", getAccountIdentifier(user));
+        data.put("nickname", user.getNickname());
         return Result.success(data);
+    }
+
+    /**
+     * 简化注册 - 不需要验证码
+     */
+    public Result<?> simpleRegister(String phone, String email, String wechat, String password) {
+        // 至少需要一个账号标识
+        if ((phone == null || phone.trim().isEmpty()) 
+            && (email == null || email.trim().isEmpty()) 
+            && (wechat == null || wechat.trim().isEmpty())) {
+            return Result.error(ResultCode.PARAM_ERROR, "请至少填写手机号、邮箱或微信号中的一个");
+        }
+        if (password == null || password.trim().isEmpty()) {
+            return Result.error(ResultCode.PARAM_ERROR, "密码不能为空");
+        }
+        if (password.length() < 6) {
+            return Result.error(ResultCode.PARAM_ERROR, "密码长度至少6位");
+        }
+        
+        // 检查账号是否已存在
+        if (phone != null && !phone.trim().isEmpty()) {
+            User existUser = getOne(new LambdaQueryWrapper<User>().eq(User::getPhone, phone.trim()));
+            if (existUser != null) {
+                return Result.error(ResultCode.PARAM_ERROR, "该手机号已注册");
+            }
+        }
+        if (email != null && !email.trim().isEmpty()) {
+            User existUser = getOne(new LambdaQueryWrapper<User>().eq(User::getEmail, email.trim()));
+            if (existUser != null) {
+                return Result.error(ResultCode.PARAM_ERROR, "该邮箱已注册");
+            }
+        }
+        if (wechat != null && !wechat.trim().isEmpty()) {
+            User existUser = getOne(new LambdaQueryWrapper<User>().eq(User::getWechat, wechat.trim()));
+            if (existUser != null) {
+                return Result.error(ResultCode.PARAM_ERROR, "该微信号已注册");
+            }
+        }
+        
+        // 创建用户
+        User user = new User();
+        if (phone != null && !phone.trim().isEmpty()) {
+            user.setPhone(phone.trim());
+        }
+        if (email != null && !email.trim().isEmpty()) {
+            user.setEmail(email.trim());
+        }
+        if (wechat != null && !wechat.trim().isEmpty()) {
+            user.setWechat(wechat.trim());
+        }
+        user.setPassword(BCrypt.hashpw(password));
+        user.setNickname("用户" + System.currentTimeMillis() % 100000);
+        save(user);
+        
+        // 注册成功后自动登录
+        String token = jwtUtil.generateToken(user.getId(), getAccountIdentifier(user));
+        Map<String, Object> data = new HashMap<>();
+        data.put("user_token", token);
+        data.put("user_id", user.getId());
+        data.put("account", getAccountIdentifier(user));
+        data.put("nickname", user.getNickname());
+        return Result.success(data);
+    }
+
+    /**
+     * 根据账号查找用户（支持手机号/邮箱/微信号）
+     */
+    private User findUserByAccount(String account) {
+        // 先按邮箱查
+        User user = getOne(new LambdaQueryWrapper<User>().eq(User::getEmail, account));
+        if (user != null) return user;
+        
+        // 再按手机号查
+        user = getOne(new LambdaQueryWrapper<User>().eq(User::getPhone, account));
+        if (user != null) return user;
+        
+        // 最后按微信号查
+        user = getOne(new LambdaQueryWrapper<User>().eq(User::getWechat, account));
+        return user;
+    }
+
+    /**
+     * 获取用户的主要账号标识
+     */
+    private String getAccountIdentifier(User user) {
+        if (user.getPhone() != null && !user.getPhone().isEmpty()) {
+            return user.getPhone();
+        }
+        if (user.getEmail() != null && !user.getEmail().isEmpty()) {
+            return user.getEmail();
+        }
+        if (user.getWechat() != null && !user.getWechat().isEmpty()) {
+            return user.getWechat();
+        }
+        return String.valueOf(user.getId());
     }
 
     public Result<?> walletLogin(String walletAddress, String signature, String timestamp) {
@@ -139,7 +248,11 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         }
         Map<String, Object> data = new HashMap<>();
         data.put("user_id", user.getId());
+        data.put("account", getAccountIdentifier(user));
+        data.put("nickname", user.getNickname());
         data.put("email", user.getEmail());
+        data.put("phone", user.getPhone());
+        data.put("wechat", user.getWechat());
         return Result.success(data);
     }
 

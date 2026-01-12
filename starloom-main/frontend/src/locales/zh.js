@@ -235,4 +235,11 @@ export default {
     cancleSign: '用户取消签名',
     notInstallMetamask: '未找到该程序，请使用 dApp 浏览器或安装 {wallet}',
     AuthorizationSuccessful: '授权成功',
+    
+    // 品牌展示
+    brandTitle: '天机AI · 命理大数据',
+    whyChooseUs: '为什么选择天机AI',
+    userTestimonials: '用户真实反馈',
+    learnAdvantages: '了解天机AI的优势',
+    collapseSection: '收起',
 }

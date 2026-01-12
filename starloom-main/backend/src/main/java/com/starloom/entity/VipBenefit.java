@@ -5,28 +5,17 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("t_user")
-public class User {
+@TableName("t_vip_benefit")
+public class VipBenefit {
     @TableId(type = IdType.AUTO)
     private Long id;
     
-    private String email;
-    
-    private String phone;
-    
-    private String wechat;
-    
-    private String password;
-    
-    private String walletAddress;
-    
-    private String nickname;
-    
-    private String avatar;
-    
-    private Integer vipLevel;
-    
-    private LocalDateTime vipExpireTime;
+    private String name;
+    private String code;
+    private String description;
+    private String icon;
+    private Integer sortOrder;
+    private Integer status;
     
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

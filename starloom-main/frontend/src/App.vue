@@ -1,37 +1,56 @@
 <template>
- <div class="main-app">
-  <!-- 深邃星空背景 -->
-  <div class="cosmic-bg">
-    <!-- 星云层 -->
-    <div class="nebula-layer"></div>
-    <!-- 星星层 -->
-    <div class="stars-bg">
-      <div v-for="n in 80" :key="'star-'+n" class="star" :style="getStarStyle(n)"></div>
-    </div>
-    <!-- 流星 -->
-    <div v-for="n in 3" :key="'meteor-'+n" class="shooting-star" :style="getMeteorStyle(n)"></div>
-    <!-- 神秘光晕 -->
-    <div class="mystic-glow"></div>
+  <!-- 新首页独立布局 -->
+  <div v-if="pathName === 'home'" class="home-layout">
+    <router-view></router-view>
   </div>
-  <Header/>
-  <div class="container" :class="screenWidth<=900?'mb-cont':''">
-    <div class="left" v-if="screenWidth>900 && pathName != 'chat'">
-      <TypeTab />
+  
+  <!-- 原有AI聊天布局 -->
+  <div v-else class="main-app">
+    <!-- 深邃星空背景 -->
+    <div class="cosmic-bg">
+      <!-- 星云层 -->
+      <div class="nebula-layer"></div>
+      <!-- 星星层 -->
+      <div class="stars-bg">
+        <div v-for="n in 80" :key="'star-'+n" class="star" :style="getStarStyle(n)"></div>
+      </div>
+      <!-- 流星 -->
+      <div v-for="n in 3" :key="'meteor-'+n" class="shooting-star" :style="getMeteorStyle(n)"></div>
+      <!-- 神秘光晕 -->
+      <div class="mystic-glow"></div>
     </div>
-    <div class="main-router">
-      <img class="chatBg" src="/@/assets/images/chatBg.png" alt="">
-      <div class="right">
-        <div class="router-content">
-          <router-view></router-view>
-        </div>
-        <InputContent v-if="pathName != 'chat'"/>
-      </div> 
+    <Header/>
+    <div class="container" :class="screenWidth<=900?'mb-cont':''">
+      <div class="left" v-if="screenWidth>900 && pathName != 'chat'">
+        <TypeTab />
+      </div>
+      <div class="main-router">
+        <img class="chatBg" src="/@/assets/images/chatBg.png" alt="">
+        <div class="right">
+          <!-- 品牌展示区域 - AI首页显示 -->
+          <div class="brand-area" v-if="pathName === 'index' && !showBrandCollapsed">
+            <BrandShowcase />
+            <div class="collapse-btn" @click="showBrandCollapsed = true">
+              <span>收起</span>
+              <span class="arrow">▲</span>
+            </div>
+          </div>
+          <div class="expand-btn" v-if="pathName === 'index' && showBrandCollapsed" @click="showBrandCollapsed = false">
+            <span class="icon">✧</span>
+            <span>了解天机AI的优势</span>
+            <span class="icon">✧</span>
+          </div>
+          <div class="router-content">
+            <router-view></router-view>
+          </div>
+          <InputContent v-if="pathName != 'chat'"/>
+        </div> 
+      </div>
     </div>
+    <selectModelDialog 
+      :showModelDialog ="showModelDialog"
+    />
   </div>
- </div>
-  <selectModelDialog 
-    :showModelDialog ="showModelDialog"
-  />
 </template>
 <script>
 import { ref, computed, onMounted, watch } from 'vue'
@@ -41,6 +60,7 @@ import Header from '/@/components/Header.vue'
 import selectModelDialog from '/@/components/ChatComponent/selectModelDialog.vue'
 import TypeTab from '/@/components/TypeTab.vue'
 import InputContent from '/@/components/Input.vue'
+import BrandShowcase from '/@/components/BrandShowcase.vue'
 import { checkLogin } from '/@/api/api.js'
 import EventBus from '/@/utils/EventBus.js'
 export default {
@@ -49,6 +69,7 @@ export default {
     const store = useStore()
     const route = useRoute()
     const showModelDialog = ref(false)
+    const showBrandCollapsed = ref(true) // 默认收起品牌展示
     // 登录状态
     const loginStatus = computed( () => {
       return store.state.loginStatus
@@ -91,6 +112,7 @@ export default {
       screenWidth,
       pathName,
       showModelDialog,
+      showBrandCollapsed,
     }
   },
   methods: {
@@ -154,6 +176,7 @@ export default {
     TypeTab,
     InputContent,
     selectModelDialog,
+    BrandShowcase,
   },
   watch: {
     $route: {
@@ -182,6 +205,12 @@ export default {
 </script>
 
 <style scoped lang="scss">
+// 新首页独立布局
+.home-layout {
+  width: 100%;
+  min-height: 100vh;
+}
+
 // 神秘动画
 @keyframes twinkle {
   0%, 100% { opacity: 0.2; transform: scale(1); }
@@ -233,6 +262,11 @@ export default {
     opacity: 0.5;
     transform: scale(1.1);
   }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
 }
 
 // 宇宙背景容器
@@ -385,6 +419,71 @@ export default {
       top: 0px;
       z-index: 1;
     }
+    .brand-area {
+      max-height: 60vh;
+      overflow-y: auto;
+      position: relative;
+      border-bottom: 1px solid rgba(123, 92, 245, 0.2);
+      
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+      &::-webkit-scrollbar-track {
+        background: rgba(123, 92, 245, 0.1);
+      }
+      &::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #7B5CF5 0%, #9D4EDD 100%);
+        border-radius: 4px;
+      }
+      
+      .collapse-btn {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0.2rem;
+        text-align: center;
+        background: linear-gradient(180deg, transparent 0%, rgba(5, 5, 16, 0.95) 30%);
+        color: rgba(248, 244, 255, 0.7);
+        cursor: pointer;
+        font-size: 0.28rem;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          color: #F5D547;
+        }
+        
+        .arrow {
+          margin-left: 0.1rem;
+          display: inline-block;
+          animation: bounce 1s infinite;
+        }
+      }
+    }
+    
+    .expand-btn {
+      padding: 0.25rem 0.4rem;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(123, 92, 245, 0.15) 0%, rgba(157, 78, 221, 0.1) 100%);
+      border-bottom: 1px solid rgba(123, 92, 245, 0.2);
+      color: rgba(248, 244, 255, 0.8);
+      cursor: pointer;
+      font-size: 0.3rem;
+      font-family: Alimama-DongFangDaKai;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: linear-gradient(135deg, rgba(123, 92, 245, 0.25) 0%, rgba(157, 78, 221, 0.2) 100%);
+        color: #F5D547;
+      }
+      
+      .icon {
+        margin: 0 0.15rem;
+        color: #F5D547;
+        animation: twinkle 2s infinite;
+      }
+    }
+    
     .router-content{
       flex: 1;
       overflow: hidden;
