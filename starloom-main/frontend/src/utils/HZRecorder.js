@@ -251,12 +251,12 @@
 		alert(message);
 		throw new function () { this.toString = function () { return message; } }
 	}
-	//是否支持录音
-	HZRecorder.canRecording = (navigator.getUserMedia != null || navigator.mediaDevices.getUserMedia != null);
+	//是否支持录音 (需要 HTTPS 或 localhost)
+	HZRecorder.canRecording = (navigator.getUserMedia != null || (navigator.mediaDevices && navigator.mediaDevices.getUserMedia != null));
 	//获取录音机
 	HZRecorder.get = function (callback, config) {
 		if (callback) {
-			if (navigator.getUserMedia || navigator.mediaDevices.getUserMedia) {
+			if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 				navigator.mediaDevices.getUserMedia(
 					{ audio: true } //只启用音频
 				).then (stream=> {

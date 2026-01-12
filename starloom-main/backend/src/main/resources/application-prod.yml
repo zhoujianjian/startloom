@@ -16,41 +16,59 @@ spring:
           starttls:
             enable: true
 
-# LLM 多厂商配置 - 生产环境使用环境变量
+# 日志配置
+logging:
+  file:
+    path: /app/logs
+    name: /app/logs/starloom.log
+  level:
+    root: INFO
+    com.starloom: DEBUG
+  logback:
+    rollingpolicy:
+      max-file-size: 50MB
+      max-history: 30
+      total-size-cap: 1GB
+
+# LLM 多厂商配置 - 生产环境
 llm:
-  default-provider: ${LLM_DEFAULT_PROVIDER:qwen}
-  load-balance: ${LLM_LOAD_BALANCE:true}
+  default-provider: deepseek
+  load-balance: false
   fallback-enabled: true
   
   providers:
-    qwen:
-      enabled: ${LLM_QWEN_ENABLED:true}
-      url: https://api-inference.modelscope.cn/v1/chat/completions
-      api-key: ${LLM_QWEN_API_KEY:}
-      model: ${LLM_QWEN_MODEL:Qwen/Qwen2.5-72B-Instruct}
+    # 阿里云 DashScope (通义千问官方API)
+    dashscope:
+      enabled: false
+      url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
+      api-key: YOUR_DASHSCOPE_API_KEY
+      model: qwen-plus
       timeout: 60
       priority: 1
     
-    qwen-vl:
-      enabled: ${LLM_QWEN_VL_ENABLED:false}
+    # ModelScope
+    modelscope:
+      enabled: false
       url: https://api-inference.modelscope.cn/v1/chat/completions
-      api-key: ${LLM_QWEN_VL_API_KEY:}
-      model: ${LLM_QWEN_VL_MODEL:Qwen/Qwen2.5-VL-72B-Instruct}
+      api-key: 4005f439-8ddc-4e26-8876-51f6281e99af
+      model: Qwen/Qwen2.5-72B-Instruct
       timeout: 60
       priority: 2
     
+    # DeepSeek - 主力
     deepseek:
-      enabled: ${LLM_DEEPSEEK_ENABLED:true}
+      enabled: true
       url: https://api.deepseek.com/v1/chat/completions
-      api-key: ${LLM_DEEPSEEK_API_KEY:}
-      model: ${LLM_DEEPSEEK_MODEL:deepseek-chat}
+      api-key: sk-ea6d2510726144df9754c1155cd2433d
+      model: deepseek-chat
       timeout: 120
-      priority: 3
+      priority: 1
     
+    # OpenAI GPT
     gpt:
-      enabled: ${LLM_GPT_ENABLED:false}
+      enabled: false
       url: https://api.openai.com/v1/chat/completions
-      api-key: ${LLM_GPT_API_KEY:}
-      model: ${LLM_GPT_MODEL:gpt-4.1}
+      api-key: sk-dPdIN0I5Tor1ezj5uqukHtf2kP8hYDwSJJ5_9ikXE6T3BlbkFJJiEDyehM9kBfBDPhoAVAu_3v9Yz2RnLTP-MlL2PnQA
+      model: gpt-4.1
       timeout: 60
       priority: 4
