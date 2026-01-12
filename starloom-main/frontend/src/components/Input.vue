@@ -1377,11 +1377,11 @@ export default {
     width: 100%;
     height: 100%;
     border-radius: 100%;
-    border: 5px solid transparentize(#fff, 0.3);
+    border: 5px solid rgba(255, 255, 255, 0.7);
     border-right: none;
     border-top: none;
     // backgroudn-clip: padding;
-    box-shadow: inset 0px 0px 10px transparentize(#fff, 0.85);
+    box-shadow: inset 0px 0px 10px rgba(255, 255, 255, 0.15);
   }
 }
 
@@ -1390,7 +1390,7 @@ export default {
   height: 23px;
   border-radius: 100%;
   .inner{
-    border: 1px solid transparentize(#fff, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.7);
   }
 }
 

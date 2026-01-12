@@ -3,7 +3,7 @@
 # StarLoom 前端 Docker Nginx 部署脚本
 
 CONTAINER_NAME="starloom-frontend"
-FRONTEND_DIR="/opt/suanming/frontend"
+FRONTEND_DIR="/opt/suanming/dist"
 NGINX_CONF="/opt/suanming/nginx.conf"
 
 echo "=========================================="
