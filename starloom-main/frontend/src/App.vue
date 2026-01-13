@@ -1,7 +1,9 @@
 <template>
   <!-- 新首页独立布局 -->
-  <div v-if="pathName === 'home'" class="home-layout">
+  <div v-if="pathName === 'home' || pathName === 'learn' || pathName === 'articleDetail'" class="home-layout">
     <router-view></router-view>
+    <!-- 底部悬浮大师服务横幅 - 非首页显示（首页已有） -->
+    <MasterFloatBar v-if="pathName !== 'home'" />
   </div>
   
   <!-- 原有AI聊天布局 -->
@@ -50,6 +52,8 @@
     <selectModelDialog 
       :showModelDialog ="showModelDialog"
     />
+    <!-- 底部悬浮大师服务横幅 -->
+    <MasterFloatBar />
   </div>
 </template>
 <script>
@@ -61,6 +65,7 @@ import selectModelDialog from '/@/components/ChatComponent/selectModelDialog.vue
 import TypeTab from '/@/components/TypeTab.vue'
 import InputContent from '/@/components/Input.vue'
 import BrandShowcase from '/@/components/BrandShowcase.vue'
+import MasterFloatBar from '/@/components/MasterFloatBar.vue'
 import { checkLogin } from '/@/api/api.js'
 import EventBus from '/@/utils/EventBus.js'
 export default {
@@ -177,6 +182,7 @@ export default {
     InputContent,
     selectModelDialog,
     BrandShowcase,
+    MasterFloatBar,
   },
   watch: {
     $route: {

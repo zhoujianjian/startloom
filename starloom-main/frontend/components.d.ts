@@ -42,6 +42,8 @@ declare module 'vue' {
     Horoscope: typeof import('./src/components/Horoscope.vue')['default']
     Input: typeof import('./src/components/Input.vue')['default']
     Login: typeof import('./src/components/Login.vue')['default']
+    MasterFloatBar: typeof import('./src/components/MasterFloatBar.vue')['default']
+    MasterService: typeof import('./src/components/MasterService.vue')['default']
     MoonSign: typeof import('./src/components/MoonSign.vue')['default']
     MoreShareMb: typeof import('./src/components/ChatComponent/moreShareMb.vue')['default']
     PlanetInHouse: typeof import('./src/components/PlanetInHouse.vue')['default']

@@ -983,6 +983,8 @@
               {{ $t('regenerateResponse') }}
           </button>
       </div>
+      <!-- 大师服务引导 -->
+      <MasterService />
   </div>
   <DisLikeReason
     :disLikeDialog="disLikeDialog"
@@ -1015,6 +1017,7 @@ import AstrologicalHouseChart from '/@/components/AstrologicalHouseChart.vue'
 import PlanetInHouse from '/@/components/PlanetInHouse.vue'
 import PlanetInSign from '/@/components/PlanetInSign.vue'
 import DateTimeSelect from '/@/components/ChatComponent/DateTimeSelect.vue'
+import MasterService from '/@/components/MasterService.vue'
 
 import { SuccessFilled } from '@element-plus/icons-vue'
 import { ref, computed, watch, markRaw } from 'vue';
@@ -3654,6 +3657,7 @@ export default {
     PlanetInSign,
     DisLikeReason,
     DateTimeSelect,
+    MasterService,
   },
   watch:{
     // chatList(val, old){

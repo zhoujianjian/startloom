@@ -7,6 +7,8 @@ const Chat = () => import("../page/Chat.vue")
 const AskDivination = () => import("../page/AskDivination.vue")
 const Success = () => import("../components/ChatComponent/Success.vue")
 const Cancel = () => import("../components/ChatComponent/Cancel.vue")
+const Learn = () => import("../page/Learn.vue")
+const ArticleDetail = () => import("../page/ArticleDetail.vue")
 
 const routes = [
   {
@@ -33,6 +35,16 @@ const routes = [
     path: "/chat/:shareKey",
     name: "chat",
     component: Chat
+  },
+  {
+    path: "/learn",
+    name: "learn",
+    component: Learn
+  },
+  {
+    path: "/article/:id",
+    name: "articleDetail",
+    component: ArticleDetail
   },
   // {
   //   path: "/success",

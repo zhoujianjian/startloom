@@ -7,6 +7,11 @@ import 'lib-flexible'
 import store from './store'
 import i18n from './locales'
 import router from './route'
+import { initTheme } from './utils/themes'
+
+// 在应用启动前初始化主题
+initTheme()
+
 const app = createApp(App)
 app.config.globalProperties.$formatNumber = (num) => {
     if(!num){

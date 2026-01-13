@@ -145,6 +145,8 @@
         </div>
     </div>
   </div>
+  <!-- 大师服务引导 -->
+  <MasterService />
 </template>
 
 <script>
@@ -152,6 +154,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useStore} from 'vuex'
 import { useRouter,useRoute } from 'vue-router'
 import TextComponents from '/@/components/ChatComponent/TextComponents.vue'
+import MasterService from '/@/components/MasterService.vue'
 
 
 import EventBus from '/@/utils/EventBus.js'
@@ -375,7 +378,8 @@ export default {
     } 
   },
   components: {
-    TextComponents, 
+    TextComponents,
+    MasterService,
   },
   methods: {
     //文字展示完成的回调

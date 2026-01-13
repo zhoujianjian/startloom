@@ -269,3 +269,83 @@ export const getPaymentConfig = async () => {
 export const updatePaymentConfig = async (data) => {
   return await request({ method: 'post', url: '/api/payment/admin/config', data: data });
 };
+
+
+// ============ 文章/学习课堂相关接口 ============
+
+// 获取首页聚合数据
+export const getArticleHome = async () => {
+  return await request({ method: 'get', url: '/api/article/home' });
+};
+
+// 获取文章列表（分页）
+export const getArticleList = async (data) => {
+  return await request({ method: 'get', url: '/api/article/list', params: data });
+};
+
+// 获取文章详情
+export const getArticleDetail = async (id) => {
+  return await request({ method: 'get', url: `/api/article/detail/${id}` });
+};
+
+// 获取上一篇/下一篇文章
+export const getArticleNav = async (id, categoryId) => {
+  return await request({ method: 'get', url: `/api/article/nav/${id}`, params: { categoryId } });
+};
+
+// 获取推荐文章
+export const getRecommendArticles = async (limit = 6) => {
+  return await request({ method: 'get', url: '/api/article/recommend', params: { limit } });
+};
+
+// 获取热门文章
+export const getHotArticles = async (limit = 10) => {
+  return await request({ method: 'get', url: '/api/article/hot', params: { limit } });
+};
+
+// 获取最新文章
+export const getLatestArticles = async (limit = 10) => {
+  return await request({ method: 'get', url: '/api/article/latest', params: { limit } });
+};
+
+// 获取相关文章
+export const getRelatedArticles = async (id, categoryId, limit = 5) => {
+  return await request({ method: 'get', url: `/api/article/related/${id}`, params: { categoryId, limit } });
+};
+
+// 获取分类树
+export const getCategoryTree = async () => {
+  return await request({ method: 'get', url: '/api/article/categories/tree' });
+};
+
+// 获取所有分类
+export const getAllCategories = async () => {
+  return await request({ method: 'get', url: '/api/article/categories' });
+};
+
+// 获取子分类
+export const getChildCategories = async (parentId) => {
+  return await request({ method: 'get', url: `/api/article/categories/${parentId}/children` });
+};
+
+// 获取所有标签
+export const getAllTags = async () => {
+  return await request({ method: 'get', url: '/api/article/tags' });
+};
+
+// 获取热门标签
+export const getHotTags = async (limit = 20) => {
+  return await request({ method: 'get', url: '/api/article/tags/hot', params: { limit } });
+};
+
+// ============ 大师服务配置接口 ============
+
+// 获取大师服务配置（服务列表+系统配置）
+export const getMasterServiceConfig = async () => {
+  return await request({ method: 'get', url: '/api/master/config' });
+};
+
+// 创建大师服务订单
+export const createMasterOrder = async (data) => {
+  return await request({ method: 'post', url: '/api/master/order/create', data: data });
+};

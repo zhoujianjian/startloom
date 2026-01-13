@@ -287,6 +287,8 @@
       @closeDisLike="closeDisLike"
       ref="disLike"
     />
+    <!-- 大师服务引导 -->
+    <MasterService />
   </template>
   
   <script>
@@ -315,6 +317,7 @@
   import PlanetInHouse from '/@/components/PlanetInHouse.vue'
   import PlanetInSign from '/@/components/PlanetInSign.vue'
   import DateTimeSelect from '/@/components/ChatComponent/DateTimeSelect.vue'
+  import MasterService from '/@/components/MasterService.vue'
   
   import { GPTChat, xingzuoYunshi, shengxiaoYunshi, shengxiaoQuery, xingzuoChaxun, xingzuoShengrishu,
    xingzuoShengrimima, xingzuoShengrihua, xingzuoRankingList, xingzuoRankingGet, xingzuoRankingQuestion,
@@ -1694,6 +1697,7 @@
       PlanetInSign,
       DisLikeReason,
       DateTimeSelect,
+      MasterService,
     },
     watch:{
       chatNum(val,old){
