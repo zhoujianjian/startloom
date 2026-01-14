@@ -1,6 +1,6 @@
 <template>
   <!-- 底部悬浮大师服务横幅 -->
-  <div class="master-float-bar" :class="{ collapsed: isCollapsed, hidden: isHidden }" v-if="!isHidden">
+  <div class="master-float-bar" :class="{ collapsed: isCollapsed, hidden: isHidden, 'modal-open': isModalOpen }" v-if="!isHidden">
     <!-- 收起状态 - 小按钮 -->
     <div class="float-collapsed" v-if="isCollapsed" @click="isCollapsed = false">
       <span class="collapsed-icon">🔮</span>
@@ -36,6 +36,10 @@
           <h3>🔮 大师服务</h3>
           <span class="close-modal" @click="showModal = false">×</span>
         </div>
+        <!-- 新用户优惠提示 -->
+        <div class="promo-tip" v-if="isNewUserPromo">
+          🎁 新用户专享：每项服务立减 <strong>¥{{ promoDiscount }}</strong>
+        </div>
         <div class="modal-body">
           <div class="modal-services">
             <p class="services-title">选择您需要的服务</p>
@@ -48,11 +52,13 @@
                   <p>{{ service.subtitle }}</p>
                 </div>
                 <div class="msi-price">
-                  <span class="price">¥{{ service.price }}</span>
-                  <span class="original" v-if="service.originalPrice">¥{{ service.originalPrice }}</span>
+                  <span class="price" :class="{ promo: isNewUserPromo }">¥{{ isNewUserPromo ? applyPromoDiscount(service.price) : service.price }}</span>
+                  <span class="original" v-if="isNewUserPromo">¥{{ service.price }}</span>
+                  <span class="original" v-else-if="service.originalPrice">¥{{ service.originalPrice }}</span>
                 </div>
                 <span class="msi-tag hot" v-if="service.tag === 'hot'">热门</span>
                 <span class="msi-tag new" v-if="service.tag === 'new'">新品</span>
+                <span class="msi-tag promo" v-if="isNewUserPromo">-¥{{ promoDiscount }}</span>
                 <span class="check-icon" v-if="selectedService?.id === service.id">✓</span>
               </div>
             </div>
@@ -60,7 +66,7 @@
           <div class="modal-action" v-if="selectedService">
             <div class="action-buttons">
               <button class="order-btn primary" @click="createOrder('pay')" :disabled="orderLoading">
-                {{ orderLoading ? '提交中...' : `立即预约付款 ¥${selectedService.price}` }}
+                {{ orderLoading ? '提交中...' : `立即预约付款 ¥${isNewUserPromo ? applyPromoDiscount(selectedService.price) : selectedService.price}` }}
               </button>
               <button class="order-btn secondary" @click="createOrder('consult')" :disabled="orderLoading">
                 先咨询后付费（免费）
@@ -151,6 +157,7 @@ import { getMasterServiceConfig, createMasterOrder, getPaymentOptions, createPay
 
 const isHidden = ref(false)
 const isCollapsed = ref(false)
+const isModalOpen = ref(false) // 外部弹窗是否打开
 const showModal = ref(false)
 const selectedService = ref(null)
 const orderLoading = ref(false)
@@ -295,15 +302,31 @@ const closeSuccessModal = () => {
   selectedService.value = null
 }
 
+// 新用户优惠
+const isNewUserPromo = ref(false)
+const promoDiscount = ref(50) // 优惠金额
+
+const applyPromoDiscount = (price) => {
+  if (isNewUserPromo.value && price > promoDiscount.value) {
+    return price - promoDiscount.value
+  }
+  return price
+}
+
 defineExpose({
   show: () => { isHidden.value = false; localStorage.removeItem('master-float-hidden') },
-  openModal: () => { showModal.value = true }
+  openModal: (promo = false) => { 
+    isNewUserPromo.value = promo
+    showModal.value = true 
+  },
+  setModalOpen: (open) => { isModalOpen.value = open } // 外部控制隐藏
 })
 </script>
 
 <style scoped>
 .master-float-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; transition: all 0.3s ease; }
 .master-float-bar.hidden { display: none; }
+.master-float-bar.modal-open { display: none; } /* 当有弹窗打开时隐藏 */
 .float-collapsed { position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: linear-gradient(135deg, #1a1a2e, #16213e); border-radius: 30px; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.3); animation: pulse 2s infinite; }
 @keyframes pulse { 0%, 100% { box-shadow: 0 4px 20px rgba(0,0,0,0.3); } 50% { box-shadow: 0 4px 30px rgba(245,158,11,0.4); } }
 .collapsed-icon { font-size: 20px; }
@@ -327,6 +350,8 @@ defineExpose({
 @keyframes modalIn { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; background: linear-gradient(135deg, #1a1a2e, #16213e); position: sticky; top: 0; z-index: 10; }
 .modal-header h3 { color: #fff; margin: 0; font-size: 18px; }
+.promo-tip { background: linear-gradient(90deg, #ef4444, #dc2626); color: #fff; padding: 10px 20px; text-align: center; font-size: 14px; }
+.promo-tip strong { color: #ffd700; font-size: 16px; }
 .close-modal { font-size: 24px; color: rgba(255,255,255,0.7); cursor: pointer; }
 .close-modal:hover { color: #fff; }
 .modal-body { padding: 20px; }
@@ -341,10 +366,12 @@ defineExpose({
 .msi-info p { font-size: 11px; color: var(--textMuted, rgba(255,255,255,0.6)); margin: 0; line-height: 1.3; }
 .msi-price { margin-top: 8px; display: flex; align-items: baseline; gap: 6px; }
 .msi-price .price { font-size: 16px; font-weight: 700; color: #ef4444; }
+.msi-price .price.promo { color: #10b981; }
 .msi-price .original { font-size: 11px; color: var(--textMuted, rgba(255,255,255,0.5)); text-decoration: line-through; }
 .msi-tag { position: absolute; top: 8px; right: 8px; font-size: 9px; padding: 2px 6px; border-radius: 6px; }
 .msi-tag.hot { background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: #fff; }
 .msi-tag.new { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+.msi-tag.promo { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; top: auto; bottom: 8px; }
 .check-icon { position: absolute; bottom: 8px; right: 8px; width: 20px; height: 20px; background: var(--accent, #f59e0b); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
 .modal-action { margin-bottom: 20px; }
 .action-buttons { display: flex; flex-direction: column; gap: 10px; }
@@ -407,19 +434,49 @@ defineExpose({
 .close-success-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; border-radius: 10px; color: #fff; font-size: 15px; font-weight: 500; cursor: pointer; }
 .close-success-btn:hover { opacity: 0.9; }
 @media (max-width: 768px) {
-  .float-collapsed { bottom: 16px; right: 16px; padding: 10px 16px; }
-  .float-content { flex-direction: column; gap: 12px; padding: 16px; }
-  .float-left { width: 100%; }
+  /* 收起状态 - 移动端更小巧 */
+  .float-collapsed { 
+    bottom: 70px; /* 避免遮挡底部内容 */
+    right: 12px; 
+    padding: 8px 14px;
+    border-radius: 24px;
+  }
+  .collapsed-icon { font-size: 16px; }
+  .collapsed-text { font-size: 12px; }
+  .collapsed-badge { font-size: 9px; padding: 2px 6px; }
+  
+  /* 展开状态 - 移动端精简 */
+  .float-expanded { padding-bottom: env(safe-area-inset-bottom, 0); }
+  .float-content { flex-direction: column; gap: 10px; padding: 12px 16px; }
+  .float-left { width: 100%; gap: 12px; }
   .float-right { width: 100%; justify-content: space-between; }
-  .consult-btn { flex: 1; justify-content: center; }
-  .float-icon { font-size: 28px; }
-  .float-title { font-size: 14px; }
-  .float-subtitle { font-size: 12px; }
-  .modal-service-grid { grid-template-columns: 1fr; }
-  .contact-row { flex-direction: column; align-items: center; text-align: center; }
+  .consult-btn { flex: 1; justify-content: center; padding: 10px 20px; font-size: 14px; }
+  .float-icon { font-size: 24px; }
+  .float-title { font-size: 13px; }
+  .float-subtitle { font-size: 11px; }
+  .collapse-btn, .close-btn { width: 26px; height: 26px; font-size: 16px; }
+  
+  /* 弹窗移动端 */
+  .consult-modal { padding: 0; align-items: flex-end; }
+  .modal-content { 
+    max-width: 100%; 
+    max-height: 85vh;
+    border-radius: 20px 20px 0 0;
+  }
+  .modal-service-grid { grid-template-columns: 1fr; gap: 10px; }
+  .modal-service-item { padding: 12px; }
+  .msi-icon { font-size: 20px; }
+  .msi-info h5 { font-size: 13px; }
+  .msi-info p { font-size: 10px; }
+  .contact-row { flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+  .contact-qrcode img { width: 80px; height: 80px; }
   .contact-info { width: 100%; }
   .info-item { justify-content: center; }
   .info-label { width: auto; }
   .pay-options { flex-direction: column; }
+  
+  /* 订单成功弹窗移动端 */
+  .order-success-modal { padding: 10px; }
+  .success-content { padding: 24px 20px; }
 }
 </style>

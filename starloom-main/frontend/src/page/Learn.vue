@@ -199,6 +199,11 @@
       <!-- 大师服务组件 -->
       <MasterService />
     </div>
+    
+    <!-- 移动端返回首页悬浮按钮 -->
+    <div class="mobile-home-btn" @click="goHome">
+      <span class="home-icon">🏠</span>
+    </div>
   </div>
 </template>
 
@@ -765,5 +770,28 @@ const formatDate = (dateStr) => {
   .header-center { display: none; }
   
   .article-actions { display: none; }
+  
+  /* 移动端返回首页按钮 */
+  .mobile-home-btn { display: flex; }
 }
+
+/* 移动端返回首页悬浮按钮 */
+.mobile-home-btn {
+  display: none;
+  position: fixed;
+  left: 16px;
+  bottom: 80px;
+  width: 48px;
+  height: 48px;
+  background: var(--primaryGradient);
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 100;
+  transition: transform 0.2s;
+}
+.mobile-home-btn:active { transform: scale(0.95); }
+.home-icon { font-size: 22px; }
 </style>

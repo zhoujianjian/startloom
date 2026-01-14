@@ -61,6 +61,11 @@
         </div>
       </template>
     </div>
+    
+    <!-- 移动端返回首页悬浮按钮 -->
+    <div class="mobile-home-btn" @click="goHome">
+      <span class="home-icon">🏠</span>
+    </div>
   </div>
 </template>
 
@@ -69,6 +74,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getArticleDetail, getArticleNav } from '../api/api'
 import { themes, getCurrentTheme, setTheme, initTheme } from '../utils/themes'
+import { setArticleSEO, setStructuredData } from '../utils/seo'
 
 const route = useRoute()
 const router = useRouter()
@@ -104,8 +110,12 @@ const loadArticle = async (id) => {
     const res = await getArticleDetail(id)
     article.value = (res.code === 200 && res.data) ? res.data : null
     
-    // 加载上一篇/下一篇
+    // 设置文章 SEO
     if (article.value) {
+      setArticleSEO(article.value)
+      setStructuredData('article', article.value)
+      
+      // 加载上一篇/下一篇
       const navRes = await getArticleNav(id, article.value.categoryId)
       if (navRes.code === 200 && navRes.data) {
         prevArticle.value = navRes.data.prev
@@ -188,5 +198,34 @@ onMounted(() => { initTheme(); currentTheme.value = getCurrentTheme(); if (route
 .article-nav .nav-label { display: block; font-size: 12px; color: var(--textMuted); margin-bottom: 6px; }
 .article-nav .nav-title { display: block; font-size: 14px; color: var(--textPrimary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-@media (max-width: 600px) { .main-content { padding: 20px 15px; } .article-card { padding: 20px; } .article-header h1 { font-size: 1.4rem; } .header-center { display: none; } .article-nav { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { 
+  .main-content { padding: 20px 15px; } 
+  .article-card { padding: 20px; } 
+  .article-header h1 { font-size: 1.4rem; } 
+  .header-center { display: none; } 
+  .article-nav { grid-template-columns: 1fr; }
+  
+  /* 移动端返回首页按钮 */
+  .mobile-home-btn { display: flex; }
+}
+
+/* 移动端返回首页悬浮按钮 */
+.mobile-home-btn {
+  display: none;
+  position: fixed;
+  left: 16px;
+  bottom: 80px;
+  width: 48px;
+  height: 48px;
+  background: var(--primaryGradient);
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 100;
+  transition: transform 0.2s;
+}
+.mobile-home-btn:active { transform: scale(0.95); }
+.home-icon { font-size: 22px; }
 </style>

@@ -1,0 +1,29 @@
+# robots.txt for ibazi.site
+# 天机命理 - 免费八字排盘
+
+User-agent: *
+Allow: /
+
+# 允许所有搜索引擎爬取
+User-agent: Googlebot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: 360Spider
+Allow: /
+
+User-agent: Sogou web spider
+Allow: /
+
+User-agent: bingbot
+Allow: /
+
+# 禁止爬取的路径
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*.json$
+
+# Sitemap 位置
+Sitemap: https://ibazi.site/sitemap.xml

@@ -15,11 +15,11 @@
         <div class="logo"><span class="logo-icon">八字</span><span class="logo-text">天机命理</span></div>
       </div>
       <div class="header-center">
-        <div class="nav-item" :class="{ active: currentTab === 'home' }" @click="currentTab = 'home'">排盘首页</div>
+        <div class="nav-item" :class="{ active: currentTab === 'home' }" @click="currentTab = 'home'">首页</div>
         <div class="nav-item" :class="{ active: currentTab === 'paipan' }" @click="currentTab = 'paipan'">八字排盘</div>
         <div class="nav-item" :class="{ active: currentTab === 'hepan' }" @click="currentTab = 'hepan'">八字合盘</div>
         <div class="nav-item" :class="{ active: currentTab === 'calendar' }" @click="currentTab = 'calendar'">万年历</div>
-        <div class="nav-item" :class="{ active: currentTab === 'divination' }" @click="currentTab = 'divination'">AI问卦</div>
+        <div class="nav-item" :class="{ active: currentTab === 'divination' }" @click="currentTab = 'divination'">天机问答</div>
         <div class="nav-item" @click="goToLearn">学习课堂</div>
         <div class="nav-item" :class="{ active: currentTab === 'member' }" @click="goToMember">会员中心</div>
       </div>
@@ -50,11 +50,11 @@
         <span class="mobile-login" @click="showLoginModal = true; showMobileMenu = false">登录</span>
         <span class="mobile-register" @click="showRegisterModal = true; showMobileMenu = false">注册</span>
       </div>
-      <div class="nav-item" @click="switchTab('home')">排盘首页</div>
+      <div class="nav-item" @click="switchTab('home')">首页</div>
       <div class="nav-item" @click="switchTab('paipan')">八字排盘</div>
       <div class="nav-item" @click="switchTab('hepan')">八字合盘</div>
       <div class="nav-item" @click="switchTab('calendar')">万年历</div>
-      <div class="nav-item" @click="switchTab('divination')">AI问卦</div>
+      <div class="nav-item" @click="switchTab('divination')">天机问答</div>
       <div class="nav-item" @click="switchTab('learn')">学习课堂</div>
       <div class="nav-item" @click="switchTab('member')">会员中心</div>
     </div>
@@ -152,25 +152,171 @@
     </div>
 
 
+    <!-- 今日运势提示条 -->
+    <div class="daily-tip-bar" v-if="currentTab === 'home'">
+      <div class="tip-content">
+        <span class="tip-date">📅 {{ todayDateStr }}</span>
+        <span class="tip-divider">|</span>
+        <span class="tip-lunar">{{ todayLunarStr }}</span>
+        <span class="tip-divider">|</span>
+        <span class="tip-yi">宜：{{ dailyYi }}</span>
+        <span class="tip-divider">|</span>
+        <span class="tip-ji">忌：{{ dailyJi }}</span>
+      </div>
+      <div class="tip-stats">
+        <span class="stat-item">🔥 今日已测 <strong>{{ todayCount }}</strong> 次</span>
+        <span class="stat-item online">🟢 <strong>{{ onlineCount }}</strong> 人在线</span>
+      </div>
+    </div>
+
     <!-- 主内容区域 -->
     <div class="main-content">
       <!-- 首页 -->
       <div v-if="currentTab === 'home'" class="tab-content home-tab">
         <div class="hero-section">
           <h1>天机命理 · 八字排盘</h1>
-          <p>传承千年易学智慧，AI智能解读命理玄机</p>
-          <button class="cta-btn" @click="currentTab = 'paipan'">立即排盘</button>
+          <p>传承千年易学智慧，专业解读命理玄机</p>
         </div>
-        <div class="features-section">
-          <div class="feature-card" v-for="item in features" :key="item.title" @click="switchTab(item.tab)">
-            <div class="feature-icon">{{ item.icon }}</div>
-            <h3>{{ item.title }}</h3>
-            <p>{{ item.desc }}</p>
+        
+        <!-- 限时优惠横幅 -->
+        <div class="promo-banner" v-if="showPromoBanner" @click="openPromoMaster">
+          <span class="promo-icon">🎁</span>
+          <span class="promo-text">新用户专享：首次咨询立减 <strong>50元</strong></span>
+          <span class="promo-countdown">
+            <span class="countdown-label">倒计时</span>
+            <span class="countdown-time">{{ promoCountdown }}</span>
+          </span>
+          <span class="promo-close" @click.stop="closePromoBanner">×</span>
+        </div>
+        
+        <!-- 核心功能 - 4个一行 -->
+        <div class="features-row">
+          <div class="feature-item" v-for="item in features" :key="item.title" @click="switchTab(item.tab)">
+            <span class="fi-icon">{{ item.icon }}</span>
+            <span class="fi-title">{{ item.title }}</span>
           </div>
         </div>
-        <!-- 首页大师服务引导 - 紧凑横幅式 -->
-        <MasterService mode="compact" />
+        
+        <!-- 免费工具矩阵 -->
+        <ToolsGrid @open-master="openMasterService" @switch-tab="switchTab" @modal-change="handleToolModalChange" />
+        
+        <!-- 用户好评滚动 + 功德箱 -->
+        <div class="social-proof-section">
+          <!-- 滚动好评 -->
+          <div class="reviews-scroll">
+            <div class="reviews-header">
+              <span class="reviews-title">🌟 用户好评</span>
+              <button class="write-review-btn" @click="showReviewModal = true">✍️ 写评价</button>
+            </div>
+            <div class="reviews-container">
+              <div class="reviews-track">
+                <div class="review-item" v-for="(r, i) in displayReviews" :key="i">
+                  <span class="review-avatar">{{ r.avatar }}</span>
+                  <div class="review-content">
+                    <span class="review-name">{{ r.name }}</span>
+                    <span class="review-text">{{ r.text }}</span>
+                    <span class="review-time">{{ r.time }}</span>
+                    <span class="review-mine" v-if="r.isMine">我的评价</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 功德箱 -->
+          <div class="merit-box" @click="showMeritModal = true">
+            <div class="merit-icon">🙏</div>
+            <div class="merit-info">
+              <span class="merit-title">功德箱</span>
+              <span class="merit-desc">点香祈福 · 积累功德</span>
+            </div>
+            <span class="merit-arrow">→</span>
+          </div>
+        </div>
+        
+        <!-- 分享引导 -->
+        <div class="share-section">
+          <span class="share-text">觉得准？分享给好友</span>
+          <div class="share-btns">
+            <button class="share-btn wechat" @click="shareToWechat">
+              <span>💚</span> 微信
+            </button>
+            <button class="share-btn copy" @click="copyShareLink">
+              <span>🔗</span> 复制链接
+            </button>
+          </div>
+        </div>
       </div>
+      
+      <!-- 功德箱弹窗 -->
+      <div class="merit-modal" v-if="showMeritModal" @click.self="showMeritModal = false">
+        <div class="merit-modal-content">
+          <div class="merit-modal-header">
+            <h3>🙏 功德箱 · 点香祈福</h3>
+            <span class="close-btn" @click="showMeritModal = false">×</span>
+          </div>
+          <div class="merit-modal-body">
+            <div class="incense-display">
+              <div class="incense-burner">🏮</div>
+              <p class="incense-tip">心诚则灵，功德无量</p>
+            </div>
+            <div class="merit-options">
+              <div class="merit-option" v-for="opt in meritOptions" :key="opt.price" :class="{ selected: selectedMerit === opt.price }" @click="selectedMerit = opt.price">
+                <span class="opt-icon">{{ opt.icon }}</span>
+                <span class="opt-name">{{ opt.name }}</span>
+                <span class="opt-price">¥{{ opt.price }}</span>
+              </div>
+            </div>
+            <div class="merit-wish">
+              <label>许下心愿（选填）</label>
+              <textarea v-model="meritWish" placeholder="写下您的心愿，诚心祈福..." rows="2"></textarea>
+            </div>
+            <button class="merit-submit" @click="submitMerit" :disabled="!selectedMerit || meritLoading">
+              {{ meritLoading ? '祈福中...' : (selectedMerit ? `点香祈福 ¥${selectedMerit}` : '请选择香火') }}
+            </button>
+            <p class="merit-note">💡 香火钱用于网站运营维护，感谢您的支持</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 用户评价弹窗 -->
+      <div class="review-modal" v-if="showReviewModal" @click.self="showReviewModal = false">
+        <div class="review-modal-content">
+          <div class="review-modal-header">
+            <h3>✍️ 写下您的评价</h3>
+            <span class="close-btn" @click="showReviewModal = false">×</span>
+          </div>
+          <div class="review-modal-body">
+            <div class="review-rating">
+              <label>满意度</label>
+              <div class="rating-stars">
+                <span v-for="s in 5" :key="s" class="star" :class="{ active: reviewForm.rating >= s }" @click="reviewForm.rating = s">⭐</span>
+              </div>
+            </div>
+            <div class="review-service">
+              <label>使用的服务</label>
+              <select v-model="reviewForm.service">
+                <option value="">请选择</option>
+                <option value="八字排盘">八字排盘</option>
+                <option value="八字合盘">八字合盘</option>
+                <option value="姓名测试">姓名测试</option>
+                <option value="周公解梦">周公解梦</option>
+                <option value="大师咨询">大师咨询</option>
+                <option value="其他工具">其他工具</option>
+              </select>
+            </div>
+            <div class="review-text">
+              <label>评价内容</label>
+              <textarea v-model="reviewForm.content" placeholder="分享您的使用体验..." rows="3" maxlength="100"></textarea>
+              <span class="char-count">{{ reviewForm.content.length }}/100</span>
+            </div>
+            <button class="review-submit" @click="submitReview" :disabled="reviewLoading || !reviewForm.content">
+              {{ reviewLoading ? '提交中...' : '提交评价' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
 
       <!-- 八字排盘 -->
       <div v-if="currentTab === 'paipan'" class="tab-content paipan-tab">
@@ -394,14 +540,14 @@
         <MasterService mode="compact" />
       </div>
 
-      <!-- AI问卦 -->
+      <!-- 天机问答 -->
       <div v-if="currentTab === 'divination'" class="tab-content divination-tab">
-        <h2>AI智能问卦</h2>
+        <h2>天机问答</h2>
         <!-- 功能标签栏 - 横向滚动 -->
         <div class="div-tabs-wrapper">
           <div class="div-tabs">
             <div class="div-tab" :class="{ active: activeDiv === 'chat' }" @click="activeDiv = 'chat'">
-              <span class="tab-icon">🤖</span><span class="tab-name">AI问答</span>
+              <span class="tab-icon">💬</span><span class="tab-name">在线问答</span>
             </div>
             <div class="div-tab" :class="{ active: activeDiv === 'horoscope' }" @click="activeDiv = 'horoscope'">
               <span class="tab-icon">⭐</span><span class="tab-name">星座运势</span>
@@ -421,7 +567,7 @@
           </div>
         </div>
         
-        <!-- AI对话 -->
+        <!-- 在线问答 -->
         <div class="div-content" v-if="activeDiv === 'chat'">
           <div class="chat-container">
             <div class="chat-messages" ref="chatMessagesRef">
@@ -556,7 +702,7 @@
     <div class="floating-feedback" @click="showFeedbackModal = true"><span>💬</span></div>
     
     <!-- 底部悬浮大师服务横幅 -->
-    <MasterFloatBar />
+    <MasterFloatBar ref="masterFloatBarRef" />
   </div>
 </template>
 
@@ -569,8 +715,10 @@ import { ElMessage } from 'element-plus'
 import { themes, getCurrentTheme, setTheme, initTheme } from '../utils/themes'
 import MasterService from './MasterService.vue'
 import MasterFloatBar from './MasterFloatBar.vue'
+import ToolsGrid from './ToolsGrid.vue'
 
 const router = useRouter()
+const masterFloatBarRef = ref(null)
 
 // 主题相关
 const currentTheme = ref(getCurrentTheme())
@@ -609,7 +757,7 @@ const currentOrder = ref({})
 const payRemark = ref('')
 const confirmLoading = ref(false)
 
-// AI问卦相关
+// 天机问答相关
 const activeDiv = ref('chat')
 const chatMessages = ref([])
 const chatInput = ref('')
@@ -868,12 +1016,252 @@ const hourOptions = [
 ]
 
 const features = [
-  { icon: '🔮', title: '八字排盘', desc: '精准排出四柱八字，分析命理格局', tab: 'paipan' },
-  { icon: '💑', title: '八字合盘', desc: '男女八字配对，分析婚姻缘分', tab: 'hepan' },
-  { icon: '📅', title: '万年历', desc: '农历查询、黄道吉日、节气宜忌', tab: 'calendar' },
-  { icon: '📚', title: '命理学习', desc: '系统学习八字命理知识', tab: 'learn' },
-  { icon: '🧙', title: '大师解盘', desc: '资深命理师深度解析命盘', tab: 'member' }
+  { icon: '🔮', title: '八字排盘', desc: '精准排盘分析命理', tab: 'paipan' },
+  { icon: '💑', title: '八字合盘', desc: '男女配对婚姻分析', tab: 'hepan' },
+  { icon: '📅', title: '万年历', desc: '农历黄道吉日查询', tab: 'calendar' },
+  { icon: '🔮', title: '天机问答', desc: '命理疑惑在线解答', tab: 'divination' }
 ]
+
+// 今日运势提示数据
+const todayDateStr = computed(() => {
+  const d = new Date()
+  return `${d.getMonth() + 1}月${d.getDate()}日`
+})
+const todayLunarStr = computed(() => {
+  const d = new Date()
+  const lunar = solarToLunar(d.getFullYear(), d.getMonth() + 1, d.getDate())
+  return `农历${lunarMonths[lunar.month - 1]}月${lunarDays[lunar.day - 1]}`
+})
+const dailyYi = computed(() => {
+  const seed = new Date().getDate()
+  return ['祈福', '求财', '出行', '签约'][seed % 4] + '、' + ['开业', '嫁娶', '搬家', '动土'][(seed + 1) % 4]
+})
+const dailyJi = computed(() => {
+  const seed = new Date().getDate()
+  return ['诉讼', '开仓', '破土', '安葬'][seed % 4]
+})
+
+// 在线统计（模拟数据，增加真实感）
+const todayCount = ref(0)
+const onlineCount = ref(0)
+const initStats = () => {
+  // 基于时间生成看起来真实的数据
+  const hour = new Date().getHours()
+  const baseCount = 1200 + Math.floor(Math.random() * 300)
+  todayCount.value = baseCount + hour * 45 + Math.floor(Math.random() * 20)
+  onlineCount.value = Math.floor(50 + hour * 3 + Math.random() * 30)
+  // 每隔几秒随机增加
+  setInterval(() => {
+    if (Math.random() > 0.7) todayCount.value += Math.floor(Math.random() * 3) + 1
+    onlineCount.value = Math.max(20, onlineCount.value + Math.floor(Math.random() * 5) - 2)
+  }, 5000)
+}
+
+// 限时优惠倒计时
+const showPromoBanner = ref(true)
+const promoCountdown = ref('00:00:00')
+const initPromoCountdown = () => {
+  // 每天晚上12点重置
+  const updateCountdown = () => {
+    const now = new Date()
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59)
+    const diff = endOfDay - now
+    if (diff <= 0) {
+      promoCountdown.value = '00:00:00'
+      return
+    }
+    const hours = Math.floor(diff / 3600000)
+    const minutes = Math.floor((diff % 3600000) / 60000)
+    const seconds = Math.floor((diff % 60000) / 1000)
+    promoCountdown.value = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+  }
+  updateCountdown()
+  setInterval(updateCountdown, 1000)
+  // 检查是否已关闭过
+  if (sessionStorage.getItem('promo-closed')) showPromoBanner.value = false
+}
+
+// 打开带优惠的大师咨询弹窗
+const openPromoMaster = () => {
+  if (masterFloatBarRef.value) {
+    masterFloatBarRef.value.openModal(true) // true 表示新用户优惠
+  }
+}
+
+// 关闭优惠横幅
+const closePromoBanner = () => {
+  showPromoBanner.value = false
+  sessionStorage.setItem('promo-closed', 'true')
+}
+
+// 分享功能
+const shareToWechat = () => {
+  // 移动端尝试调用微信分享，PC端提示
+  if (/MicroMessenger/i.test(navigator.userAgent)) {
+    ElMessage.info('请点击右上角分享给好友')
+  } else {
+    ElMessage.info('请在微信中打开本页面进行分享')
+  }
+}
+const copyShareLink = async () => {
+  try {
+    await navigator.clipboard.writeText(window.location.href)
+    ElMessage.success('链接已复制，快去分享给好友吧！')
+  } catch {
+    ElMessage.info('请手动复制地址栏链接分享')
+  }
+}
+
+// 用户好评数据（默认假数据）
+const defaultReviews = [
+  { avatar: '👨', name: '张**', text: '大师算得太准了！事业运势分析得很到位', time: '3分钟前' },
+  { avatar: '👩', name: '李**', text: '姻缘合盘很准，和老公确实很配', time: '5分钟前' },
+  { avatar: '👨', name: '王**', text: '八字排盘详细专业，比其他网站好太多', time: '8分钟前' },
+  { avatar: '👩', name: '陈**', text: '宝宝起名服务很满意，名字寓意好', time: '12分钟前' },
+  { avatar: '👨', name: '刘**', text: '流年运势预测准确，提前避开了小人', time: '15分钟前' },
+  { avatar: '👩', name: '赵**', text: '周公解梦解析得很透彻，心里踏实了', time: '18分钟前' },
+  { avatar: '👨', name: '孙**', text: '选的结婚吉日很顺利，感谢大师', time: '22分钟前' },
+  { avatar: '👩', name: '周**', text: '手机号测吉凶很有意思，换了个号运气变好了', time: '25分钟前' },
+  { avatar: '👨', name: '吴**', text: '公司起名后生意明显好转，神了', time: '30分钟前' },
+  { avatar: '👩', name: '郑**', text: '每天来抽个签，心情都变好了', time: '35分钟前' }
+]
+
+// 用户自己的评论（包括被隐藏的负面评论）
+const myReviews = ref([])
+// 公开的好评（AI审核通过的）
+const publicReviews = ref([])
+
+// 显示的评论列表（合并默认+公开+自己的）
+const displayReviews = computed(() => {
+  const all = [...defaultReviews, ...publicReviews.value, ...myReviews.value]
+  // 复制一份用于无限滚动
+  return [...all, ...all]
+})
+
+// 评论弹窗
+const showReviewModal = ref(false)
+const reviewLoading = ref(false)
+const reviewForm = reactive({
+  rating: 5,
+  service: '',
+  content: ''
+})
+
+// 提交评论（AI审核）
+const submitReview = async () => {
+  if (!reviewForm.content.trim()) {
+    ElMessage.warning('请输入评价内容')
+    return
+  }
+  reviewLoading.value = true
+  try {
+    // 调用AI接口判断评论情感
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
+    const response = await fetch(`${baseUrl}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('starloomAI-token') || '' },
+      body: JSON.stringify({
+        message: `请判断以下用户评价是正面还是负面，只回复"正面"或"负面"两个字：\n"${reviewForm.content}"`,
+        stream: false
+      })
+    })
+    const result = await response.text()
+    
+    // 解析AI返回结果
+    let isPositive = true
+    if (result.includes('负面') || result.includes('差评') || result.includes('不好')) {
+      isPositive = false
+    }
+    
+    // 构建评论对象
+    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
+    const newReview = {
+      avatar: '👤',
+      name: (userInfo.nickname || userInfo.phone || '匿名用户').slice(0, 1) + '**',
+      text: reviewForm.content,
+      time: '刚刚',
+      service: reviewForm.service,
+      rating: reviewForm.rating,
+      isMine: true,
+      isPublic: isPositive
+    }
+    
+    if (isPositive) {
+      // 正面评价：公开显示
+      publicReviews.value.unshift(newReview)
+      ElMessage.success('感谢您的好评！已发布')
+    } else {
+      // 负面评价：只有自己能看到
+      myReviews.value.unshift(newReview)
+      ElMessage.success('感谢您的反馈！我们会持续改进')
+    }
+    
+    // 保存到本地存储
+    localStorage.setItem('my-reviews', JSON.stringify(myReviews.value))
+    localStorage.setItem('public-reviews', JSON.stringify(publicReviews.value))
+    
+    // 重置表单
+    showReviewModal.value = false
+    reviewForm.content = ''
+    reviewForm.rating = 5
+    reviewForm.service = ''
+  } catch (e) {
+    // 如果AI接口失败，默认当作正面评价
+    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
+    const newReview = {
+      avatar: '👤',
+      name: (userInfo.nickname || '用户').slice(0, 1) + '**',
+      text: reviewForm.content,
+      time: '刚刚',
+      isMine: true,
+      isPublic: true
+    }
+    publicReviews.value.unshift(newReview)
+    localStorage.setItem('public-reviews', JSON.stringify(publicReviews.value))
+    ElMessage.success('评价已发布')
+    showReviewModal.value = false
+    reviewForm.content = ''
+  }
+  reviewLoading.value = false
+}
+
+// 加载本地存储的评论
+const loadLocalReviews = () => {
+  try {
+    const savedMy = localStorage.getItem('my-reviews')
+    const savedPublic = localStorage.getItem('public-reviews')
+    if (savedMy) myReviews.value = JSON.parse(savedMy)
+    if (savedPublic) publicReviews.value = JSON.parse(savedPublic)
+  } catch (e) { /* ignore */ }
+}
+
+// 功德箱相关
+const showMeritModal = ref(false)
+const selectedMerit = ref(null)
+const meritWish = ref('')
+const meritOptions = [
+  { icon: '🕯️', name: '一炷清香', price: 1.88 },
+  { icon: '🪔', name: '三炷高香', price: 6.66 },
+  { icon: '🏮', name: '九炷福香', price: 9.99 },
+  { icon: '🎋', name: '功德圆满', price: 66.66 }
+]
+
+const meritLoading = ref(false)
+const submitMerit = async () => {
+  if (!selectedMerit.value || meritLoading.value) return
+  meritLoading.value = true
+  try {
+    // 模拟提交（后续可接入实际支付）
+    await new Promise(resolve => setTimeout(resolve, 800))
+    ElMessage.success(`🙏 感谢您的香火钱 ¥${selectedMerit.value}，功德无量！`)
+    showMeritModal.value = false
+    selectedMerit.value = null
+    meritWish.value = ''
+  } catch (e) {
+    ElMessage.error('提交失败，请重试')
+  }
+  meritLoading.value = false
+}
 
 const constellations = [
   { name: '白羊座', icon: '♈' }, { name: '金牛座', icon: '♉' }, { name: '双子座', icon: '♊' },
@@ -915,6 +1303,20 @@ const switchTab = (tab) => {
 }
 const goToLearn = () => { router.push({ name: 'learn' }) }
 const goToMember = () => { currentTab.value = 'member'; loadVipData() }
+const openMasterService = () => {
+  // 打开大师服务弹窗
+  if (masterFloatBarRef.value) {
+    masterFloatBarRef.value.openModal()
+  }
+}
+
+// 处理工具弹窗状态变化，控制底部浮动栏显示
+const handleToolModalChange = (isOpen) => {
+  if (masterFloatBarRef.value) {
+    masterFloatBarRef.value.setModalOpen(isOpen)
+  }
+}
+
 const formatDate = (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString('zh-CN') : ''
 
 // 选择星座并滚动到操作区
@@ -1250,15 +1652,140 @@ const handleStreamResponse = async (response, onUpdate) => {
   }
 }
 
-onMounted(() => { 
+onMounted(() => {
   initTheme()
   checkLoginStatus()
   updateCalendar() // 初始化万年历
+  initStats() // 初始化统计数据
+  initPromoCountdown() // 初始化倒计时
+  loadLocalReviews() // 加载本地评论
 })
 </script>
 
 
 <style scoped>
+/* ========== 今日运势提示条 ========== */
+.daily-tip-bar {
+  background: linear-gradient(90deg, rgba(245,158,11,0.15), rgba(217,119,6,0.1));
+  border-bottom: 1px solid rgba(245,158,11,0.2);
+  padding: 8px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  position: relative;
+  z-index: 10;
+}
+.tip-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.tip-date { color: var(--accent, #f59e0b); font-weight: 500; }
+.tip-divider { color: rgba(255,255,255,0.2); }
+.tip-lunar { color: var(--textMuted, rgba(255,255,255,0.7)); }
+.tip-yi { color: #10b981; }
+.tip-ji { color: #ef4444; }
+.tip-stats {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+}
+.stat-item { color: var(--textMuted, rgba(255,255,255,0.6)); }
+.stat-item strong { color: var(--accent, #f59e0b); }
+.stat-item.online strong { color: #10b981; }
+
+/* ========== 限时优惠横幅 ========== */
+.promo-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+  border-radius: 12px;
+  margin: 0 20px 16px;
+  cursor: pointer;
+  position: relative;
+  animation: promoPulse 2s ease-in-out infinite;
+}
+@keyframes promoPulse {
+  0%, 100% { box-shadow: 0 4px 15px rgba(239,68,68,0.3); }
+  50% { box-shadow: 0 4px 25px rgba(239,68,68,0.5); }
+}
+.promo-icon { font-size: 20px; }
+.promo-text { color: #fff; font-size: 14px; }
+.promo-text strong { color: #ffd700; font-size: 16px; }
+.promo-countdown {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0,0,0,0.2);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+.countdown-label { font-size: 11px; color: rgba(255,255,255,0.8); }
+.countdown-time { font-size: 14px; color: #ffd700; font-weight: 600; font-family: monospace; }
+.promo-close {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.6);
+  font-size: 16px;
+  cursor: pointer;
+}
+.promo-close:hover { color: #fff; }
+
+/* ========== 分享区域 ========== */
+.share-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px 20px;
+  margin: 20px auto;
+  max-width: 400px;
+}
+.share-text {
+  font-size: 13px;
+  color: var(--textMuted, rgba(255,255,255,0.6));
+}
+.share-btns {
+  display: flex;
+  gap: 10px;
+}
+.share-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.share-btn.wechat {
+  background: #07c160;
+  color: #fff;
+}
+.share-btn.copy {
+  background: var(--bgCard, rgba(255,255,255,0.1));
+  color: var(--textPrimary, #fff);
+  border: 1px solid var(--border, rgba(255,255,255,0.1));
+}
+.share-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
 /* ========== 主题切换按钮样式（在header中） ========== */
 .theme-btn {
   font-size: 20px;
@@ -1461,14 +1988,14 @@ onMounted(() => {
 .modal-footer a:hover { color: var(--primary, #f093fb); }
 
 .main-content { padding: 30px; max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
-.hero-section { text-align: center; padding: 80px 20px; }
+.hero-section { text-align: center; padding: 40px 20px 20px; }
 .hero-section h1 { 
-  font-size: 48px; margin-bottom: 20px; 
+  font-size: 36px; margin-bottom: 10px; 
   background: var(--primaryGradient, linear-gradient(90deg, #f093fb, #f5576c)); 
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
   text-shadow: 0 0 60px var(--shadow, rgba(240,147,251,0.3));
 }
-.hero-section p { font-size: 18px; color: var(--accentLight, #c8a5d9); margin-bottom: 35px; letter-spacing: 2px; }
+.hero-section p { font-size: 14px; color: var(--accentLight, #c8a5d9); margin-bottom: 0; letter-spacing: 2px; }
 .cta-btn { 
   padding: 16px 45px; 
   background: var(--primaryGradient, linear-gradient(135deg, #f093fb, #f5576c)); 
@@ -1478,6 +2005,90 @@ onMounted(() => {
   transition: all 0.3s;
 }
 .cta-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 40px var(--shadowHover, rgba(240,147,251,0.5)); }
+.cta-btn.secondary { background: var(--bgCard); border: 2px solid var(--accent); }
+.cta-btn.secondary:hover { background: var(--accent); }
+.hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+/* 核心功能 - 紧凑横排 */
+.features-row { display: flex; justify-content: center; gap: 16px; margin: 24px 0 16px; flex-wrap: wrap; }
+.feature-item { display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--bgCard, rgba(255,255,255,0.08)); border: 1px solid var(--border, rgba(255,255,255,0.1)); border-radius: 24px; cursor: pointer; transition: all 0.3s; }
+.feature-item:hover { background: var(--bgCardHover, rgba(255,255,255,0.15)); border-color: var(--accent, #f59e0b); transform: translateY(-2px); }
+.fi-icon { font-size: 20px; }
+.fi-title { font-size: 14px; color: var(--textPrimary, #fff); font-weight: 500; }
+
+/* 用户好评 + 功德箱 */
+.social-proof-section { display: flex; gap: 20px; margin: 30px auto; max-width: 900px; padding: 0 20px; align-items: stretch; }
+.reviews-scroll { flex: 1; background: var(--bgCard, rgba(255,255,255,0.05)); border-radius: 16px; padding: 16px; overflow: hidden; }
+.reviews-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.reviews-title { font-size: 14px; color: var(--textPrimary, #fff); }
+.write-review-btn { padding: 4px 12px; background: var(--accent, #f59e0b); border: none; border-radius: 12px; color: #fff; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+.write-review-btn:hover { transform: scale(1.05); }
+.reviews-container { overflow: hidden; height: 120px; }
+.reviews-track { display: flex; flex-direction: column; animation: scrollReviews 30s linear infinite; }
+.reviews-track:hover { animation-play-state: paused; }
+@keyframes scrollReviews { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
+.review-item { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border, rgba(255,255,255,0.05)); }
+.review-avatar { font-size: 20px; }
+.review-content { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.review-name { font-size: 12px; color: var(--accent, #f59e0b); }
+.review-text { font-size: 13px; color: var(--textPrimary, #fff); line-height: 1.4; }
+.review-time { font-size: 11px; color: var(--textMuted, rgba(255,255,255,0.4)); }
+.review-mine { font-size: 10px; color: var(--accent, #f59e0b); background: rgba(245,158,11,0.15); padding: 1px 6px; border-radius: 8px; margin-left: 6px; }
+
+.merit-box { display: flex; align-items: center; gap: 12px; padding: 20px; background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,165,0,0.1)); border: 1px solid rgba(255,215,0,0.3); border-radius: 16px; cursor: pointer; transition: all 0.3s; min-width: 180px; }
+.merit-box:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(255,215,0,0.2); border-color: rgba(255,215,0,0.5); }
+.merit-icon { font-size: 36px; }
+.merit-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.merit-title { font-size: 16px; color: #ffd700; font-weight: 600; }
+.merit-desc { font-size: 12px; color: var(--textMuted, rgba(255,255,255,0.6)); }
+.merit-arrow { font-size: 18px; color: #ffd700; }
+
+/* 功德箱弹窗 */
+.merit-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.merit-modal-content { background: var(--bgCard, #1a1a2e); border-radius: 20px; width: 100%; max-width: 400px; animation: modalIn 0.3s ease; }
+.merit-modal-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.1)); border-radius: 20px 20px 0 0; }
+.merit-modal-header h3 { color: #ffd700; margin: 0; font-size: 18px; }
+.merit-modal-body { padding: 24px; }
+.incense-display { text-align: center; margin-bottom: 20px; }
+.incense-burner { font-size: 60px; animation: incenseGlow 2s ease-in-out infinite; }
+@keyframes incenseGlow { 0%, 100% { filter: drop-shadow(0 0 10px rgba(255,215,0,0.5)); } 50% { filter: drop-shadow(0 0 20px rgba(255,215,0,0.8)); } }
+.incense-tip { font-size: 14px; color: var(--textMuted, rgba(255,255,255,0.6)); margin-top: 8px; }
+.merit-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+.merit-option { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 12px; background: var(--bgInput, rgba(255,255,255,0.05)); border: 2px solid transparent; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+.merit-option:hover { border-color: rgba(255,215,0,0.3); }
+.merit-option.selected { border-color: #ffd700; background: rgba(255,215,0,0.1); }
+.opt-icon { font-size: 28px; }
+.opt-name { font-size: 13px; color: var(--textPrimary, #fff); }
+.opt-price { font-size: 15px; color: #ffd700; font-weight: 600; }
+.merit-wish label { display: block; font-size: 13px; color: var(--textSecondary, rgba(255,255,255,0.8)); margin-bottom: 8px; }
+.merit-wish textarea { width: 100%; padding: 12px; background: var(--bgInput, rgba(255,255,255,0.08)); border: 1px solid var(--border, rgba(255,255,255,0.1)); border-radius: 10px; color: var(--textPrimary, #fff); font-size: 14px; resize: none; }
+.merit-submit { width: 100%; padding: 14px; background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; border-radius: 12px; color: #1a1a2e; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 16px; transition: all 0.3s; }
+.merit-submit:hover:not(:disabled) { transform: scale(1.02); box-shadow: 0 4px 20px rgba(255,215,0,0.4); }
+.merit-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.merit-note { font-size: 12px; color: var(--textMuted, rgba(255,255,255,0.5)); text-align: center; margin-top: 12px; }
+
+/* 用户评价弹窗 */
+.review-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.review-modal-content { background: var(--bgCard, #1a1a2e); border-radius: 20px; width: 100%; max-width: 400px; animation: modalIn 0.3s ease; }
+.review-modal-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(217,119,6,0.1)); border-radius: 20px 20px 0 0; }
+.review-modal-header h3 { color: var(--accent, #f59e0b); margin: 0; font-size: 18px; }
+.review-modal-body { padding: 24px; }
+.review-rating { margin-bottom: 20px; }
+.review-rating label, .review-service label, .review-text label { display: block; font-size: 14px; color: var(--textSecondary, rgba(255,255,255,0.8)); margin-bottom: 10px; font-weight: 500; }
+.rating-stars { display: flex; gap: 8px; }
+.rating-stars .star { font-size: 28px; cursor: pointer; filter: grayscale(100%); opacity: 0.4; transition: all 0.2s; }
+.rating-stars .star.active { filter: grayscale(0%); opacity: 1; }
+.rating-stars .star:hover { transform: scale(1.2); filter: grayscale(0%); opacity: 0.8; }
+.review-service { margin-bottom: 20px; }
+.review-service select { width: 100%; padding: 10px 14px; background: var(--bgInput, rgba(255,255,255,0.08)); border: 1px solid var(--border, rgba(255,255,255,0.1)); border-radius: 10px; color: var(--textPrimary, #fff); font-size: 14px; }
+.review-text { margin-bottom: 16px; position: relative; }
+.review-text textarea { width: 100%; padding: 12px; background: var(--bgInput, rgba(255,255,255,0.08)); border: 1px solid var(--border, rgba(255,255,255,0.1)); border-radius: 10px; color: var(--textPrimary, #fff); font-size: 14px; resize: none; }
+.char-count { position: absolute; bottom: 8px; right: 12px; font-size: 11px; color: var(--textMuted, rgba(255,255,255,0.4)); }
+.review-submit { width: 100%; padding: 14px; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+.review-submit:hover:not(:disabled) { transform: scale(1.02); box-shadow: 0 4px 20px rgba(245,158,11,0.4); }
+.review-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* 旧的features样式保留兼容 */
 .features-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin: 50px 0; }
 .feature-card { 
   background: var(--bgCard, rgba(255,255,255,0.06)); 
@@ -1529,7 +2140,7 @@ onMounted(() => {
   text-align: center; margin-bottom: 25px; font-size: 26px;
 }
 
-/* ========== AI问卦标签页样式 ========== */
+/* ========== 天机问答标签页样式 ========== */
 .div-tabs-wrapper {
   overflow-x: auto;
   margin-bottom: 20px;
@@ -2086,17 +2697,83 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  /* 今日提示条移动端 - 精简显示 */
+  .daily-tip-bar {
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  .tip-content {
+    font-size: 11px;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .tip-divider { display: none; }
+  .tip-yi, .tip-ji { 
+    background: rgba(255,255,255,0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .tip-stats {
+    font-size: 11px;
+    gap: 12px;
+  }
+  
+  /* 限时优惠横幅移动端 */
+  .promo-banner {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 30px 10px 16px;
+    margin: 0 10px 12px;
+  }
+  .promo-icon { font-size: 16px; }
+  .promo-text { font-size: 12px; }
+  .promo-text strong { font-size: 14px; }
+  .promo-countdown { padding: 3px 10px; }
+  .countdown-label { font-size: 10px; }
+  .countdown-time { font-size: 12px; }
+  
+  /* Hero区域移动端 - 更紧凑 */
+  .hero-section { padding: 20px 15px 10px; }
+  .hero-section h1 { font-size: 22px; margin-bottom: 6px; }
+  .hero-section p { font-size: 12px; }
+  
+  /* 核心功能 - 移动端2x2布局 */
+  .features-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 16px 10px;
+  }
+  .feature-item {
+    padding: 12px 10px;
+    border-radius: 12px;
+    justify-content: center;
+  }
+  .fi-icon { font-size: 18px; }
+  .fi-title { font-size: 13px; }
+  
+  /* 分享区域移动端 */
+  .share-section {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 16px;
+  }
+  .share-btns { gap: 8px; }
+  .share-btn { padding: 8px 14px; font-size: 12px; }
+  
   .header-center, .header-right { display: none; }
   .mobile-header-right { display: flex; }
   .mobile-menu-btn { display: block; font-size: 24px; cursor: pointer; color: var(--accent, #f5a5c8); }
   .mobile-nav { display: block; }
-  .hero-section h1 { font-size: 28px; }
-  .hero-section { padding: 40px 15px; }
   .form-row { grid-template-columns: 1fr; }
   .plans-grid { grid-template-columns: 1fr; }
   .theme-panel { top: 60px; right: 10px; width: 150px; }
   .theme-panel .theme-option { padding: 8px 10px; font-size: 12px; }
   .mobile-nav .nav-item { font-size: 15px; }
+  
   /* 移动端表单优化 */
   .paipan-form, .hepan-form { padding: 20px; margin: 0 10px; }
   .form-group input, .form-group select { padding: 12px 14px; font-size: 16px; }
@@ -2105,7 +2782,31 @@ onMounted(() => {
   .features-section { gap: 15px; margin: 30px 0; }
   .feature-card { padding: 25px 15px; }
   .feature-icon { font-size: 40px; margin-bottom: 12px; }
-  /* AI问卦移动端优化 */
+  
+  /* 用户好评+功德箱移动端 */
+  .social-proof-section { flex-direction: column; gap: 12px; padding: 0 10px; margin: 20px auto; }
+  .reviews-scroll { padding: 12px; }
+  .reviews-header { flex-direction: row; gap: 8px; align-items: center; justify-content: space-between; }
+  .write-review-btn { font-size: 11px; padding: 4px 10px; }
+  .reviews-container { height: 80px; }
+  .review-item { padding: 6px 0; }
+  .review-avatar { font-size: 16px; }
+  .review-name { font-size: 11px; }
+  .review-text { font-size: 12px; }
+  .review-time { font-size: 10px; }
+  .review-modal-content { max-width: 100%; margin: 10px; }
+  
+  /* 功德箱移动端 - 更紧凑 */
+  .merit-box { padding: 12px; gap: 10px; }
+  .merit-icon { font-size: 24px; }
+  .merit-title { font-size: 13px; }
+  .merit-desc { font-size: 11px; }
+  .merit-modal-content { max-width: 100%; margin: 10px; }
+  .merit-options { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .merit-option { padding: 12px 8px; }
+  .opt-icon { font-size: 24px; }
+  
+  /* 天机问答移动端优化 */
   .divination-tab h2 { font-size: 22px; margin-bottom: 15px; }
   .div-tabs { gap: 8px; }
   .div-tab { padding: 8px 12px; }
@@ -2127,6 +2828,7 @@ onMounted(() => {
   .birthday-btn { padding: 8px 15px; font-size: 13px; }
   .chat-messages { height: 300px; padding: 15px; }
   .chat-input-area { padding: 12px; }
+  
   /* 移动端日期选择器和按钮优化 */
   .date-selects {
     display: flex;

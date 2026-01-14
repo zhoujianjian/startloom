@@ -55,6 +55,7 @@ declare module 'vue' {
     SubscribeType: typeof import('./src/components/ChatComponent/SubscribeType.vue')['default']
     Success: typeof import('./src/components/ChatComponent/Success.vue')['default']
     TextComponents: typeof import('./src/components/ChatComponent/TextComponents.vue')['default']
+    ToolsGrid: typeof import('./src/components/ToolsGrid.vue')['default']
     TypeTab: typeof import('./src/components/TypeTab.vue')['default']
     ZodiacQuery: typeof import('./src/components/ZodiacQuery.vue')['default']
   }
