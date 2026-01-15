@@ -133,6 +133,13 @@ import { ref, reactive, computed, nextTick } from 'vue'
 
 const emit = defineEmits(['openMaster', 'switchTab', 'modalChange'])
 
+// 百度统计埋点 - 记录工具使用
+const trackEvent = (category, action, label) => {
+  if (window._hmt) {
+    window._hmt.push(['_trackEvent', category, action, label])
+  }
+}
+
 const showToolModal = ref(false)
 const currentTool = ref(null)
 const loading = ref(false)
@@ -178,7 +185,8 @@ const openTool = (tool) => {
   currentTool.value = tool
   toolResult.value = ''
   showToolModal.value = true
-  emit('modalChange', true) // 通知父组件弹窗打开
+  trackEvent('工具', '打开', tool.name) // 埋点：打开工具
+  emit('modalChange', true)
 }
 const closeModal = () => { 
   showToolModal.value = false
@@ -235,6 +243,7 @@ const callAIStream = async (prompt) => {
 }
 
 const testName = () => {
+  trackEvent('工具', '使用', currentTool.value?.name) // 埋点：使用工具
   if (currentTool.value?.id === 'company-name') {
     if (!nameForm.name) return alert('请输入公司名称')
     callAIStream(`请为公司名称"${nameForm.name}"进行测试打分，分析五行属性、数理吉凶、行业适配度、综合评分(满分100分)。`)
@@ -246,16 +255,16 @@ const testName = () => {
     callAIStream(`请为"${nameForm.surname}${nameForm.name}"(${nameForm.gender})进行姓名测试打分，分析五行、三才五格、名字寓意，综合评分(满分100分)。`)
   }
 }
-const matchZodiac = () => { if (!matchForm.zodiac1 || !matchForm.zodiac2) return alert('请选择双方生肖'); callAIStream(`请分析属${matchForm.zodiac1}和属${matchForm.zodiac2}的生肖配对：配对指数(满分100)、性格互补、感情运势、相处建议。`) }
-const matchStar = () => { if (!matchForm.star1 || !matchForm.star2) return alert('请选择双方星座'); callAIStream(`请分析${matchForm.star1}和${matchForm.star2}的星座配对：配对指数(满分100)、性格分析、相处建议。`) }
-const interpretDream = () => { if (!dreamForm.content) return alert('请描述你的梦境'); callAIStream(`请用周公解梦解析这个梦境："${dreamForm.content}"，包括梦境寓意、吉凶预兆、运势提示。`) }
-const testPhone = () => { if (!phoneForm.number || phoneForm.number.length !== 11) return alert('请输入正确的11位手机号'); callAIStream(`请分析手机号${phoneForm.number}的吉凶：数字能量、五行属性、吉凶等级、对事业财运感情的影响。`) }
-const testPlate = () => { if (!plateForm.number) return alert('请输入车牌号'); callAIStream(`请分析车牌号"${plateForm.number}"的吉凶：字母数字寓意、五行分析、吉凶等级。`) }
-const testFate = () => { if (!fateForm.name1 || !fateForm.name2) return alert('请输入双方名字'); callAIStream(`请测算"${fateForm.name1}"和"${fateForm.name2}"的缘分：缘分指数(满分100)、姓名配对、感情预测。`) }
-const testPastLife = () => { if (!pastForm.name || !pastForm.birthday) return alert('请输入完整信息'); callAIStream(`请根据姓名"${pastForm.name}"和生日${pastForm.birthday}，推测前世身份、今生使命。`) }
-const queryLuckyDay = () => { if (!luckyForm.event || !luckyForm.month) return alert('请选择事项和月份'); callAIStream(`请查询${luckyForm.month}适合${luckyForm.event}的黄道吉日，列出5个最佳日期，包括公历农历、宜忌、吉时。`) }
-const drawSign = () => { if (loading.value || toolResult.value) return; signDrawing.value = true; callAIStream('请为我抽取一支今日运势签，包括签文等级、四句签诗、签文解读、开运建议。'); setTimeout(() => { signDrawing.value = false }, 1000) }
-const consultMaster = () => { emit('openMaster'); closeModal() }
+const matchZodiac = () => { trackEvent('工具', '使用', '生肖配对'); if (!matchForm.zodiac1 || !matchForm.zodiac2) return alert('请选择双方生肖'); callAIStream(`请分析属${matchForm.zodiac1}和属${matchForm.zodiac2}的生肖配对：配对指数(满分100)、性格互补、感情运势、相处建议。`) }
+const matchStar = () => { trackEvent('工具', '使用', '星座配对'); if (!matchForm.star1 || !matchForm.star2) return alert('请选择双方星座'); callAIStream(`请分析${matchForm.star1}和${matchForm.star2}的星座配对：配对指数(满分100)、性格分析、相处建议。`) }
+const interpretDream = () => { trackEvent('工具', '使用', '周公解梦'); if (!dreamForm.content) return alert('请描述你的梦境'); callAIStream(`请用周公解梦解析这个梦境："${dreamForm.content}"，包括梦境寓意、吉凶预兆、运势提示。`) }
+const testPhone = () => { trackEvent('工具', '使用', '手机测吉凶'); if (!phoneForm.number || phoneForm.number.length !== 11) return alert('请输入正确的11位手机号'); callAIStream(`请分析手机号${phoneForm.number}的吉凶：数字能量、五行属性、吉凶等级、对事业财运感情的影响。`) }
+const testPlate = () => { trackEvent('工具', '使用', '车牌测吉凶'); if (!plateForm.number) return alert('请输入车牌号'); callAIStream(`请分析车牌号"${plateForm.number}"的吉凶：字母数字寓意、五行分析、吉凶等级。`) }
+const testFate = () => { trackEvent('工具', '使用', '缘分测试'); if (!fateForm.name1 || !fateForm.name2) return alert('请输入双方名字'); callAIStream(`请测算"${fateForm.name1}"和"${fateForm.name2}"的缘分：缘分指数(满分100)、姓名配对、感情预测。`) }
+const testPastLife = () => { trackEvent('工具', '使用', '前世今生'); if (!pastForm.name || !pastForm.birthday) return alert('请输入完整信息'); callAIStream(`请根据姓名"${pastForm.name}"和生日${pastForm.birthday}，推测前世身份、今生使命。`) }
+const queryLuckyDay = () => { trackEvent('工具', '使用', '黄道吉日'); if (!luckyForm.event || !luckyForm.month) return alert('请选择事项和月份'); callAIStream(`请查询${luckyForm.month}适合${luckyForm.event}的黄道吉日，列出5个最佳日期，包括公历农历、宜忌、吉时。`) }
+const drawSign = () => { trackEvent('工具', '使用', '今日运势'); if (loading.value || toolResult.value) return; signDrawing.value = true; callAIStream('请为我抽取一支今日运势签，包括签文等级、四句签诗、签文解读、开运建议。'); setTimeout(() => { signDrawing.value = false }, 1000) }
+const consultMaster = () => { trackEvent('转化', '点击', '咨询大师'); emit('openMaster'); closeModal() }
 </script>
 
 

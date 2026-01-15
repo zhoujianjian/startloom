@@ -348,26 +348,11 @@ export default {
     },
   },
   mounted() {
-    // 控制登录弹框是否弹出
-    const num = this.getCookie("popUpLogin");
-    const loginToken = localStorage.getItem("starloomAI-token");
-    if (num) {
-      this.setCookie("popUpLogin", Number(num) + 1, 365);
-      const time = (Number(num) + 1) % 5;
-      if (time == 1) {
-        if (!loginToken) {
-          this.loginTipMessageBox();
-        }
-      }
-      // else {
-      //   this.$refs.advertiseAlert.show = false
-      // }
-    } else {
-      this.setCookie("popUpLogin", 1, 365);
-      if (!loginToken) {
-        this.loginTipMessageBox();
-      }
-    }
+    // 移除自动弹出登录框的逻辑 - 只在关键操作时提示登录
+    // const num = this.getCookie("popUpLogin");
+    // const loginToken = localStorage.getItem("starloomAI-token");
+    // ... 旧逻辑已移除
+    
     this.getPayCardInfoList();
     setTimeout(() => {
       // const lang = localStorage.getItem('lang')
