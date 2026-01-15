@@ -744,11 +744,17 @@ import HotAndLive from './HotAndLive.vue'
 const router = useRouter()
 const masterFloatBarRef = ref(null)
 const testHistoryRef = ref(null)
-const toolsGridRef = ref(null)// 处理打开工具
+const toolsGridRef = ref(null)
+
+// 处理打开工具
 const handleOpenTool = (tool) => {
-  // 这里可以触发ToolsGrid打开对应工具
-  // 暂时跳转到首页
+  // 切换到首页并打开对应工具弹窗
   currentTab.value = 'home'
+  nextTick(() => {
+    if (toolsGridRef.value && tool?.id) {
+      toolsGridRef.value.openToolById(tool.id)
+    }
+  })
 }
 
 // 主题相关

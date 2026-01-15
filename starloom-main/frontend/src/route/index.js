@@ -140,6 +140,49 @@ const routes = [
     component: HomePage,
     meta: { seoKey: 'luckyDay', defaultTool: 'lucky-day' }
   },
+  // 新增工具路由
+  {
+    path: "/tool/taisui",
+    name: "taisui",
+    component: HomePage,
+    meta: { seoKey: 'taisui', defaultTool: 'taisui' }
+  },
+  {
+    path: "/tool/peach-blossom",
+    name: "peachBlossom",
+    component: HomePage,
+    meta: { seoKey: 'peachBlossom', defaultTool: 'peach-blossom' }
+  },
+  {
+    path: "/tool/wealth-test",
+    name: "wealthTest",
+    component: HomePage,
+    meta: { seoKey: 'wealthTest', defaultTool: 'wealth-test' }
+  },
+  {
+    path: "/tool/mbti-test",
+    name: "mbtiTest",
+    component: HomePage,
+    meta: { seoKey: 'mbtiTest', defaultTool: 'mbti-test' }
+  },
+  {
+    path: "/tool/lucky-number",
+    name: "luckyNumber",
+    component: HomePage,
+    meta: { seoKey: 'luckyNumber', defaultTool: 'lucky-number' }
+  },
+  {
+    path: "/tool/birthday-flower",
+    name: "birthdayFlower",
+    component: HomePage,
+    meta: { seoKey: 'birthdayFlower', defaultTool: 'birthday-flower' }
+  },
+  {
+    path: "/tool/fengshui-test",
+    name: "fengshuiTest",
+    component: HomePage,
+    meta: { seoKey: 'fengshuiTest', defaultTool: 'fengshui-test' }
+  },
   {
     path: "/naming",
     name: "naming",

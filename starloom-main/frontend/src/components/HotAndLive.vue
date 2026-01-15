@@ -32,7 +32,12 @@
         </div>
         <div class="live-list">
           <transition-group name="live" tag="div">
-            <div class="live-item" v-for="feed in liveFeeds" :key="feed.id">
+            <div 
+              class="live-item" 
+              v-for="feed in liveFeeds" 
+              :key="feed.id"
+              @click="$emit('openTool', { id: feed.toolId, icon: feed.toolIcon, name: feed.toolName })"
+            >
               <span class="avatar">{{ feed.avatar }}</span>
               <span class="text">{{ feed.text }}</span>
               <span class="time">{{ feed.time }}</span>
@@ -82,23 +87,35 @@ const feedId = ref(0)
 
 const names = ['小明', '阿花', '大壮', '小红', '阿强', '小美', '老王', '小李', '阿珍', '大伟', '晓晓', '明明']
 const avatars = ['👤', '👩', '👨', '🧑', '👧', '👦', '🧔', '👱', '👸', '🤴', '👩‍🦰', '👨‍🦱']
-const actions = [
-  '刚测了姓名，得分92分',
-  '完成了生肖配对测试',
-  '抽到了上上签',
-  '测了今日运势',
-  '做了周公解梦',
-  '测了缘分指数98%',
-  '查了黄道吉日',
-  '测了手机号吉凶'
+
+// 动态关联到具体工具
+const actionTemplates = [
+  { text: '刚测了姓名，得分92分', toolId: 'name-test', toolIcon: '✍️', toolName: '姓名测试' },
+  { text: '完成了生肖配对测试', toolId: 'zodiac-match', toolIcon: '🐲', toolName: '生肖配对' },
+  { text: '抽到了上上签', toolId: 'daily-sign', toolIcon: '🎋', toolName: '今日运势' },
+  { text: '测了今日运势', toolId: 'daily-sign', toolIcon: '🎋', toolName: '今日运势' },
+  { text: '做了周公解梦', toolId: 'dream', toolIcon: '🌙', toolName: '周公解梦' },
+  { text: '测了缘分指数98%', toolId: 'fate-test', toolIcon: '💘', toolName: '缘分测试' },
+  { text: '查了黄道吉日', toolId: 'lucky-day', toolIcon: '📅', toolName: '黄道吉日' },
+  { text: '测了手机号吉凶', toolId: 'phone-test', toolIcon: '📱', toolName: '手机测吉凶' },
+  { text: '查了犯太岁', toolId: 'taisui', toolIcon: '🐉', toolName: '犯太岁查询' },
+  { text: '测了桃花运', toolId: 'peach-blossom', toolIcon: '🌸', toolName: '桃花运测试' },
+  { text: '测了今年财运', toolId: 'wealth-test', toolIcon: '💰', toolName: '财运测试' },
+  { text: '做了性格测试', toolId: 'mbti-test', toolIcon: '🧠', toolName: '性格测试' },
+  { text: '查了生日花语', toolId: 'birthday-flower', toolIcon: '💐', toolName: '生日花语' },
+  { text: '测了星座配对', toolId: 'constellation-match', toolIcon: '⭐', toolName: '星座配对' }
 ]
 
 const addFeed = () => {
+  const action = actionTemplates[Math.floor(Math.random() * actionTemplates.length)]
   const feed = {
     id: feedId.value++,
     avatar: avatars[Math.floor(Math.random() * avatars.length)],
-    text: names[Math.floor(Math.random() * names.length)] + actions[Math.floor(Math.random() * actions.length)],
-    time: '刚刚'
+    text: names[Math.floor(Math.random() * names.length)] + action.text,
+    time: '刚刚',
+    toolId: action.toolId,
+    toolIcon: action.toolIcon,
+    toolName: action.toolName
   }
   liveFeeds.value.unshift(feed)
   if (liveFeeds.value.length > 5) liveFeeds.value.pop()
@@ -249,8 +266,14 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 0;
+  padding: 8px 10px;
   border-bottom: 1px solid rgba(255,255,255,0.05);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+.live-item:hover {
+  background: rgba(245,158,11,0.1);
 }
 .live-item:last-child { border-bottom: none; }
 

@@ -6,7 +6,11 @@
         <div class="logo" @click="goHome"><span class="logo-icon">八字</span><span class="logo-text">天机命理</span></div>
       </div>
       <div class="header-center">
-        <div class="nav-item" @click="goHome">排盘首页</div>
+        <div class="nav-item" @click="goHome">首页</div>
+        <div class="nav-item" @click="goTo('paipan')">八字排盘</div>
+        <div class="nav-item" @click="goTo('hepan')">八字合盘</div>
+        <div class="nav-item" @click="goTo('calendar')">万年历</div>
+        <div class="nav-item" @click="goTo('divination')">天机问答</div>
         <div class="nav-item active">学习课堂</div>
       </div>
       <div class="header-right">
@@ -19,6 +23,20 @@
         </div>
         <span class="theme-btn" @click="showThemePanel = !showThemePanel">{{ themeList.find(t => t.key === currentTheme)?.icon || '🎨' }}</span>
       </div>
+      <div class="mobile-header-right">
+        <span class="theme-btn-mobile" @click="showThemePanel = !showThemePanel">{{ themeList.find(t => t.key === currentTheme)?.icon || '🎨' }}</span>
+        <span class="mobile-menu-btn" @click="showMobileMenu = !showMobileMenu">☰</span>
+      </div>
+    </div>
+
+    <!-- 移动端导航 -->
+    <div class="mobile-nav" v-if="showMobileMenu">
+      <div class="nav-item" @click="goHome; showMobileMenu = false">首页</div>
+      <div class="nav-item" @click="goTo('paipan'); showMobileMenu = false">八字排盘</div>
+      <div class="nav-item" @click="goTo('hepan'); showMobileMenu = false">八字合盘</div>
+      <div class="nav-item" @click="goTo('calendar'); showMobileMenu = false">万年历</div>
+      <div class="nav-item" @click="goTo('divination'); showMobileMenu = false">天机问答</div>
+      <div class="nav-item active" @click="showMobileMenu = false">学习课堂</div>
     </div>
 
     <!-- 主题面板 -->
@@ -218,6 +236,7 @@ const router = useRouter()
 const currentTheme = ref(getCurrentTheme())
 const showThemePanel = ref(false)
 const showSearch = ref(false)
+const showMobileMenu = ref(false)
 const themeList = Object.entries(themes).map(([key, val]) => ({ key, name: val.name, icon: val.icon }))
 
 const changeTheme = (themeName) => {
@@ -401,6 +420,7 @@ const selectSubCategoryDirect = async (parentCat, sub) => {
 }
 
 const goHome = () => router.push({ name: 'home' })
+const goTo = (name) => router.push({ name })
 const goToDetail = (id) => {
   recordRead(id) // 记录阅读
   router.push({ name: 'articleDetail', params: { id } })
@@ -768,11 +788,46 @@ const formatDate = (dateStr) => {
   
   .filter-status { flex-direction: column; gap: 10px; align-items: flex-start; }
   .header-center { display: none; }
+  .mobile-header-right { display: flex; }
   
   .article-actions { display: none; }
   
   /* 移动端返回首页按钮 */
   .mobile-home-btn { display: flex; }
+}
+
+/* 移动端Header右侧 */
+.mobile-header-right {
+  display: none;
+  align-items: center;
+  gap: 12px;
+}
+.theme-btn-mobile { font-size: 20px; cursor: pointer; }
+.mobile-menu-btn { font-size: 24px; cursor: pointer; color: var(--textPrimary); }
+
+/* 移动端导航菜单 */
+.mobile-nav {
+  display: none;
+  flex-direction: column;
+  background: var(--bgCard);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 0;
+}
+.mobile-nav .nav-item {
+  padding: 12px 20px;
+  color: var(--textSecondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mobile-nav .nav-item:hover,
+.mobile-nav .nav-item.active {
+  background: var(--bgCardHover);
+  color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .mobile-nav { display: flex; }
 }
 
 /* 移动端返回首页悬浮按钮 */
