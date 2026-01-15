@@ -126,6 +126,108 @@
             <button class="submit-btn" @click="queryLuckyDay" :disabled="loading">{{ loading ? '查询中...' : '查询吉日' }}</button>
           </div>
           
+          <!-- 犯太岁查询 -->
+          <div v-if="currentTool?.id === 'taisui'" class="tool-form">
+            <div class="form-group"><label>选择你的生肖</label>
+              <div class="zodiac-grid">
+                <span v-for="z in zodiacList" :key="z" class="zodiac-item" :class="{ active: taisuiForm.zodiac === z }" @click="taisuiForm.zodiac = z">{{ z }}</span>
+              </div>
+            </div>
+            <button class="submit-btn" @click="checkTaisui" :disabled="loading">{{ loading ? '查询中...' : '查询太岁' }}</button>
+          </div>
+          
+          <!-- 桃花运测试 -->
+          <div v-if="currentTool?.id === 'peach-blossom'" class="tool-form">
+            <div class="form-group"><label>性别</label>
+              <div class="radio-group">
+                <label><input type="radio" v-model="peachForm.gender" value="男" /> 男</label>
+                <label><input type="radio" v-model="peachForm.gender" value="女" /> 女</label>
+              </div>
+            </div>
+            <div class="form-group"><label>出生日期</label><input type="date" v-model="peachForm.birthday" /></div>
+            <button class="submit-btn" @click="testPeachBlossom" :disabled="loading">{{ loading ? '测算中...' : '测桃花运' }}</button>
+          </div>
+          
+          <!-- 财运测试 -->
+          <div v-if="currentTool?.id === 'wealth-test'" class="tool-form">
+            <div class="form-group"><label>出生日期</label><input type="date" v-model="wealthForm.birthday" /></div>
+            <button class="submit-btn" @click="testWealth" :disabled="loading">{{ loading ? '测算中...' : '测财运' }}</button>
+          </div>
+          
+          <!-- 性格测试(MBTI简化版) -->
+          <div v-if="currentTool?.id === 'mbti-test'" class="tool-form">
+            <div class="mbti-intro">
+              <p>回答以下4个问题，快速了解你的性格类型</p>
+            </div>
+            <div class="mbti-questions">
+              <div class="mbti-q">
+                <p>1. 在社交场合，你更倾向于？</p>
+                <div class="mbti-opts">
+                  <label><input type="radio" v-model="mbtiForm.q1" value="E" /> 主动与人交流</label>
+                  <label><input type="radio" v-model="mbtiForm.q1" value="I" /> 安静观察</label>
+                </div>
+              </div>
+              <div class="mbti-q">
+                <p>2. 做决定时，你更依赖？</p>
+                <div class="mbti-opts">
+                  <label><input type="radio" v-model="mbtiForm.q2" value="T" /> 逻辑分析</label>
+                  <label><input type="radio" v-model="mbtiForm.q2" value="F" /> 感受和价值观</label>
+                </div>
+              </div>
+              <div class="mbti-q">
+                <p>3. 你更喜欢？</p>
+                <div class="mbti-opts">
+                  <label><input type="radio" v-model="mbtiForm.q3" value="J" /> 提前计划</label>
+                  <label><input type="radio" v-model="mbtiForm.q3" value="P" /> 随机应变</label>
+                </div>
+              </div>
+              <div class="mbti-q">
+                <p>4. 获取信息时，你更关注？</p>
+                <div class="mbti-opts">
+                  <label><input type="radio" v-model="mbtiForm.q4" value="S" /> 具体事实</label>
+                  <label><input type="radio" v-model="mbtiForm.q4" value="N" /> 整体概念</label>
+                </div>
+              </div>
+            </div>
+            <button class="submit-btn" @click="testMbti" :disabled="loading">{{ loading ? '分析中...' : '查看结果' }}</button>
+          </div>
+          
+          <!-- 幸运数字 -->
+          <div v-if="currentTool?.id === 'lucky-number'" class="tool-form">
+            <div class="form-group"><label>出生日期</label><input type="date" v-model="luckyNumForm.birthday" /></div>
+            <button class="submit-btn" @click="getLuckyNumber" :disabled="loading">{{ loading ? '计算中...' : '查看幸运数字' }}</button>
+          </div>
+          
+          <!-- 生日花语 -->
+          <div v-if="currentTool?.id === 'birthday-flower'" class="tool-form">
+            <div class="form-group"><label>出生日期</label><input type="date" v-model="flowerForm.birthday" /></div>
+            <button class="submit-btn" @click="getBirthdayFlower" :disabled="loading">{{ loading ? '查询中...' : '查看生日花' }}</button>
+          </div>
+          
+          <!-- 家居风水 -->
+          <div v-if="currentTool?.id === 'fengshui-test'" class="tool-form">
+            <div class="form-group"><label>房屋朝向</label>
+              <select v-model="fengshuiForm.direction">
+                <option value="">请选择</option>
+                <option value="坐北朝南">坐北朝南</option>
+                <option value="坐南朝北">坐南朝北</option>
+                <option value="坐东朝西">坐东朝西</option>
+                <option value="坐西朝东">坐西朝东</option>
+                <option value="东北朝西南">东北朝西南</option>
+                <option value="西南朝东北">西南朝东北</option>
+                <option value="东南朝西北">东南朝西北</option>
+                <option value="西北朝东南">西北朝东南</option>
+              </select>
+            </div>
+            <div class="form-group"><label>楼层</label>
+              <select v-model="fengshuiForm.floor">
+                <option value="">请选择</option>
+                <option v-for="f in 30" :key="f" :value="f">{{ f }}层</option>
+              </select>
+            </div>
+            <button class="submit-btn" @click="testFengshui" :disabled="loading">{{ loading ? '分析中...' : '风水分析' }}</button>
+          </div>
+          
           <!-- 结果展示 -->
           <div class="tool-result" v-if="toolResult" ref="resultRef">
             <div class="result-content">{{ toolResult }}<span class="typing-cursor" v-if="loading">|</span></div>
@@ -208,8 +310,16 @@ const allTools = ref([
   { id: 'daily-sign', icon: '🎋', name: '今日运势', hot: true },
   { id: 'dream', icon: '🌙', name: '周公解梦', hot: true },
   { id: 'fate-test', icon: '💘', name: '缘分测试' },
+  // 新增引流工具
+  { id: 'taisui', icon: '🐉', name: '犯太岁查询', hot: true },
+  { id: 'peach-blossom', icon: '🌸', name: '桃花运测试', new: true },
+  { id: 'wealth-test', icon: '💰', name: '财运测试', new: true },
+  { id: 'mbti-test', icon: '🧠', name: '性格测试' },
+  { id: 'lucky-number', icon: '🔢', name: '幸运数字' },
+  { id: 'birthday-flower', icon: '💐', name: '生日花语' },
+  { id: 'fengshui-test', icon: '🏡', name: '家居风水' },
   // 起名类
-  { id: 'baby-name', icon: '👶', name: '宝宝起名', new: true },
+  { id: 'baby-name', icon: '👶', name: '宝宝起名' },
   { id: 'company-name', icon: '🏢', name: '公司起名' },
   // 号码测吉
   { id: 'phone-test', icon: '📱', name: '手机测吉凶' },
@@ -233,6 +343,14 @@ const plateForm = reactive({ number: '' })
 const fateForm = reactive({ name1: '', name2: '' })
 const pastForm = reactive({ name: '', birthday: '' })
 const luckyForm = reactive({ event: '', month: '' })
+// 新增工具表单
+const taisuiForm = reactive({ zodiac: '' })
+const peachForm = reactive({ gender: '女', birthday: '' })
+const wealthForm = reactive({ birthday: '' })
+const mbtiForm = reactive({ q1: '', q2: '', q3: '', q4: '' })
+const luckyNumForm = reactive({ birthday: '' })
+const flowerForm = reactive({ birthday: '' })
+const fengshuiForm = reactive({ direction: '', floor: '' })
 
 const openTool = (tool) => {
   currentTool.value = tool
@@ -329,6 +447,54 @@ const testFate = () => { trackEvent('工具', '使用', '缘分测试'); if (!fa
 const testPastLife = () => { trackEvent('工具', '使用', '前世今生'); if (!pastForm.name || !pastForm.birthday) return alert('请输入完整信息'); callAIStream(`请根据姓名"${pastForm.name}"和生日${pastForm.birthday}，推测前世身份、今生使命。`) }
 const queryLuckyDay = () => { trackEvent('工具', '使用', '黄道吉日'); if (!luckyForm.event || !luckyForm.month) return alert('请选择事项和月份'); callAIStream(`请查询${luckyForm.month}适合${luckyForm.event}的黄道吉日，列出5个最佳日期，包括公历农历、宜忌、吉时。`) }
 const drawSign = () => { trackEvent('工具', '使用', '今日运势'); if (loading.value || toolResult.value) return; signDrawing.value = true; callAIStream('请为我抽取一支今日运势签，包括签文等级、四句签诗、签文解读、开运建议。'); setTimeout(() => { signDrawing.value = false }, 1000) }
+
+// 新增工具函数
+const checkTaisui = () => { 
+  trackEvent('工具', '使用', '犯太岁查询')
+  if (!taisuiForm.zodiac) return alert('请选择你的生肖')
+  const year = new Date().getFullYear()
+  callAIStream(`请查询属${taisuiForm.zodiac}的人在${year}年是否犯太岁，包括：是否犯太岁、犯太岁类型(值太岁/冲太岁/刑太岁/害太岁/破太岁)、影响程度、化解方法、注意事项。`) 
+}
+
+const testPeachBlossom = () => { 
+  trackEvent('工具', '使用', '桃花运测试')
+  if (!peachForm.birthday) return alert('请选择出生日期')
+  const year = new Date().getFullYear()
+  callAIStream(`请根据出生日期${peachForm.birthday}(${peachForm.gender})测算${year}年桃花运势：桃花指数(满分100)、桃花旺月、桃花位、脱单建议、感情运势分析。`) 
+}
+
+const testWealth = () => { 
+  trackEvent('工具', '使用', '财运测试')
+  if (!wealthForm.birthday) return alert('请选择出生日期')
+  const year = new Date().getFullYear()
+  callAIStream(`请根据出生日期${wealthForm.birthday}测算${year}年财运：财运指数(满分100)、正财运、偏财运、旺财月份、破财月份、招财建议。`) 
+}
+
+const testMbti = () => { 
+  trackEvent('工具', '使用', '性格测试')
+  if (!mbtiForm.q1 || !mbtiForm.q2 || !mbtiForm.q3 || !mbtiForm.q4) return alert('请回答所有问题')
+  const type = `${mbtiForm.q1}${mbtiForm.q4}${mbtiForm.q2}${mbtiForm.q3}`
+  callAIStream(`请详细解读MBTI性格类型${type}：性格特点、优势劣势、适合职业、恋爱风格、与其他类型的相处建议。`) 
+}
+
+const getLuckyNumber = () => { 
+  trackEvent('工具', '使用', '幸运数字')
+  if (!luckyNumForm.birthday) return alert('请选择出生日期')
+  callAIStream(`请根据出生日期${luckyNumForm.birthday}计算：幸运数字、幸运颜色、幸运方位、幸运日、幸运花、数字能量分析。`) 
+}
+
+const getBirthdayFlower = () => { 
+  trackEvent('工具', '使用', '生日花语')
+  if (!flowerForm.birthday) return alert('请选择出生日期')
+  callAIStream(`请查询${flowerForm.birthday}的生日花：花名、花语、花的传说、性格特点、幸运石、守护星。`) 
+}
+
+const testFengshui = () => { 
+  trackEvent('工具', '使用', '家居风水')
+  if (!fengshuiForm.direction || !fengshuiForm.floor) return alert('请填写完整信息')
+  callAIStream(`请分析${fengshuiForm.direction}、${fengshuiForm.floor}层房屋的风水：整体风水评分、优势、不足、财位、文昌位、桃花位、化煞建议、布局建议。`) 
+}
+
 const consultMaster = () => { trackEvent('转化', '点击', '咨询大师'); emit('openMaster'); closeModal() }
 </script>
 
@@ -444,6 +610,17 @@ const consultMaster = () => { trackEvent('转化', '点击', '咨询大师'); em
 .sign-content, .sign-drawing { text-align: center; }
 .sign-icon, .drawing-icon { font-size: 36px; display: block; margin-bottom: 8px; }
 .sign-content p, .sign-drawing p { color: #f5deb3; font-size: 12px; margin: 0; }
+
+/* MBTI测试样式 */
+.mbti-intro { text-align: center; margin-bottom: 12px; }
+.mbti-intro p { font-size: 13px; color: var(--textSecondary, rgba(255,255,255,0.7)); margin: 0; }
+.mbti-questions { display: flex; flex-direction: column; gap: 16px; }
+.mbti-q { background: var(--bgInput, rgba(255,255,255,0.05)); padding: 12px; border-radius: 10px; }
+.mbti-q p { font-size: 13px; color: var(--textPrimary, #fff); margin: 0 0 10px; }
+.mbti-opts { display: flex; flex-direction: column; gap: 8px; }
+.mbti-opts label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--textSecondary, rgba(255,255,255,0.8)); cursor: pointer; padding: 6px 10px; border-radius: 6px; transition: background 0.2s; }
+.mbti-opts label:hover { background: rgba(255,255,255,0.05); }
+.mbti-opts input[type="radio"] { accent-color: var(--accent, #f59e0b); }
 
 /* 结果 */
 .tool-result { margin-top: 16px; padding: 16px; background: var(--bgInput, rgba(255,255,255,0.05)); border-radius: 10px; border-left: 3px solid var(--accent, #f59e0b); }
