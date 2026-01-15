@@ -1,8 +1,20 @@
 <template>
   <div class="tools-section">
-    <!-- 紧凑工具网格 - 一眼看到全部 -->
-    <div class="tools-compact-grid">
-      <div class="tool-chip" v-for="tool in allTools" :key="tool.id" @click="openTool(tool)" :class="{ hot: tool.hot, new: tool.new }">
+    <!-- 工具区域标题 -->
+    <div class="tools-header">
+      <span class="tools-title">🛠️ 免费工具</span>
+      <span class="tools-count">{{ allTools.length }}款</span>
+    </div>
+    
+    <!-- 紧凑工具网格 - 平铺显示 -->
+    <div class="tools-grid">
+      <div 
+        class="tool-chip" 
+        v-for="tool in allTools" 
+        :key="tool.id" 
+        @click="openTool(tool)" 
+        :class="{ hot: tool.hot, new: tool.new }"
+      >
         <span class="chip-icon">{{ tool.icon }}</span>
         <span class="chip-name">{{ tool.name }}</span>
         <span class="chip-badge" v-if="tool.hot">热</span>
@@ -120,6 +132,19 @@
             <div class="result-actions" v-if="!loading">
               <button class="action-btn" @click="consultMaster">🧙 咨询大师深度解读</button>
               <button class="action-btn secondary" @click="resetTool">重新测算</button>
+              <button class="action-btn invite" @click="showInvite = true" v-if="isMatchTool">💕 邀请TA一起测</button>
+            </div>
+            <!-- 邀请好友 -->
+            <div class="invite-card" v-if="showInvite && isMatchTool">
+              <div class="invite-header">
+                <span>💕 邀请TA一起测</span>
+                <span class="close-invite" @click="showInvite = false">×</span>
+              </div>
+              <p class="invite-desc">分享给好友，看看你们的配对结果</p>
+              <div class="invite-btns">
+                <button class="invite-btn wechat" @click="shareToWechat">💚 微信</button>
+                <button class="invite-btn copy" @click="copyShareLink">🔗 复制链接</button>
+              </div>
             </div>
           </div>
         </div>
@@ -146,27 +171,55 @@ const loading = ref(false)
 const toolResult = ref('')
 const signDrawing = ref(false)
 const resultRef = ref(null)
+const showInvite = ref(false)
+
+// 判断是否是配对类工具
+const isMatchTool = computed(() => {
+  const matchTools = ['zodiac-match', 'constellation-match', 'fate-test']
+  return matchTools.includes(currentTool.value?.id)
+})
+
+// 分享到微信
+const shareToWechat = () => {
+  const text = `我在天机命理测了${currentTool.value?.name}，快来看看你的结果！`
+  if (navigator.share) {
+    navigator.share({ title: '天机命理', text, url: window.location.href })
+  } else {
+    copyShareLink()
+  }
+}
+
+// 复制分享链接
+const copyShareLink = () => {
+  const url = `${window.location.origin}/?tool=${currentTool.value?.id}&from=share`
+  navigator.clipboard.writeText(url)
+  alert('链接已复制，快去分享给好友吧！')
+}
 
 // 检查登录状态
 const isLoggedIn = computed(() => !!localStorage.getItem('starloomAI-token'))
 
-// 所有工具 - 全部免费开放，降低使用门槛
-// 产品策略：让用户先体验价值，再引导付费咨询大师
-const allTools = computed(() => [
+// 所有工具 - 按使用频率排序，核心功能已在顶部导航，这里不重复
+const allTools = ref([
+  // 高频工具
   { id: 'name-test', icon: '✍️', name: '姓名测试', hot: true },
   { id: 'zodiac-match', icon: '🐲', name: '生肖配对', hot: true },
   { id: 'constellation-match', icon: '⭐', name: '星座配对', hot: true },
   { id: 'daily-sign', icon: '🎋', name: '今日运势', hot: true },
   { id: 'dream', icon: '🌙', name: '周公解梦', hot: true },
   { id: 'fate-test', icon: '💘', name: '缘分测试' },
-  { id: 'phone-test', icon: '📱', name: '手机测吉凶' },
-  { id: 'plate-test', icon: '🚗', name: '车牌测吉凶' },
+  // 起名类
   { id: 'baby-name', icon: '👶', name: '宝宝起名', new: true },
   { id: 'company-name', icon: '🏢', name: '公司起名' },
-  { id: 'past-life', icon: '🌀', name: '前世今生' },
+  // 号码测吉
+  { id: 'phone-test', icon: '📱', name: '手机测吉凶' },
+  { id: 'plate-test', icon: '🚗', name: '车牌测吉凶' },
+  // 吉日查询
   { id: 'lucky-day', icon: '📅', name: '黄道吉日' },
   { id: 'wedding-day', icon: '💍', name: '结婚吉日' },
-  { id: 'move-day', icon: '🏠', name: '搬家吉日' }
+  { id: 'move-day', icon: '🏠', name: '搬家吉日' },
+  // 趣味测试
+  { id: 'past-life', icon: '🌀', name: '前世今生' }
 ])
 
 const zodiacList = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪']
@@ -185,9 +238,21 @@ const openTool = (tool) => {
   currentTool.value = tool
   toolResult.value = ''
   showToolModal.value = true
-  trackEvent('工具', '打开', tool.name) // 埋点：打开工具
+  trackEvent('工具', '打开', tool.name)
   emit('modalChange', true)
 }
+
+// 通过ID打开工具（供父组件调用）
+const openToolById = (toolId) => {
+  const tool = allTools.value.find(t => t.id === toolId)
+  if (tool) {
+    openTool(tool)
+  }
+}
+
+// 暴露方法给父组件
+defineExpose({ openToolById })
+
 const closeModal = () => { 
   showToolModal.value = false
   currentTool.value = null
@@ -269,17 +334,71 @@ const consultMaster = () => { trackEvent('转化', '点击', '咨询大师'); em
 
 
 <style scoped>
-.tools-section { padding: 16px 20px; max-width: 1000px; margin: 0 auto; }
+.tools-section { 
+  margin: 24px auto;
+  padding: 20px;
+  max-width: 900px;
+  background: var(--bgCard, rgba(255,255,255,0.04));
+  border: 1px solid var(--border, rgba(255,255,255,0.06));
+  border-radius: 20px;
+  box-sizing: border-box;
+}
+
+/* 工具区域标题 */
+.tools-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border, rgba(255,255,255,0.08));
+}
+
+.tools-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--textPrimary, #fff);
+}
+
+.tools-count {
+  font-size: 12px;
+  color: var(--textMuted, rgba(255,255,255,0.5));
+  background: var(--bgInput, rgba(255,255,255,0.08));
+  padding: 4px 10px;
+  border-radius: 12px;
+}
 
 /* 紧凑工具网格 */
-.tools-compact-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-.tool-chip { display: flex; align-items: center; gap: 6px; padding: 10px 16px; background: var(--bgCard, rgba(255,255,255,0.06)); border: 1px solid var(--border, rgba(255,255,255,0.08)); border-radius: 20px; cursor: pointer; transition: all 0.2s; position: relative; }
-.tool-chip:hover { background: var(--bgCardHover, rgba(255,255,255,0.12)); border-color: var(--accent, #f59e0b); transform: translateY(-2px); }
+.tools-grid { 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 10px; 
+  justify-content: center; 
+}
+
+.tool-chip { 
+  display: flex; 
+  align-items: center; 
+  gap: 6px; 
+  padding: 10px 16px; 
+  background: var(--bgInput, rgba(255,255,255,0.06)); 
+  border: 1px solid var(--border, rgba(255,255,255,0.08)); 
+  border-radius: 20px; 
+  cursor: pointer; 
+  transition: all 0.25s ease; 
+  position: relative;
+}
+.tool-chip:hover { 
+  background: var(--bgCardHover, rgba(255,255,255,0.12)); 
+  border-color: var(--accent, #f59e0b); 
+  transform: translateY(-2px); 
+  box-shadow: 0 4px 12px var(--shadow, rgba(245,158,11,0.15));
+}
 .tool-chip.hot { border-color: rgba(255,107,107,0.3); }
 .tool-chip.new { border-color: rgba(16,185,129,0.3); }
 .chip-icon { font-size: 16px; }
-.chip-name { font-size: 13px; color: var(--textPrimary, #fff); white-space: nowrap; }
-.chip-badge { position: absolute; top: -6px; right: -4px; font-size: 9px; padding: 2px 5px; border-radius: 6px; background: #ff6b6b; color: #fff; }
+.chip-name { font-size: 13px; color: var(--textPrimary, #fff); white-space: nowrap; font-weight: 500; }
+.chip-badge { position: absolute; top: -6px; right: -4px; font-size: 9px; padding: 2px 5px; border-radius: 6px; background: #ff6b6b; color: #fff; font-weight: 600; }
 .chip-badge.new { background: #10b981; }
 
 /* 弹窗 */
@@ -335,18 +454,39 @@ const consultMaster = () => { trackEvent('转化', '点击', '咨询大师'); em
 .action-btn { padding: 8px 16px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: all 0.2s; border: none; }
 .action-btn:first-child { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
 .action-btn.secondary { background: var(--bgCard, rgba(255,255,255,0.08)); color: var(--textPrimary, #fff); border: 1px solid var(--border, rgba(255,255,255,0.1)); }
+.action-btn.invite { background: linear-gradient(135deg, #ec4899, #db2777); color: #fff; }
+
+/* 邀请卡片 */
+.invite-card { margin-top: 12px; padding: 12px; background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(219,39,119,0.1)); border: 1px solid rgba(236,72,153,0.3); border-radius: 12px; }
+.invite-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 14px; color: var(--textPrimary); }
+.close-invite { cursor: pointer; color: var(--textMuted); }
+.invite-desc { font-size: 12px; color: var(--textSecondary); margin: 0 0 10px; }
+.invite-btns { display: flex; gap: 10px; }
+.invite-btn { flex: 1; padding: 8px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.invite-btn.wechat { background: #07c160; color: #fff; }
+.invite-btn.copy { background: rgba(255,255,255,0.1); color: var(--textPrimary); border: 1px solid var(--border); }
 
 @media (max-width: 768px) {
-  .tools-section { padding: 12px 10px; }
-  .section-header h2 { font-size: 18px; }
+  .tools-section { 
+    padding: 14px; 
+    margin: 0 10px;
+    border-radius: 16px;
+  }
   
-  /* 工具网格 - 移动端3列紧凑布局 */
-  .tools-compact-grid { 
+  .tools-header {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+  }
+  
+  .tools-title { font-size: 15px; }
+  
+  /* 工具网格 - 移动端 */
+  .tools-grid { 
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
-    justify-content: center;
   }
+  
   .tool-chip { 
     padding: 10px 8px;
     flex-direction: column;

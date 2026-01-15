@@ -20,6 +20,16 @@
         <div class="nav-item" :class="{ active: currentTab === 'hepan' }" @click="currentTab = 'hepan'">八字合盘</div>
         <div class="nav-item" :class="{ active: currentTab === 'calendar' }" @click="currentTab = 'calendar'">万年历</div>
         <div class="nav-item" :class="{ active: currentTab === 'divination' }" @click="currentTab = 'divination'">天机问答</div>
+        <!-- 工具箱下拉菜单 -->
+        <div class="nav-item nav-dropdown" @mouseenter="showToolsDropdown = true" @mouseleave="showToolsDropdown = false">
+          <span>🛠️ 工具箱</span>
+          <div class="dropdown-menu" v-show="showToolsDropdown">
+            <div class="dropdown-item" v-for="tool in navTools" :key="tool.id" @click="openNavTool(tool)">
+              <span class="dropdown-icon">{{ tool.icon }}</span>
+              <span class="dropdown-name">{{ tool.name }}</span>
+            </div>
+          </div>
+        </div>
         <div class="nav-item" @click="goToLearn">学习课堂</div>
         <div class="nav-item" :class="{ active: currentTab === 'member' }" @click="goToMember">会员中心</div>
       </div>
@@ -55,6 +65,16 @@
       <div class="nav-item" @click="switchTab('hepan')">八字合盘</div>
       <div class="nav-item" @click="switchTab('calendar')">万年历</div>
       <div class="nav-item" @click="switchTab('divination')">天机问答</div>
+      <!-- 移动端工具箱 -->
+      <div class="nav-item mobile-tools-toggle" @click="showMobileTools = !showMobileTools">
+        🛠️ 工具箱 <span class="toggle-arrow">{{ showMobileTools ? '▲' : '▼' }}</span>
+      </div>
+      <div class="mobile-tools-list" v-if="showMobileTools">
+        <div class="mobile-tool-item" v-for="tool in navTools" :key="tool.id" @click="openNavTool(tool); showMobileMenu = false">
+          <span>{{ tool.icon }}</span>
+          <span>{{ tool.name }}</span>
+        </div>
+      </div>
       <div class="nav-item" @click="switchTab('learn')">学习课堂</div>
       <div class="nav-item" @click="switchTab('member')">会员中心</div>
     </div>
@@ -189,16 +209,17 @@
           <span class="promo-close" @click.stop="closePromoBanner">×</span>
         </div>
         
-        <!-- 核心功能 - 4个一行 -->
-        <div class="features-row">
-          <div class="feature-item" v-for="item in features" :key="item.title" @click="switchTab(item.tab)">
-            <span class="fi-icon">{{ item.icon }}</span>
-            <span class="fi-title">{{ item.title }}</span>
-          </div>
-        </div>
+        <!-- 免费工具箱 - 放在最前面，用户最常用 -->
+        <ToolsGrid ref="toolsGridRef" @open-master="openMasterService" @switch-tab="switchTab" @modal-change="handleToolModalChange" />
         
-        <!-- 免费工具矩阵 -->
-        <ToolsGrid @open-master="openMasterService" @switch-tab="switchTab" @modal-change="handleToolModalChange" />
+        <!-- 热门测试 + 实时动态 - 社交证明 -->
+        <HotAndLive @open-tool="handleOpenTool" />
+        
+        <!-- 今日运势弹窗 -->
+        <DailyFortune v-if="showFortuneModal" @close="showFortuneModal = false" @open-master="openMasterService" :is-modal="true" />
+        
+        <!-- 历史记录弹窗 -->
+        <TestHistory v-if="showHistoryModal" ref="testHistoryRef" @close="showHistoryModal = false" @show-login="showLoginModal = true" @open-tool="handleOpenTool" :is-modal="true" />
         
         <!-- 用户好评滚动 + 功德箱 -->
         <div class="social-proof-section">
@@ -716,9 +737,19 @@ import { themes, getCurrentTheme, setTheme, initTheme } from '../utils/themes'
 import MasterService from './MasterService.vue'
 import MasterFloatBar from './MasterFloatBar.vue'
 import ToolsGrid from './ToolsGrid.vue'
+import DailyFortune from './DailyFortune.vue'
+import TestHistory from './TestHistory.vue'
+import HotAndLive from './HotAndLive.vue'
 
 const router = useRouter()
 const masterFloatBarRef = ref(null)
+const testHistoryRef = ref(null)
+const toolsGridRef = ref(null)// 处理打开工具
+const handleOpenTool = (tool) => {
+  // 这里可以触发ToolsGrid打开对应工具
+  // 暂时跳转到首页
+  currentTab.value = 'home'
+}
 
 // 主题相关
 const currentTheme = ref(getCurrentTheme())
@@ -733,6 +764,8 @@ const changeTheme = (themeName) => {
 
 const currentTab = ref('home')
 const showMobileMenu = ref(false)
+const showToolsDropdown = ref(false)
+const showMobileTools = ref(false)
 const showLoginModal = ref(false)
 const showRegisterModal = ref(false)
 const showFeedbackModal = ref(false)
@@ -749,6 +782,34 @@ const hepanResult = ref('')
 const vipPlans = ref([])
 const vipBenefits = ref([])
 const vipInfo = ref(null)
+
+// 导航栏工具列表
+const navTools = ref([
+  { id: 'name-test', icon: '✍️', name: '姓名测试' },
+  { id: 'zodiac-match', icon: '🐲', name: '生肖配对' },
+  { id: 'constellation-match', icon: '⭐', name: '星座配对' },
+  { id: 'daily-sign', icon: '🎋', name: '今日运势' },
+  { id: 'dream', icon: '🌙', name: '周公解梦' },
+  { id: 'fate-test', icon: '💘', name: '缘分测试' },
+  { id: 'baby-name', icon: '👶', name: '宝宝起名' },
+  { id: 'company-name', icon: '🏢', name: '公司起名' },
+  { id: 'phone-test', icon: '📱', name: '手机测吉凶' },
+  { id: 'plate-test', icon: '🚗', name: '车牌测吉凶' },
+  { id: 'lucky-day', icon: '📅', name: '黄道吉日' },
+  { id: 'past-life', icon: '🌀', name: '前世今生' }
+])
+
+// 从导航打开工具
+const openNavTool = (tool) => {
+  showToolsDropdown.value = false
+  currentTab.value = 'home'
+  // 等待切换到首页后再打开工具
+  nextTick(() => {
+    if (toolsGridRef.value) {
+      toolsGridRef.value.openToolById(tool.id)
+    }
+  })
+}
 
 // 支付相关
 const payStep = ref('')
@@ -1854,39 +1915,104 @@ onMounted(() => {
   0%, 100% { opacity: 0.8; }
   50% { opacity: 1; }
 }
+/* ========== 优化后的导航栏样式 ========== */
 .home-header { 
   display: flex; align-items: center; justify-content: space-between; 
-  padding: 15px 30px; 
+  padding: 0 30px; 
+  height: 68px;
   background: var(--bgHeader, rgba(255,255,255,0.08)); 
   backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255,255,255,0.1);
   position: sticky; top: 0; z-index: 100; 
 }
-.header-left .logo { display: flex; align-items: center; gap: 8px; }
+.header-left .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
 .logo-icon { 
   background: var(--primaryGradient, linear-gradient(135deg, #f093fb, #f5576c)); 
   color: #fff; 
-  padding: 6px 12px; 
+  padding: 8px 14px; 
   border-radius: 12px; 
   font-weight: bold; 
+  font-size: 16px;
   box-shadow: 0 4px 15px var(--shadow, rgba(240,147,251,0.4));
 }
 .logo-text { 
-  font-size: 20px; font-weight: bold; 
+  font-size: 22px; font-weight: 700; 
+  font-family: 'Noto Serif SC', serif;
   background: var(--primaryGradient, linear-gradient(90deg, #f093fb, #f5576c)); 
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+  letter-spacing: 1px;
 }
-.header-center { display: flex; gap: 25px; }
+.header-center { display: flex; gap: 8px; height: 100%; align-items: center; }
 .header-center .nav-item { 
-  cursor: pointer; padding: 8px 18px; border-radius: 25px; 
+  cursor: pointer; 
+  padding: 8px 16px; 
+  border-radius: 8px; 
   transition: all 0.3s; 
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--textSecondary, #e8d5f2);
+  position: relative;
 }
-.header-center .nav-item:hover, .header-center .nav-item.active { 
-  background: var(--bgCardHover, linear-gradient(135deg, rgba(240,147,251,0.3), rgba(245,87,108,0.3))); 
+.header-center .nav-item:hover { 
+  background: var(--bgCardHover, rgba(240,147,251,0.15)); 
   color: var(--accent, #f5a5c8);
-  box-shadow: 0 0 20px var(--shadow, rgba(240,147,251,0.3));
 }
+.header-center .nav-item.active { 
+  color: var(--accent, #f5a5c8);
+  font-weight: 600;
+}
+.header-center .nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  background: var(--primaryGradient, linear-gradient(90deg, #f093fb, #f5576c));
+  border-radius: 2px;
+}
+
+/* 工具箱下拉菜单 */
+.nav-dropdown {
+  position: relative;
+}
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 10px;
+  background: var(--bgModal, rgba(30,30,50,0.98));
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border, rgba(255,255,255,0.1));
+  border-radius: 16px;
+  padding: 12px;
+  min-width: 320px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  z-index: 200;
+}
+.dropdown-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bgCard, rgba(255,255,255,0.05));
+}
+.dropdown-item:hover {
+  background: var(--bgCardHover, rgba(245,158,11,0.15));
+  transform: translateY(-2px);
+}
+.dropdown-icon { font-size: 20px; }
+.dropdown-name { font-size: 12px; color: var(--textPrimary, #fff); white-space: nowrap; }
+
 .header-right { display: flex; gap: 15px; align-items: center; }
 .login-btn, .register-btn, .logout-btn { cursor: pointer; padding: 8px 20px; border-radius: 25px; transition: all 0.3s; font-size: 14px; }
 .login-btn { border: 1px solid var(--accent, #f5a5c8); color: var(--accent, #f5a5c8); }
@@ -1898,6 +2024,39 @@ onMounted(() => {
 .mobile-menu-btn { display: none; font-size: 24px; cursor: pointer; color: var(--accent, #f5a5c8); }
 .mobile-nav { display: none; background: var(--bgMobileNav, rgba(15,12,41,0.95)); backdrop-filter: blur(20px); padding: 20px; }
 .mobile-nav .nav-item { padding: 15px; border-bottom: 1px solid var(--borderLight, rgba(255,255,255,0.1)); color: var(--textSecondary, #e8d5f2); cursor: pointer; }
+
+/* 移动端工具箱 */
+.mobile-tools-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.toggle-arrow { font-size: 10px; opacity: 0.6; }
+.mobile-tools-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 12px;
+  background: var(--bgCard, rgba(255,255,255,0.03));
+  border-radius: 12px;
+  margin: 0 0 10px;
+}
+.mobile-tool-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  background: var(--bgInput, rgba(255,255,255,0.05));
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--textPrimary, #fff);
+}
+.mobile-tool-item:active {
+  background: var(--bgCardHover, rgba(245,158,11,0.15));
+}
+
 .mobile-user-section {
   display: flex; justify-content: space-between; align-items: center;
   padding: 15px; margin-bottom: 10px;
@@ -1988,14 +2147,24 @@ onMounted(() => {
 .modal-footer a:hover { color: var(--primary, #f093fb); }
 
 .main-content { padding: 30px; max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
-.hero-section { text-align: center; padding: 40px 20px 20px; }
+.hero-section { text-align: center; padding: 50px 20px 30px; }
 .hero-section h1 { 
-  font-size: 36px; margin-bottom: 10px; 
+  font-size: 40px; 
+  margin-bottom: 14px; 
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  letter-spacing: 2px;
   background: var(--primaryGradient, linear-gradient(90deg, #f093fb, #f5576c)); 
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
   text-shadow: 0 0 60px var(--shadow, rgba(240,147,251,0.3));
 }
-.hero-section p { font-size: 14px; color: var(--accentLight, #c8a5d9); margin-bottom: 0; letter-spacing: 2px; }
+.hero-section p { 
+  font-size: 16px; 
+  color: var(--textSecondary, #e8d5f2); 
+  margin-bottom: 0; 
+  letter-spacing: 3px; 
+  opacity: 0.9;
+}
 .cta-btn { 
   padding: 16px 45px; 
   background: var(--primaryGradient, linear-gradient(135deg, #f093fb, #f5576c)); 
@@ -2009,12 +2178,35 @@ onMounted(() => {
 .cta-btn.secondary:hover { background: var(--accent); }
 .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
 
-/* 核心功能 - 紧凑横排 */
-.features-row { display: flex; justify-content: center; gap: 16px; margin: 24px 0 16px; flex-wrap: wrap; }
-.feature-item { display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--bgCard, rgba(255,255,255,0.08)); border: 1px solid var(--border, rgba(255,255,255,0.1)); border-radius: 24px; cursor: pointer; transition: all 0.3s; }
-.feature-item:hover { background: var(--bgCardHover, rgba(255,255,255,0.15)); border-color: var(--accent, #f59e0b); transform: translateY(-2px); }
-.fi-icon { font-size: 20px; }
-.fi-title { font-size: 14px; color: var(--textPrimary, #fff); font-weight: 500; }
+/* 核心功能 - 紧凑横排 + 优化样式 */
+.features-row { 
+  display: flex; 
+  justify-content: center; 
+  gap: 20px; 
+  margin: 28px 0 20px; 
+  flex-wrap: wrap; 
+  padding: 0 20px;
+}
+.feature-item { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  padding: 14px 24px; 
+  background: var(--bgCard, rgba(255,255,255,0.08)); 
+  border: 1px solid var(--border, rgba(255,255,255,0.1)); 
+  border-radius: 28px; 
+  cursor: pointer; 
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.feature-item:hover { 
+  background: var(--bgCardHover, rgba(255,255,255,0.15)); 
+  border-color: var(--accent, #f59e0b); 
+  transform: translateY(-3px); 
+  box-shadow: 0 8px 24px var(--shadow, rgba(240,147,251,0.25));
+}
+.fi-icon { font-size: 22px; }
+.fi-title { font-size: 15px; color: var(--textPrimary, #fff); font-weight: 600; }
 
 /* 用户好评 + 功德箱 */
 .social-proof-section { display: flex; gap: 20px; margin: 30px auto; max-width: 900px; padding: 0 20px; align-items: stretch; }
@@ -2694,6 +2886,21 @@ onMounted(() => {
 .theme-guoxue .birthday-btn:hover {
   background: #1a1a1a;
   color: #d4a574;
+}
+
+/* 国学雅韵主题 - 新增UI元素样式 */
+.theme-guoxue .header-center .nav-item.active::after {
+  background: linear-gradient(90deg, #8b5a2b, #d4a574);
+}
+.theme-guoxue .feature-item {
+  background: rgba(139,90,43,0.06);
+  border-color: rgba(139,90,43,0.15);
+  box-shadow: 0 2px 8px rgba(139,90,43,0.08);
+}
+.theme-guoxue .feature-item:hover {
+  background: rgba(139,90,43,0.12);
+  border-color: #8b5a2b;
+  box-shadow: 0 6px 20px rgba(139,90,43,0.15);
 }
 
 @media (max-width: 768px) {
