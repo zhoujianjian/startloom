@@ -7,6 +7,8 @@ const Chat = () => import("../page/Chat.vue")
 const AskDivination = () => import("../page/AskDivination.vue")
 const Learn = () => import("../page/Learn.vue")
 const ArticleDetail = () => import("../page/ArticleDetail.vue")
+const AdminStats = () => import("../page/AdminStats.vue")
+const Tools = () => import("../page/Tools.vue")
 
 const routes = [
   {
@@ -16,6 +18,16 @@ const routes = [
     meta: {
       seoKey: 'home',
       title: '天机命理_免费八字排盘_周公解梦_姓名测试_生肖星座配对'
+    }
+  },
+  {
+    path: "/tools",
+    name: "tools",
+    component: HomePage,
+    meta: {
+      seoKey: 'tools',
+      title: '免费命理工具箱_生肖配对_星座配对_姓名测试_周公解梦_天机命理',
+      defaultTab: 'tools'
     }
   },
   {
@@ -184,6 +196,30 @@ const routes = [
     meta: { seoKey: 'fengshuiTest', defaultTool: 'fengshui-test' }
   },
   {
+    path: "/tool/name-match",
+    name: "nameMatch",
+    component: HomePage,
+    meta: { seoKey: 'nameMatch', defaultTool: 'name-match' }
+  },
+  {
+    path: "/tool/wuxing",
+    name: "wuxing",
+    component: HomePage,
+    meta: { seoKey: 'wuxing', defaultTool: 'wuxing' }
+  },
+  {
+    path: "/tool/tarot",
+    name: "tarot",
+    component: HomePage,
+    meta: { seoKey: 'tarot', defaultTool: 'tarot' }
+  },
+  {
+    path: "/tool/guanyin",
+    name: "guanyin",
+    component: HomePage,
+    meta: { seoKey: 'guanyin', defaultTool: 'guanyin' }
+  },
+  {
     path: "/naming",
     name: "naming",
     component: HomePage,
@@ -240,6 +276,13 @@ const routes = [
     name: "articleByCat",
     component: ArticleDetail,
     meta: { seoKey: 'article' }
+  },
+  // 隐藏的管理员统计页面
+  {
+    path: "/admin-stats",
+    name: "adminStats",
+    component: AdminStats,
+    meta: { title: '数据统计' }
   }
 ]
 

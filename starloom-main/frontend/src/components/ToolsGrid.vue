@@ -6,11 +6,27 @@
       <span class="tools-count">{{ allTools.length }}款</span>
     </div>
     
-    <!-- 紧凑工具网格 - 平铺显示 -->
+    <!-- 分类标签 -->
+    <div class="category-tabs">
+      <span 
+        class="cat-tab" 
+        :class="{ active: activeCategory === 'all' }" 
+        @click="activeCategory = 'all'"
+      >全部</span>
+      <span 
+        class="cat-tab" 
+        v-for="cat in categories" 
+        :key="cat.key"
+        :class="{ active: activeCategory === cat.key }" 
+        @click="activeCategory = cat.key"
+      >{{ cat.icon }} {{ cat.name }}</span>
+    </div>
+    
+    <!-- 工具网格 -->
     <div class="tools-grid">
       <div 
         class="tool-chip" 
-        v-for="tool in allTools" 
+        v-for="tool in filteredTools" 
         :key="tool.id" 
         @click="openTool(tool)" 
         :class="{ hot: tool.hot, new: tool.new }"
@@ -228,6 +244,37 @@
             <button class="submit-btn" @click="testFengshui" :disabled="loading">{{ loading ? '分析中...' : '风水分析' }}</button>
           </div>
           
+          <!-- 姓名配对 -->
+          <div v-if="currentTool?.id === 'name-match'" class="tool-form">
+            <div class="form-group"><label>你的名字</label><input v-model="nameMatchForm.name1" placeholder="请输入你的名字" /></div>
+            <div class="form-group"><label>TA的名字</label><input v-model="nameMatchForm.name2" placeholder="请输入TA的名字" /></div>
+            <button class="submit-btn" @click="testNameMatch" :disabled="loading">{{ loading ? '配对中...' : '开始配对' }}</button>
+          </div>
+          
+          <!-- 五行查询 -->
+          <div v-if="currentTool?.id === 'wuxing'" class="tool-form">
+            <div class="form-group"><label>出生日期</label><input type="date" v-model="wuxingForm.birthday" /></div>
+            <button class="submit-btn" @click="queryWuxing" :disabled="loading">{{ loading ? '查询中...' : '查询五行' }}</button>
+          </div>
+          
+          <!-- 塔罗牌占卜 -->
+          <div v-if="currentTool?.id === 'tarot'" class="tool-form">
+            <div class="tarot-intro">
+              <p>🎴 静心冥想，想着你的问题，然后抽取塔罗牌</p>
+            </div>
+            <div class="form-group"><label>你想问什么？（选填）</label><input v-model="tarotForm.question" placeholder="如：感情、事业、财运..." /></div>
+            <button class="submit-btn" @click="drawTarot" :disabled="loading">{{ loading ? '抽牌中...' : '🎴 抽取塔罗牌' }}</button>
+          </div>
+          
+          <!-- 观音灵签 -->
+          <div v-if="currentTool?.id === 'guanyin'" class="tool-form sign-form">
+            <div class="guanyin-intro">
+              <p>🙏 诚心祈祷，心中默念所求之事</p>
+            </div>
+            <div class="form-group"><label>许下心愿（选填）</label><input v-model="guanyinForm.wish" placeholder="如：求姻缘、求事业、求平安..." /></div>
+            <button class="submit-btn" @click="drawGuanyin" :disabled="loading">{{ loading ? '求签中...' : '📿 诚心求签' }}</button>
+          </div>
+          
           <!-- 结果展示 -->
           <div class="tool-result" v-if="toolResult" ref="resultRef">
             <div class="result-content">{{ toolResult }}<span class="typing-cursor" v-if="loading">|</span></div>
@@ -257,6 +304,7 @@
 
 <script setup>
 import { ref, reactive, computed, nextTick } from 'vue'
+import { trackToolOpen, trackToolUse } from '../utils/analytics'
 
 const emit = defineEmits(['openMaster', 'switchTab', 'modalChange'])
 
@@ -301,36 +349,58 @@ const copyShareLink = () => {
 // 检查登录状态
 const isLoggedIn = computed(() => !!localStorage.getItem('starloomAI-token'))
 
-// 所有工具 - 按使用频率排序，核心功能已在顶部导航，这里不重复
-const allTools = ref([
-  // 高频工具
-  { id: 'name-test', icon: '✍️', name: '姓名测试', hot: true },
-  { id: 'zodiac-match', icon: '🐲', name: '生肖配对', hot: true },
-  { id: 'constellation-match', icon: '⭐', name: '星座配对', hot: true },
-  { id: 'daily-sign', icon: '🎋', name: '今日运势', hot: true },
-  { id: 'dream', icon: '🌙', name: '周公解梦', hot: true },
-  { id: 'fate-test', icon: '💘', name: '缘分测试' },
-  // 新增引流工具
-  { id: 'taisui', icon: '🐉', name: '犯太岁查询', hot: true },
-  { id: 'peach-blossom', icon: '🌸', name: '桃花运测试', new: true },
-  { id: 'wealth-test', icon: '💰', name: '财运测试', new: true },
-  { id: 'mbti-test', icon: '🧠', name: '性格测试' },
-  { id: 'lucky-number', icon: '🔢', name: '幸运数字' },
-  { id: 'birthday-flower', icon: '💐', name: '生日花语' },
-  { id: 'fengshui-test', icon: '🏡', name: '家居风水' },
-  // 起名类
-  { id: 'baby-name', icon: '👶', name: '宝宝起名' },
-  { id: 'company-name', icon: '🏢', name: '公司起名' },
-  // 号码测吉
-  { id: 'phone-test', icon: '📱', name: '手机测吉凶' },
-  { id: 'plate-test', icon: '🚗', name: '车牌测吉凶' },
-  // 吉日查询
-  { id: 'lucky-day', icon: '📅', name: '黄道吉日' },
-  { id: 'wedding-day', icon: '💍', name: '结婚吉日' },
-  { id: 'move-day', icon: '🏠', name: '搬家吉日' },
-  // 趣味测试
-  { id: 'past-life', icon: '🌀', name: '前世今生' }
+// 当前选中分类
+const activeCategory = ref('all')
+
+// 工具分类
+const categories = ref([
+  { key: 'match', name: '配对测试', icon: '💕' },
+  { key: 'fortune', name: '运势测算', icon: '🔮' },
+  { key: 'naming', name: '起名测名', icon: '✍️' },
+  { key: 'divination', name: '占卜求签', icon: '🎋' },
+  { key: 'life', name: '生活工具', icon: '📅' }
 ])
+
+// 所有工具 - 带分类标签
+const allTools = ref([
+  // 配对测试
+  { id: 'zodiac-match', icon: '🐲', name: '生肖配对', hot: true, category: 'match' },
+  { id: 'constellation-match', icon: '⭐', name: '星座配对', hot: true, category: 'match' },
+  { id: 'fate-test', icon: '💘', name: '缘分测试', category: 'match' },
+  { id: 'name-match', icon: '💑', name: '姓名配对', new: true, category: 'match' },
+  // 运势测算
+  { id: 'daily-sign', icon: '🎋', name: '今日运势', hot: true, category: 'fortune' },
+  { id: 'taisui', icon: '🐉', name: '犯太岁查询', hot: true, category: 'fortune' },
+  { id: 'peach-blossom', icon: '🌸', name: '桃花运测试', new: true, category: 'fortune' },
+  { id: 'wealth-test', icon: '💰', name: '财运测试', new: true, category: 'fortune' },
+  { id: 'wuxing', icon: '🌈', name: '五行查询', category: 'fortune' },
+  // 起名测名
+  { id: 'name-test', icon: '✍️', name: '姓名测试', hot: true, category: 'naming' },
+  { id: 'baby-name', icon: '👶', name: '宝宝起名', category: 'naming' },
+  { id: 'company-name', icon: '🏢', name: '公司起名', category: 'naming' },
+  // 占卜求签
+  { id: 'dream', icon: '🌙', name: '周公解梦', hot: true, category: 'divination' },
+  { id: 'tarot', icon: '🎯', name: '塔罗牌占卜', new: true, category: 'divination' },
+  { id: 'guanyin', icon: '📿', name: '观音灵签', new: true, category: 'divination' },
+  { id: 'past-life', icon: '🌀', name: '前世今生', category: 'divination' },
+  // 生活工具
+  { id: 'lucky-day', icon: '📅', name: '黄道吉日', category: 'life' },
+  { id: 'wedding-day', icon: '💍', name: '结婚吉日', category: 'life' },
+  { id: 'move-day', icon: '🏠', name: '搬家吉日', category: 'life' },
+  { id: 'phone-test', icon: '📱', name: '手机测吉凶', category: 'life' },
+  { id: 'plate-test', icon: '🚗', name: '车牌测吉凶', category: 'life' },
+  { id: 'fengshui-test', icon: '🏡', name: '家居风水', category: 'life' },
+  // 趣味测试
+  { id: 'mbti-test', icon: '🧠', name: '性格测试', category: 'fortune' },
+  { id: 'lucky-number', icon: '🔢', name: '幸运数字', category: 'fortune' },
+  { id: 'birthday-flower', icon: '💐', name: '生日花语', category: 'life' }
+])
+
+// 根据分类筛选工具
+const filteredTools = computed(() => {
+  if (activeCategory.value === 'all') return allTools.value
+  return allTools.value.filter(t => t.category === activeCategory.value)
+})
 
 const zodiacList = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪']
 const starList = ['白羊座', '金牛座', '双子座', '巨蟹座', '狮子座', '处女座', '天秤座', '天蝎座', '射手座', '摩羯座', '水瓶座', '双鱼座']
@@ -351,12 +421,18 @@ const mbtiForm = reactive({ q1: '', q2: '', q3: '', q4: '' })
 const luckyNumForm = reactive({ birthday: '' })
 const flowerForm = reactive({ birthday: '' })
 const fengshuiForm = reactive({ direction: '', floor: '' })
+// 新增工具表单
+const nameMatchForm = reactive({ name1: '', name2: '' })
+const wuxingForm = reactive({ birthday: '' })
+const tarotForm = reactive({ question: '' })
+const guanyinForm = reactive({ wish: '' })
 
 const openTool = (tool) => {
   currentTool.value = tool
   toolResult.value = ''
   showToolModal.value = true
   trackEvent('工具', '打开', tool.name)
+  trackToolOpen(tool.id) // 自定义埋点
   emit('modalChange', true)
 }
 
@@ -383,6 +459,12 @@ const resetTool = () => { toolResult.value = '' }
 const callAIStream = async (prompt) => {
   loading.value = true
   toolResult.value = ''
+  
+  // 记录工具使用埋点
+  if (currentTool.value) {
+    trackToolUse(currentTool.value.id)
+  }
+  
   try {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
     const response = await fetch(`${baseUrl}/chat`, {
@@ -495,6 +577,31 @@ const testFengshui = () => {
   callAIStream(`请分析${fengshuiForm.direction}、${fengshuiForm.floor}层房屋的风水：整体风水评分、优势、不足、财位、文昌位、桃花位、化煞建议、布局建议。`) 
 }
 
+// 新增工具函数
+const testNameMatch = () => {
+  trackEvent('工具', '使用', '姓名配对')
+  if (!nameMatchForm.name1 || !nameMatchForm.name2) return alert('请输入双方名字')
+  callAIStream(`请测算"${nameMatchForm.name1}"和"${nameMatchForm.name2}"的姓名配对：配对指数(满分100)、姓名笔画分析、五行相生相克、感情缘分、相处建议。`)
+}
+
+const queryWuxing = () => {
+  trackEvent('工具', '使用', '五行查询')
+  if (!wuxingForm.birthday) return alert('请选择出生日期')
+  callAIStream(`请根据出生日期${wuxingForm.birthday}查询五行属性：日主五行、五行强弱分析、喜用神、忌神、五行补救建议、适合的颜色/方位/数字。`)
+}
+
+const drawTarot = () => {
+  trackEvent('工具', '使用', '塔罗牌占卜')
+  const question = tarotForm.question || '综合运势'
+  callAIStream(`请为我抽取一张塔罗牌，问题是"${question}"。请告诉我：抽到的牌名、牌面含义（正位/逆位）、对问题的解读、行动建议。用神秘而温暖的语气解读。`)
+}
+
+const drawGuanyin = () => {
+  trackEvent('工具', '使用', '观音灵签')
+  const wish = guanyinForm.wish || '求平安顺遂'
+  callAIStream(`请为我求一支观音灵签，心愿是"${wish}"。请告诉我：签号(第几签)、签诗四句、签文等级(上上签/上签/中签/下签)、签文解读、开示建议。用慈悲庄严的语气解读。`)
+}
+
 const consultMaster = () => { trackEvent('转化', '点击', '咨询大师'); emit('openMaster'); closeModal() }
 </script>
 
@@ -534,7 +641,40 @@ const consultMaster = () => { trackEvent('转化', '点击', '咨询大师'); em
   border-radius: 12px;
 }
 
-/* 紧凑工具网格 */
+/* 分类标签 */
+.category-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+.category-tabs::-webkit-scrollbar { height: 0; }
+
+.cat-tab {
+  padding: 8px 16px;
+  background: var(--bgInput, rgba(255,255,255,0.06));
+  border: 1px solid var(--border, rgba(255,255,255,0.08));
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--textSecondary, rgba(255,255,255,0.7));
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+}
+.cat-tab:hover {
+  background: var(--bgCardHover, rgba(255,255,255,0.1));
+  border-color: var(--accent, #f59e0b);
+}
+.cat-tab.active {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-color: transparent;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* 工具网格 */
 .tools-grid { 
   display: flex; 
   flex-wrap: wrap; 
@@ -616,6 +756,14 @@ const consultMaster = () => { trackEvent('转化', '点击', '咨询大师'); em
 .mbti-intro p { font-size: 13px; color: var(--textSecondary, rgba(255,255,255,0.7)); margin: 0; }
 .mbti-questions { display: flex; flex-direction: column; gap: 16px; }
 .mbti-q { background: var(--bgInput, rgba(255,255,255,0.05)); padding: 12px; border-radius: 10px; }
+
+/* 塔罗牌样式 */
+.tarot-intro { text-align: center; margin-bottom: 12px; padding: 16px; background: linear-gradient(135deg, rgba(139,69,19,0.2), rgba(75,0,130,0.2)); border-radius: 12px; }
+.tarot-intro p { font-size: 14px; color: var(--textSecondary, rgba(255,255,255,0.8)); margin: 0; }
+
+/* 观音灵签样式 */
+.guanyin-intro { text-align: center; margin-bottom: 12px; padding: 16px; background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,140,0,0.1)); border-radius: 12px; }
+.guanyin-intro p { font-size: 14px; color: var(--textSecondary, rgba(255,255,255,0.8)); margin: 0; }
 .mbti-q p { font-size: 13px; color: var(--textPrimary, #fff); margin: 0 0 10px; }
 .mbti-opts { display: flex; flex-direction: column; gap: 8px; }
 .mbti-opts label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--textSecondary, rgba(255,255,255,0.8)); cursor: pointer; padding: 6px 10px; border-radius: 6px; transition: background 0.2s; }

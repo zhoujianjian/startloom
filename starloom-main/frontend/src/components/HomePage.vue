@@ -12,26 +12,17 @@
     <!-- 顶部Header -->
     <div class="home-header">
       <div class="header-left">
-        <div class="logo"><span class="logo-icon">八字</span><span class="logo-text">天机命理</span></div>
+        <div class="logo" @click="currentTab = 'home'"><span class="logo-icon">八字</span><span class="logo-text">天机命理</span></div>
       </div>
       <div class="header-center">
         <div class="nav-item" :class="{ active: currentTab === 'home' }" @click="currentTab = 'home'">首页</div>
+        <div class="nav-item" :class="{ active: currentTab === 'tools' }" @click="currentTab = 'tools'">免费工具</div>
+        <div class="nav-item" :class="{ active: currentTab === 'divination' }" @click="currentTab = 'divination'">在线占卜</div>
         <div class="nav-item" :class="{ active: currentTab === 'paipan' }" @click="currentTab = 'paipan'">八字排盘</div>
-        <div class="nav-item" :class="{ active: currentTab === 'hepan' }" @click="currentTab = 'hepan'">八字合盘</div>
+        <div class="nav-item" :class="{ active: currentTab === 'hepan' }" @click="currentTab = 'hepan'">合婚配对</div>
         <div class="nav-item" :class="{ active: currentTab === 'calendar' }" @click="currentTab = 'calendar'">万年历</div>
-        <div class="nav-item" :class="{ active: currentTab === 'divination' }" @click="currentTab = 'divination'">天机问答</div>
-        <!-- 工具箱下拉菜单 -->
-        <div class="nav-item nav-dropdown" @mouseenter="showToolsDropdown = true" @mouseleave="showToolsDropdown = false">
-          <span>🛠️ 工具箱</span>
-          <div class="dropdown-menu" v-show="showToolsDropdown">
-            <div class="dropdown-item" v-for="tool in navTools" :key="tool.id" @click="openNavTool(tool)">
-              <span class="dropdown-icon">{{ tool.icon }}</span>
-              <span class="dropdown-name">{{ tool.name }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="nav-item" @click="goToLearn">学习课堂</div>
-        <div class="nav-item" :class="{ active: currentTab === 'member' }" @click="goToMember">会员中心</div>
+        <div class="nav-item" @click="goToLearn">命理学堂</div>
+        <div class="nav-item" :class="{ active: currentTab === 'member' }" @click="goToMember">会员</div>
       </div>
       <div class="header-right">
         <template v-if="!isLoggedIn">
@@ -60,23 +51,14 @@
         <span class="mobile-login" @click="showLoginModal = true; showMobileMenu = false">登录</span>
         <span class="mobile-register" @click="showRegisterModal = true; showMobileMenu = false">注册</span>
       </div>
-      <div class="nav-item" @click="switchTab('home')">首页</div>
-      <div class="nav-item" @click="switchTab('paipan')">八字排盘</div>
-      <div class="nav-item" @click="switchTab('hepan')">八字合盘</div>
-      <div class="nav-item" @click="switchTab('calendar')">万年历</div>
-      <div class="nav-item" @click="switchTab('divination')">天机问答</div>
-      <!-- 移动端工具箱 -->
-      <div class="nav-item mobile-tools-toggle" @click="showMobileTools = !showMobileTools">
-        🛠️ 工具箱 <span class="toggle-arrow">{{ showMobileTools ? '▲' : '▼' }}</span>
-      </div>
-      <div class="mobile-tools-list" v-if="showMobileTools">
-        <div class="mobile-tool-item" v-for="tool in navTools" :key="tool.id" @click="openNavTool(tool); showMobileMenu = false">
-          <span>{{ tool.icon }}</span>
-          <span>{{ tool.name }}</span>
-        </div>
-      </div>
-      <div class="nav-item" @click="switchTab('learn')">学习课堂</div>
-      <div class="nav-item" @click="switchTab('member')">会员中心</div>
+      <div class="nav-item" @click="switchTab('home')">🏠 首页</div>
+      <div class="nav-item" @click="switchTab('tools')">🛠️ 免费工具</div>
+      <div class="nav-item" @click="switchTab('divination')">🔮 在线占卜</div>
+      <div class="nav-item" @click="switchTab('paipan')">📊 八字排盘</div>
+      <div class="nav-item" @click="switchTab('hepan')">💑 合婚配对</div>
+      <div class="nav-item" @click="switchTab('calendar')">📅 万年历</div>
+      <div class="nav-item" @click="switchTab('learn')">📚 命理学堂</div>
+      <div class="nav-item" @click="switchTab('member')">👑 会员中心</div>
     </div>
 
     <!-- 登录弹窗 -->
@@ -563,113 +545,373 @@
 
       <!-- 天机问答 -->
       <div v-if="currentTab === 'divination'" class="tab-content divination-tab">
-        <h2>天机问答</h2>
-        <!-- 功能标签栏 - 横向滚动 -->
-        <div class="div-tabs-wrapper">
-          <div class="div-tabs">
-            <div class="div-tab" :class="{ active: activeDiv === 'chat' }" @click="activeDiv = 'chat'">
-              <span class="tab-icon">💬</span><span class="tab-name">在线问答</span>
-            </div>
-            <div class="div-tab" :class="{ active: activeDiv === 'horoscope' }" @click="activeDiv = 'horoscope'">
-              <span class="tab-icon">⭐</span><span class="tab-name">星座运势</span>
-            </div>
-            <div class="div-tab" :class="{ active: activeDiv === 'zodiac' }" @click="activeDiv = 'zodiac'">
-              <span class="tab-icon">🐲</span><span class="tab-name">生肖运势</span>
-            </div>
-            <div class="div-tab" :class="{ active: activeDiv === 'lottery' }" @click="activeDiv = 'lottery'">
-              <span class="tab-icon">🎋</span><span class="tab-name">抽签算命</span>
-            </div>
-            <div class="div-tab" :class="{ active: activeDiv === 'constellation' }" @click="activeDiv = 'constellation'">
-              <span class="tab-icon">♈</span><span class="tab-name">星座查询</span>
-            </div>
-            <div class="div-tab" :class="{ active: activeDiv === 'birthday' }" @click="activeDiv = 'birthday'">
-              <span class="tab-icon">🎂</span><span class="tab-name">生日密码</span>
-            </div>
-          </div>
-        </div>
-        
-        <!-- 在线问答 -->
-        <div class="div-content" v-if="activeDiv === 'chat'">
-          <div class="chat-container">
-            <div class="chat-messages" ref="chatMessagesRef">
-              <div v-for="(msg, idx) in chatMessages" :key="idx" :class="['chat-msg', msg.role]">
-                <div class="msg-content">{{ msg.content }}</div>
+        <div class="divination-layout">
+          <!-- 左侧边栏 -->
+          <div class="div-sidebar">
+            <div class="sidebar-title">天机问答</div>
+            <div class="sidebar-section">
+              <div class="section-label">🔥 热门推荐</div>
+              <div class="sidebar-item" :class="{ active: activeDiv === 'chat' }" @click="activeDiv = 'chat'">
+                <span class="item-icon">💬</span><span>天机问答</span><span class="badge-free">免费</span>
+              </div>
+              <div class="sidebar-item" :class="{ active: activeDiv === 'tarot' }" @click="activeDiv = 'tarot'">
+                <span class="item-icon">🃏</span><span>塔罗牌占卜</span><span class="badge-hot">热</span>
+              </div>
+              <div class="sidebar-item" :class="{ active: activeDiv === 'daily' }" @click="activeDiv = 'daily'">
+                <span class="item-icon">🎋</span><span>今日运势签</span>
               </div>
             </div>
-            <div class="chat-input-area">
-              <input v-model="chatInput" @keyup.enter="sendChatMessage" placeholder="请输入您的问题..." />
-              <button @click="sendChatMessage" :disabled="chatLoading">发送</button>
+            <div class="sidebar-section">
+              <div class="section-label">💕 姻缘感情</div>
+              <div class="sidebar-item" :class="{ active: activeDiv === 'yuelao' }" @click="activeDiv = 'yuelao'">
+                <span class="item-icon">💘</span><span>月老灵签</span><span class="badge-hot">热</span>
+              </div>
+              <div class="sidebar-item" :class="{ active: activeDiv === 'horoscope' }" @click="activeDiv = 'horoscope'">
+                <span class="item-icon">♈</span><span>星座运势</span>
+              </div>
+              <div class="sidebar-item" :class="{ active: activeDiv === 'birthday' }" @click="activeDiv = 'birthday'">
+                <span class="item-icon">🎂</span><span>生日密码</span>
+              </div>
+            </div>
+            <div class="sidebar-section">
+              <div class="section-label">💰 财运事业</div>
+              <div class="sidebar-item" :class="{ active: activeDiv === 'caishen' }" @click="activeDiv = 'caishen'">
+                <span class="item-icon">🧧</span><span>财神灵签</span>
+              </div>
+              <div class="sidebar-item" :class="{ active: activeDiv === 'zodiac' }" @click="activeDiv = 'zodiac'">
+                <span class="item-icon">🐲</span><span>生肖运势</span>
+              </div>
+              <div class="sidebar-item" :class="{ active: activeDiv === 'numerology' }" @click="activeDiv = 'numerology'">
+                <span class="item-icon">🔢</span><span>生命灵数</span>
+              </div>
+            </div>
+            <div class="sidebar-section">
+              <div class="section-label">🙏 祈福求签</div>
+              <div class="sidebar-item" :class="{ active: activeDiv === 'guanyin' }" @click="activeDiv = 'guanyin'">
+                <span class="item-icon">🪷</span><span>观音灵签</span>
+              </div>
+              <div class="sidebar-item" :class="{ active: activeDiv === 'angel' }" @click="activeDiv = 'angel'">
+                <span class="item-icon">👼</span><span>天使数字</span><span class="badge-new">新</span>
+              </div>
+              <div class="sidebar-item" :class="{ active: activeDiv === 'rune' }" @click="activeDiv = 'rune'">
+                <span class="item-icon">ᚱ</span><span>北欧符文</span><span class="badge-new">新</span>
+              </div>
+            </div>
+            <div class="sidebar-section">
+              <div class="section-label">📖 深度解读</div>
+              <div class="sidebar-item" :class="{ active: activeDiv === 'constellation' }" @click="activeDiv = 'constellation'">
+                <span class="item-icon">✨</span><span>星座详解</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 移动端横向滚动标签 -->
+          <div class="div-mobile-tabs">
+            <div class="mobile-tabs-scroll">
+              <div class="mobile-tab" :class="{ active: activeDiv === 'chat' }" @click="activeDiv = 'chat'">💬 问答</div>
+              <div class="mobile-tab" :class="{ active: activeDiv === 'tarot' }" @click="activeDiv = 'tarot'">🃏 塔罗</div>
+              <div class="mobile-tab" :class="{ active: activeDiv === 'daily' }" @click="activeDiv = 'daily'">🎋 今日</div>
+              <div class="mobile-tab" :class="{ active: activeDiv === 'yuelao' }" @click="activeDiv = 'yuelao'">💘 月老</div>
+              <div class="mobile-tab" :class="{ active: activeDiv === 'caishen' }" @click="activeDiv = 'caishen'">🧧 财神</div>
+              <div class="mobile-tab" :class="{ active: activeDiv === 'guanyin' }" @click="activeDiv = 'guanyin'">🪷 观音</div>
+              <div class="mobile-tab" :class="{ active: activeDiv === 'horoscope' }" @click="activeDiv = 'horoscope'">♈ 星座</div>
+              <div class="mobile-tab" :class="{ active: activeDiv === 'zodiac' }" @click="activeDiv = 'zodiac'">🐲 生肖</div>
+              <div class="mobile-tab" :class="{ active: activeDiv === 'angel' }" @click="activeDiv = 'angel'">👼 天使</div>
+              <div class="mobile-tab" :class="{ active: activeDiv === 'rune' }" @click="activeDiv = 'rune'">ᚱ 符文</div>
+              <div class="mobile-tab" :class="{ active: activeDiv === 'birthday' }" @click="activeDiv = 'birthday'">🎂 生日</div>
+              <div class="mobile-tab" :class="{ active: activeDiv === 'numerology' }" @click="activeDiv = 'numerology'">🔢 灵数</div>
+              <div class="mobile-tab" :class="{ active: activeDiv === 'constellation' }" @click="activeDiv = 'constellation'">✨ 详解</div>
+            </div>
+          </div>
+          
+          <!-- 右侧内容区 -->
+          <div class="div-main">
+            <!-- 天机问答 -->
+            <div class="div-content" v-if="activeDiv === 'chat'">
+              <div class="content-header">
+                <h3>🔮 天机问答</h3>
+                <p class="header-desc">百万真实案例 + 资深大师经验，<strong>免费</strong>为您解答命理疑惑</p>
+              </div>
+              
+              <!-- 功能亮点 -->
+              <div class="ai-features">
+                <div class="feature-item"><span class="feature-icon">📊</span><span>百万案例</span></div>
+                <div class="feature-item"><span class="feature-icon">🧙</span><span>大师经验</span></div>
+                <div class="feature-item"><span class="feature-icon">⚡</span><span>秒级响应</span></div>
+                <div class="feature-item"><span class="feature-icon">🔒</span><span>隐私保护</span></div>
+              </div>
+              
+              <!-- 热门问题 -->
+              <div class="hot-questions" v-if="chatMessages.length === 0">
+                <div class="hot-title">🔥 热门问题 <span class="hot-count">已解答 {{ hotAnswerCount }} 次</span></div>
+                <div class="hot-list-scroll">
+                  <span class="hot-item" @click="askHotQuestion('我今年的财运怎么样？')">💰 我今年财运如何</span>
+                  <span class="hot-item" @click="askHotQuestion('我的桃花运什么时候来？')">💕 桃花运何时来</span>
+                  <span class="hot-item" @click="askHotQuestion('我适合什么职业？')">💼 适合什么职业</span>
+                  <span class="hot-item" @click="askHotQuestion('我和TA的缘分如何？')">❤️ 和TA缘分如何</span>
+                  <span class="hot-item" @click="askHotQuestion('今年有什么需要注意的？')">⚠️ 今年注意事项</span>
+                  <span class="hot-item" @click="askHotQuestion('我的事业发展方向？')">📈 事业发展方向</span>
+                </div>
+              </div>
+              
+              <div class="chat-container">
+                <div class="chat-messages" ref="chatMessagesRef">
+                  <div class="chat-msg assistant" v-if="chatMessages.length === 0">
+                    <div class="msg-avatar">🔮</div>
+                    <div class="msg-content">
+                      <div class="msg-name">天机命理师</div>
+                      <div class="msg-text">您好！我是天机命理师，融合了<strong>百万真实命理案例</strong>和<strong>资深大师</strong>的解读经验。无论是八字、星座、风水还是姻缘，都可以问我。<br/><br/>💡 <strong>温馨提示：</strong>如需更深入的个性化解读，可以咨询我们的<span class="master-link" @click="openMasterService">真人大师</span>，获得一对一专属服务。</div>
+                    </div>
+                  </div>
+                  <div v-for="(msg, idx) in chatMessages" :key="idx" :class="['chat-msg', msg.role]">
+                    <div class="msg-avatar" v-if="msg.role === 'assistant'">🔮</div>
+                    <div class="msg-content">
+                      <div class="msg-name" v-if="msg.role === 'assistant'">天机命理师</div>
+                      <div class="msg-text">{{ msg.content }}</div>
+                    </div>
+                    <div class="msg-avatar user-avatar" v-if="msg.role === 'user'">👤</div>
+                  </div>
+                </div>
+                <div class="chat-input-area">
+                  <input v-model="chatInput" @keyup.enter="sendChatMessage" placeholder="输入您的命理问题，如：我今年运势如何..." />
+                  <button @click="sendChatMessage" :disabled="chatLoading">{{ chatLoading ? '分析中...' : '发送' }}</button>
+                </div>
+              </div>
+              
+              <!-- 大师引导 -->
+              <div class="master-guide" v-if="chatMessages.length >= 2">
+                <div class="guide-icon">🧙</div>
+                <div class="guide-content">
+                  <div class="guide-title">想要更精准的解读？</div>
+                  <div class="guide-desc">AI分析仅供参考，真人大师可结合您的完整八字进行深度解读</div>
+                </div>
+                <button class="guide-btn" @click="openMasterService">咨询大师</button>
+              </div>
+            </div>
+            
+            <!-- 星座运势 -->
+            <div class="div-content" v-if="activeDiv === 'horoscope'">
+              <div class="content-header"><h3>♈ 星座运势</h3><p>查看十二星座今日/本周/本月运势</p></div>
+              <div class="select-grid constellation-select">
+                <div class="select-item" v-for="c in constellations" :key="c.name" :class="{ active: selectedConstellation === c.name }" @click="selectConstellation(c.name)">
+                  <span class="item-icon">{{ c.icon }}</span><span class="item-name">{{ c.name }}</span>
+                </div>
+              </div>
+              <div class="action-bar" ref="horoscopeAction" v-if="selectedConstellation">
+                <div class="time-tabs">
+                  <span :class="{ active: fortuneType === 'today' }" @click="fortuneType = 'today'">今日</span>
+                  <span :class="{ active: fortuneType === 'week' }" @click="fortuneType = 'week'">本周</span>
+                  <span :class="{ active: fortuneType === 'month' }" @click="fortuneType = 'month'">本月</span>
+                </div>
+                <button class="action-btn" @click="queryHoroscope" :disabled="horoscopeLoading">{{ horoscopeLoading ? '查询中...' : '查询 ' + selectedConstellation + ' 运势' }}</button>
+              </div>
+              <div class="result-box" v-if="horoscopeResult">{{ horoscopeResult }}</div>
+            </div>
+            
+            <!-- 生肖运势 -->
+            <div class="div-content" v-if="activeDiv === 'zodiac'">
+              <div class="content-header"><h3>🐲 生肖运势</h3><p>查看十二生肖年度运势详解</p></div>
+              <div class="select-grid zodiac-select">
+                <div class="select-item" v-for="z in zodiacList" :key="z.name" :class="{ active: selectedZodiac === z.name }" @click="selectZodiac(z.name)">
+                  <span class="item-icon">{{ z.icon }}</span><span class="item-name">{{ z.name }}</span>
+                </div>
+              </div>
+              <div class="action-bar" ref="zodiacAction" v-if="selectedZodiac">
+                <button class="action-btn" @click="queryZodiac" :disabled="zodiacLoading">{{ zodiacLoading ? '查询中...' : '查询 ' + selectedZodiac + ' 运势' }}</button>
+              </div>
+              <div class="result-box" v-if="zodiacResult">{{ zodiacResult }}</div>
+            </div>
+            
+            <!-- 今日运势 -->
+            <div class="div-content" v-if="activeDiv === 'daily'">
+              <div class="content-header"><h3>📅 今日运势</h3><p>每日运势签文，指引今日方向</p></div>
+              <div class="daily-fortune-card">
+                <div class="fortune-draw" @click="drawDailyFortune" v-if="!dailyFortuneResult">
+                  <div class="draw-icon">🎋</div>
+                  <div class="draw-text">点击抽取今日运势签</div>
+                </div>
+                <div class="fortune-result" v-else>
+                  <div class="fortune-level" :class="dailyFortuneLevel">{{ dailyFortuneLevel }}</div>
+                  <div class="fortune-text">{{ dailyFortuneResult }}</div>
+                  <button class="redraw-btn" @click="dailyFortuneResult = ''">重新抽签</button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 塔罗牌占卜 -->
+            <div class="div-content" v-if="activeDiv === 'tarot'">
+              <div class="content-header"><h3>🃏 塔罗牌占卜</h3><p>静心冥想，让塔罗牌指引你的方向</p></div>
+              <div class="tarot-container">
+                <div class="tarot-question">
+                  <label>你想问什么？（选填）</label>
+                  <input v-model="tarotQuestion" placeholder="如：感情、事业、财运..." />
+                </div>
+                <div class="tarot-spread">
+                  <div class="tarot-card" :class="{ flipped: tarotCards[0] }" @click="drawTarotCard(0)">
+                    <div class="card-back">🎴</div>
+                    <div class="card-front" v-if="tarotCards[0]">{{ tarotCards[0].name }}<br/>{{ tarotCards[0].position }}</div>
+                  </div>
+                  <div class="tarot-card" :class="{ flipped: tarotCards[1] }" @click="drawTarotCard(1)">
+                    <div class="card-back">🎴</div>
+                    <div class="card-front" v-if="tarotCards[1]">{{ tarotCards[1].name }}<br/>{{ tarotCards[1].position }}</div>
+                  </div>
+                  <div class="tarot-card" :class="{ flipped: tarotCards[2] }" @click="drawTarotCard(2)">
+                    <div class="card-back">🎴</div>
+                    <div class="card-front" v-if="tarotCards[2]">{{ tarotCards[2].name }}<br/>{{ tarotCards[2].position }}</div>
+                  </div>
+                </div>
+                <div class="tarot-hint" v-if="!tarotCards[0]">点击卡牌抽取塔罗牌</div>
+                <button class="action-btn" v-if="tarotCards[0] && tarotCards[1] && tarotCards[2]" @click="interpretTarot" :disabled="tarotLoading">
+                  {{ tarotLoading ? '解读中...' : '🔮 AI解读牌阵' }}
+                </button>
+                <div class="result-box" v-if="tarotResult">{{ tarotResult }}</div>
+              </div>
+            </div>
+            
+            <!-- 天使数字 -->
+            <div class="div-content" v-if="activeDiv === 'angel'">
+              <div class="content-header"><h3>👼 天使数字</h3><p>解读你看到的重复数字的神秘含义</p></div>
+              <div class="angel-container">
+                <div class="angel-input">
+                  <label>输入你看到的数字</label>
+                  <input v-model="angelNumber" placeholder="如：111、222、1234..." maxlength="6" />
+                </div>
+                <button class="action-btn" @click="interpretAngel" :disabled="!angelNumber || angelLoading">
+                  {{ angelLoading ? '解读中...' : '👼 解读天使数字' }}
+                </button>
+                <div class="result-box" v-if="angelResult">{{ angelResult }}</div>
+              </div>
+            </div>
+            
+            <!-- 北欧符文 -->
+            <div class="div-content" v-if="activeDiv === 'rune'">
+              <div class="content-header"><h3>ᚱ 北欧符文</h3><p>古老的北欧符文占卜，揭示命运的指引</p></div>
+              <div class="rune-container">
+                <div class="rune-draw" @click="drawRune" v-if="!runeResult">
+                  <div class="rune-bag">🎒</div>
+                  <div class="rune-text">点击符文袋抽取符文</div>
+                </div>
+                <div class="rune-result" v-else>
+                  <div class="rune-symbol">{{ runeSymbol }}</div>
+                  <div class="rune-name">{{ runeName }}</div>
+                  <div class="result-box">{{ runeResult }}</div>
+                  <button class="redraw-btn" @click="runeResult = ''">重新抽取</button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 观音灵签 -->
+            <div class="div-content" v-if="activeDiv === 'guanyin'">
+              <div class="content-header"><h3>🙏 观音灵签</h3><p>诚心祈求，观音菩萨指引迷津</p></div>
+              <div class="lottery-container">
+                <div class="lottery-draw" @click="drawLottery('guanyin')" v-if="!lotteryResult || lotteryType !== 'guanyin'">
+                  <div class="lottery-icon">🙏</div>
+                  <div class="lottery-text">诚心默念所求之事，点击求签</div>
+                </div>
+                <div class="result-box" v-if="lotteryResult && lotteryType === 'guanyin'">
+                  <div class="lottery-number">第 {{ lotteryNumber }} 签</div>
+                  {{ lotteryResult }}
+                  <button class="redraw-btn" @click="lotteryResult = ''">重新求签</button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 月老灵签 -->
+            <div class="div-content" v-if="activeDiv === 'yuelao'">
+              <div class="content-header"><h3>💕 月老灵签</h3><p>姻缘天定，月老指点红线</p></div>
+              <div class="lottery-container">
+                <div class="lottery-draw" @click="drawLottery('yuelao')" v-if="!lotteryResult || lotteryType !== 'yuelao'">
+                  <div class="lottery-icon">💕</div>
+                  <div class="lottery-text">诚心默念姻缘之事，点击求签</div>
+                </div>
+                <div class="result-box" v-if="lotteryResult && lotteryType === 'yuelao'">
+                  <div class="lottery-number">第 {{ lotteryNumber }} 签</div>
+                  {{ lotteryResult }}
+                  <button class="redraw-btn" @click="lotteryResult = ''">重新求签</button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 财神灵签 -->
+            <div class="div-content" v-if="activeDiv === 'caishen'">
+              <div class="content-header"><h3>💰 财神灵签</h3><p>财运亨通，财神爷指点财路</p></div>
+              <div class="lottery-container">
+                <div class="lottery-draw" @click="drawLottery('caishen')" v-if="!lotteryResult || lotteryType !== 'caishen'">
+                  <div class="lottery-icon">💰</div>
+                  <div class="lottery-text">诚心默念财运之事，点击求签</div>
+                </div>
+                <div class="result-box" v-if="lotteryResult && lotteryType === 'caishen'">
+                  <div class="lottery-number">第 {{ lotteryNumber }} 签</div>
+                  {{ lotteryResult }}
+                  <button class="redraw-btn" @click="lotteryResult = ''">重新求签</button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 星座详解 -->
+            <div class="div-content" v-if="activeDiv === 'constellation'">
+              <div class="content-header"><h3>✨ 星座详解</h3><p>深入了解十二星座的性格特点</p></div>
+              <div class="select-grid constellation-select">
+                <div class="select-item" v-for="c in constellations" :key="c.name" :class="{ active: selectedConstellation === c.name }" @click="selectedConstellation = c.name">
+                  <span class="item-icon">{{ c.icon }}</span><span class="item-name">{{ c.name }}</span>
+                </div>
+              </div>
+              <div class="action-bar" v-if="selectedConstellation">
+                <button class="action-btn" @click="queryConstellation" :disabled="constLoading">{{ constLoading ? '查询中...' : '查询 ' + selectedConstellation + ' 详情' }}</button>
+              </div>
+              <div class="result-box" v-if="constResult">{{ constResult }}</div>
+            </div>
+            
+            <!-- 生日密码 -->
+            <div class="div-content" v-if="activeDiv === 'birthday'">
+              <div class="content-header"><h3>🎂 生日密码</h3><p>解读你的生日蕴含的命运密码</p></div>
+              <div class="birthday-input">
+                <label>选择您的生日</label>
+                <input type="date" v-model="birthdayDate" />
+              </div>
+              <div class="birthday-btns" v-if="birthdayDate">
+                <button class="birthday-btn" @click="queryBirthday('password')" :disabled="birthdayLoading">🔮 生日密码</button>
+                <button class="birthday-btn" @click="queryBirthday('book')" :disabled="birthdayLoading">📖 生日书</button>
+                <button class="birthday-btn" @click="queryBirthday('flower')" :disabled="birthdayLoading">🌸 生日花</button>
+              </div>
+              <div class="result-box" v-if="birthdayResult">{{ birthdayResult }}</div>
+            </div>
+            
+            <!-- 生命数字 -->
+            <div class="div-content" v-if="activeDiv === 'numerology'">
+              <div class="content-header"><h3>🔢 生命数字</h3><p>根据生日计算你的生命灵数</p></div>
+              <div class="numerology-container">
+                <div class="birthday-input">
+                  <label>选择您的生日</label>
+                  <input type="date" v-model="numerologyDate" />
+                </div>
+                <button class="action-btn" v-if="numerologyDate" @click="calcNumerology" :disabled="numerologyLoading">
+                  {{ numerologyLoading ? '计算中...' : '🔢 计算生命数字' }}
+                </button>
+                <div class="numerology-result" v-if="numerologyNumber">
+                  <div class="num-display">{{ numerologyNumber }}</div>
+                  <div class="num-name">生命灵数</div>
+                </div>
+                <div class="result-box" v-if="numerologyResult">{{ numerologyResult }}</div>
+              </div>
             </div>
           </div>
         </div>
-        
-        <!-- 星座运势 -->
-        <div class="div-content" v-if="activeDiv === 'horoscope'">
-          <div class="select-grid constellation-select">
-            <div class="select-item" v-for="c in constellations" :key="c.name" :class="{ active: selectedConstellation === c.name }" @click="selectConstellation(c.name)">
-              <span class="item-icon">{{ c.icon }}</span><span class="item-name">{{ c.name }}</span>
-            </div>
-          </div>
-          <div class="action-bar" v-if="selectedConstellation">
-            <div class="time-tabs">
-              <span :class="{ active: fortuneType === 'today' }" @click="fortuneType = 'today'">今日</span>
-              <span :class="{ active: fortuneType === 'week' }" @click="fortuneType = 'week'">本周</span>
-              <span :class="{ active: fortuneType === 'month' }" @click="fortuneType = 'month'">本月</span>
-            </div>
-            <button class="action-btn" @click="queryHoroscope" :disabled="horoscopeLoading">{{ horoscopeLoading ? '查询中...' : '查询 ' + selectedConstellation + ' 运势' }}</button>
-          </div>
-          <div class="result-box" v-if="horoscopeResult">{{ horoscopeResult }}</div>
+      </div>
+
+      <!-- 工具箱 -->
+      <div v-if="currentTab === 'tools'" class="tab-content tools-tab">
+        <div class="tools-page-header">
+          <h2>🛠️ 免费命理工具箱</h2>
+          <p>25款专业命理测算工具，全部免费使用</p>
         </div>
-        
-        <!-- 生肖运势 -->
-        <div class="div-content" v-if="activeDiv === 'zodiac'">
-          <div class="select-grid zodiac-select">
-            <div class="select-item" v-for="z in zodiacList" :key="z.name" :class="{ active: selectedZodiac === z.name }" @click="selectZodiac(z.name)">
-              <span class="item-icon">{{ z.icon }}</span><span class="item-name">{{ z.name }}</span>
-            </div>
-          </div>
-          <div class="action-bar" v-if="selectedZodiac">
-            <button class="action-btn" @click="queryZodiac" :disabled="zodiacLoading">{{ zodiacLoading ? '查询中...' : '查询 ' + selectedZodiac + ' 运势' }}</button>
-          </div>
-          <div class="result-box" v-if="zodiacResult">{{ zodiacResult }}</div>
-        </div>
-        
-        <!-- 抽签 -->
-        <div class="div-content" v-if="activeDiv === 'lottery'">
-          <div class="lottery-grid">
-            <div class="lottery-item" @click="drawLottery('guanyin')"><span class="lottery-icon">🙏</span><span class="lottery-name">观音灵签</span></div>
-            <div class="lottery-item" @click="drawLottery('yuelao')"><span class="lottery-icon">💕</span><span class="lottery-name">月老灵签</span></div>
-            <div class="lottery-item" @click="drawLottery('caishen')"><span class="lottery-icon">💰</span><span class="lottery-name">财神灵签</span></div>
-          </div>
-          <div class="result-box" v-if="lotteryResult">{{ lotteryResult }}</div>
-        </div>
-        
-        <!-- 星座查询 -->
-        <div class="div-content" v-if="activeDiv === 'constellation'">
-          <div class="select-grid constellation-select">
-            <div class="select-item" v-for="c in constellations" :key="c.name" :class="{ active: selectedConstellation === c.name }" @click="selectedConstellation = c.name">
-              <span class="item-icon">{{ c.icon }}</span><span class="item-name">{{ c.name }}</span>
-            </div>
-          </div>
-          <div class="action-bar" v-if="selectedConstellation">
-            <button class="action-btn" @click="queryConstellation" :disabled="constLoading">{{ constLoading ? '查询中...' : '查询 ' + selectedConstellation + ' 详情' }}</button>
-          </div>
-          <div class="result-box" v-if="constResult">{{ constResult }}</div>
-        </div>
-        
-        <!-- 生日密码 -->
-        <div class="div-content" v-if="activeDiv === 'birthday'">
-          <div class="birthday-input">
-            <label>选择您的生日</label>
-            <input type="date" v-model="birthdayDate" />
-          </div>
-          <div class="birthday-btns" v-if="birthdayDate">
-            <button class="birthday-btn" @click="queryBirthday('password')" :disabled="birthdayLoading">🔮 生日密码</button>
-            <button class="birthday-btn" @click="queryBirthday('book')" :disabled="birthdayLoading">📖 生日书</button>
-            <button class="birthday-btn" @click="queryBirthday('flower')" :disabled="birthdayLoading">🌸 生日花</button>
-          </div>
-          <div class="result-box" v-if="birthdayResult">{{ birthdayResult }}</div>
-        </div>
+        <ToolsGrid 
+          ref="toolsPageGridRef" 
+          @open-master="openMasterService" 
+          @switch-tab="switchTab" 
+          @modal-change="handleToolModalChange"
+          :show-full-page="true"
+        />
       </div>
 
       <!-- 学习课堂 -->
@@ -719,21 +961,32 @@
       </div>
     </div>
 
-    <!-- 悬浮留言按钮 -->
-    <div class="floating-feedback" @click="showFeedbackModal = true"><span>💬</span></div>
+    <!-- 悬浮留言按钮 - 天机问答页面隐藏 -->
+    <div class="floating-feedback" v-if="currentTab !== 'divination'" @click="showFeedbackModal = true"><span>💬</span></div>
     
     <!-- 底部悬浮大师服务横幅 -->
     <MasterFloatBar ref="masterFloatBarRef" />
+    
+    <!-- 全局工具弹窗（用于从导航栏打开工具，不受tab限制） -->
+    <div class="global-tools-modal">
+      <ToolsGrid 
+        ref="globalToolsGridRef" 
+        @open-master="openMasterService" 
+        @switch-tab="switchTab" 
+        @modal-change="handleToolModalChange" 
+      />
+    </div>
   </div>
 </template>
 
 
 <script setup>
-import { ref, reactive, computed, onMounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, reactive, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { userLogin, simpleRegister, loginOut, checkLogin, getVipPlans, getVipBenefits, getVipInfo, createVipOrder, submitFeedback, getPaymentOptions, createPayOrder, confirmPayment } from '../api/api'
 import { ElMessage } from 'element-plus'
 import { themes, getCurrentTheme, setTheme, initTheme } from '../utils/themes'
+import { trackPV, startHeartbeat, stopHeartbeat, getRealTimeStats } from '../utils/analytics'
 import MasterService from './MasterService.vue'
 import MasterFloatBar from './MasterFloatBar.vue'
 import ToolsGrid from './ToolsGrid.vue'
@@ -742,9 +995,12 @@ import TestHistory from './TestHistory.vue'
 import HotAndLive from './HotAndLive.vue'
 
 const router = useRouter()
+const route = useRoute()
 const masterFloatBarRef = ref(null)
 const testHistoryRef = ref(null)
 const toolsGridRef = ref(null)
+const toolsPageGridRef = ref(null)
+const globalToolsGridRef = ref(null)
 
 // 处理打开工具
 const handleOpenTool = (tool) => {
@@ -808,11 +1064,10 @@ const navTools = ref([
 // 从导航打开工具
 const openNavTool = (tool) => {
   showToolsDropdown.value = false
-  currentTab.value = 'home'
-  // 等待切换到首页后再打开工具
+  // 使用全局的 ToolsGrid 打开工具弹窗
   nextTick(() => {
-    if (toolsGridRef.value) {
-      toolsGridRef.value.openToolById(tool.id)
+    if (globalToolsGridRef.value) {
+      globalToolsGridRef.value.openToolById(tool.id)
     }
   })
 }
@@ -837,6 +1092,8 @@ const horoscopeResult = ref('')
 const horoscopeAction = ref(null)
 const selectedZodiac = ref('')
 const zodiacLoading = ref(false)
+// 热门问题解答次数（基数 + 随机波动）
+const hotAnswerCount = ref(Math.floor(128000 + Math.random() * 5000))
 
 // 万年历相关
 const now = new Date()
@@ -1046,11 +1303,31 @@ const showMasterModal = () => {
 const zodiacResult = ref('')
 const zodiacAction = ref(null)
 const lotteryResult = ref('')
+const lotteryType = ref('')
+const lotteryNumber = ref(0)
 const constLoading = ref(false)
 const constResult = ref('')
 const birthdayDate = ref('')
 const birthdayLoading = ref(false)
 const birthdayResult = ref('')
+
+// 新增占卜功能变量
+const dailyFortuneResult = ref('')
+const dailyFortuneLevel = ref('')
+const tarotQuestion = ref('')
+const tarotCards = ref([null, null, null])
+const tarotLoading = ref(false)
+const tarotResult = ref('')
+const angelNumber = ref('')
+const angelLoading = ref(false)
+const angelResult = ref('')
+const runeSymbol = ref('')
+const runeName = ref('')
+const runeResult = ref('')
+const numerologyDate = ref('')
+const numerologyNumber = ref('')
+const numerologyLoading = ref(false)
+const numerologyResult = ref('')
 
 const loginForm = reactive({ account: '', password: '' })
 const registerForm = reactive({ phone: '', email: '', wechat: '', password: '', confirmPassword: '' })
@@ -1108,20 +1385,34 @@ const dailyJi = computed(() => {
   return ['诉讼', '开仓', '破土', '安葬'][seed % 4]
 })
 
-// 在线统计（模拟数据，增加真实感）
+// 在线统计
 const todayCount = ref(0)
 const onlineCount = ref(0)
+let statsTimer = null
+let useRealStats = false // 标记是否使用真实数据
+
 const initStats = () => {
-  // 基于时间生成看起来真实的数据
+  // 先用本地模拟数据，等后端数据返回后会被覆盖
   const hour = new Date().getHours()
   const baseCount = 1200 + Math.floor(Math.random() * 300)
   todayCount.value = baseCount + hour * 45 + Math.floor(Math.random() * 20)
   onlineCount.value = Math.floor(50 + hour * 3 + Math.random() * 30)
-  // 每隔几秒随机增加
-  setInterval(() => {
-    if (Math.random() > 0.7) todayCount.value += Math.floor(Math.random() * 3) + 1
-    onlineCount.value = Math.max(20, onlineCount.value + Math.floor(Math.random() * 5) - 2)
-  }, 5000)
+  
+  // 定时刷新（如果使用真实数据则从后端获取，否则本地模拟）
+  statsTimer = setInterval(async () => {
+    if (useRealStats) {
+      // 从后端获取最新数据
+      const stats = await getRealTimeStats()
+      if (stats) {
+        todayCount.value = stats.todayCount || todayCount.value
+        onlineCount.value = stats.onlineCount || onlineCount.value
+      }
+    } else {
+      // 本地模拟波动
+      if (Math.random() > 0.7) todayCount.value += Math.floor(Math.random() * 3) + 1
+      onlineCount.value = Math.max(20, onlineCount.value + Math.floor(Math.random() * 5) - 2)
+    }
+  }, 30000) // 30秒刷新一次
 }
 
 // 限时优惠倒计时
@@ -1577,7 +1868,7 @@ const sendChatMessage = async () => {
   chatInput.value = ''
   chatLoading.value = true
   try {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
+    const baseUrl = import.meta.env.VITE_APP_BASE_API || ''
     const response = await fetch(`${baseUrl}/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('starloomAI-token') || '' },
@@ -1590,11 +1881,17 @@ const sendChatMessage = async () => {
   chatLoading.value = false
 }
 
+// 点击热门问题
+const askHotQuestion = (question) => {
+  chatInput.value = question
+  sendChatMessage()
+}
+
 const queryHoroscope = async () => {
   if (!selectedConstellation.value) return
   horoscopeLoading.value = true; horoscopeResult.value = ''
   try {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
+    const baseUrl = import.meta.env.VITE_APP_BASE_API || ''
     const response = await fetch(`${baseUrl}/xingzuo/stream/yunshi`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('starloomAI-token') || '' },
@@ -1622,15 +1919,105 @@ const queryZodiac = async () => {
 
 const drawLottery = async (type) => {
   lotteryResult.value = ''
+  lotteryType.value = type
+  lotteryNumber.value = Math.floor(Math.random() * 100) + 1
   try {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
+    const baseUrl = import.meta.env.VITE_APP_BASE_API || ''
     const response = await fetch(`${baseUrl}/xingzuo/stream/lottery`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('starloomAI-token') || '' },
-      body: JSON.stringify({ type })
+      body: JSON.stringify({ type, number: lotteryNumber.value })
     })
     await handleStreamResponse(response, (content) => { lotteryResult.value = content })
   } catch (e) { lotteryResult.value = '抽签失败，请重试' }
+}
+
+// 通用AI占卜接口
+const callAIDivination = async (prompt, onUpdate) => {
+  const baseUrl = import.meta.env.VITE_APP_BASE_API || ''
+  const response = await fetch(`${baseUrl}/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('starloomAI-token') || '' },
+    body: JSON.stringify({ message: prompt, stream: true })
+  })
+  await handleStreamResponse(response, onUpdate)
+}
+
+// 今日运势
+const drawDailyFortune = async () => {
+  const levels = ['大吉', '中吉', '小吉', '吉', '末吉', '凶']
+  dailyFortuneLevel.value = levels[Math.floor(Math.random() * levels.length)]
+  const prompt = `请为我抽取一支今日运势签，签文等级是"${dailyFortuneLevel.value}"。请给出：签诗（四句七言）、签文解读、今日宜忌、幸运数字和幸运颜色。用古风优雅的语气。`
+  try {
+    await callAIDivination(prompt, (content) => { dailyFortuneResult.value = content })
+  } catch (e) { dailyFortuneResult.value = '今日宜静心养神，诸事顺遂。' }
+}
+
+// 塔罗牌
+const tarotDeck = [
+  '愚者', '魔术师', '女祭司', '皇后', '皇帝', '教皇', '恋人', '战车', '力量', '隐士',
+  '命运之轮', '正义', '倒吊人', '死神', '节制', '恶魔', '塔', '星星', '月亮', '太阳', '审判', '世界'
+]
+const drawTarotCard = (index) => {
+  if (tarotCards.value[index]) return
+  const available = tarotDeck.filter(c => !tarotCards.value.some(tc => tc?.name === c))
+  const card = available[Math.floor(Math.random() * available.length)]
+  const position = Math.random() > 0.5 ? '正位' : '逆位'
+  tarotCards.value[index] = { name: card, position }
+}
+const interpretTarot = async () => {
+  tarotLoading.value = true; tarotResult.value = ''
+  const cards = tarotCards.value.map(c => `${c.name}(${c.position})`).join('、')
+  const question = tarotQuestion.value || '综合运势'
+  const prompt = `我抽取了三张塔罗牌：${cards}，问题是"${question}"。请解读这个牌阵：1.每张牌的含义 2.牌阵整体解读 3.对问题的回答 4.行动建议。用神秘而温暖的语气。`
+  try {
+    await callAIDivination(prompt, (content) => { tarotResult.value = content })
+  } catch (e) { tarotResult.value = '塔罗解读失败，请重试' }
+  tarotLoading.value = false
+  tarotCards.value = [null, null, null]
+}
+
+// 天使数字
+const interpretAngel = async () => {
+  angelLoading.value = true; angelResult.value = ''
+  const prompt = `请解读天使数字"${angelNumber.value}"的含义。包括：1.这个数字的神秘含义 2.天使想传达的信息 3.对生活的指引 4.行动建议。用温暖灵性的语气。`
+  try {
+    await callAIDivination(prompt, (content) => { angelResult.value = content })
+  } catch (e) { angelResult.value = '天使数字解读失败，请重试' }
+  angelLoading.value = false
+}
+
+// 北欧符文
+const runes = [
+  { symbol: 'ᚠ', name: 'Fehu 财富' }, { symbol: 'ᚢ', name: 'Uruz 力量' }, { symbol: 'ᚦ', name: 'Thurisaz 保护' },
+  { symbol: 'ᚨ', name: 'Ansuz 智慧' }, { symbol: 'ᚱ', name: 'Raido 旅程' }, { symbol: 'ᚲ', name: 'Kenaz 启示' },
+  { symbol: 'ᚷ', name: 'Gebo 礼物' }, { symbol: 'ᚹ', name: 'Wunjo 喜悦' }, { symbol: 'ᚺ', name: 'Hagalaz 变革' },
+  { symbol: 'ᚾ', name: 'Nauthiz 需求' }, { symbol: 'ᛁ', name: 'Isa 静止' }, { symbol: 'ᛃ', name: 'Jera 收获' }
+]
+const drawRune = async () => {
+  const rune = runes[Math.floor(Math.random() * runes.length)]
+  runeSymbol.value = rune.symbol
+  runeName.value = rune.name
+  const prompt = `我抽取了北欧符文"${rune.name}"（符号：${rune.symbol}）。请解读：1.这个符文的起源和含义 2.它代表的能量和信息 3.对当前处境的指引 4.如何运用这个符文的能量。用古老神秘的语气。`
+  try {
+    await callAIDivination(prompt, (content) => { runeResult.value = content })
+  } catch (e) { runeResult.value = '符文解读失败，请重试' }
+}
+
+// 生命数字
+const calcNumerology = async () => {
+  numerologyLoading.value = true; numerologyResult.value = ''
+  const digits = numerologyDate.value.replace(/-/g, '').split('').map(Number)
+  let sum = digits.reduce((a, b) => a + b, 0)
+  while (sum > 9 && sum !== 11 && sum !== 22) {
+    sum = sum.toString().split('').map(Number).reduce((a, b) => a + b, 0)
+  }
+  numerologyNumber.value = sum
+  const prompt = `我的生命灵数是${sum}（生日：${numerologyDate.value}）。请解读：1.生命灵数${sum}的核心特质 2.性格优势和挑战 3.适合的职业方向 4.感情特点 5.人生使命。用温暖智慧的语气。`
+  try {
+    await callAIDivination(prompt, (content) => { numerologyResult.value = content })
+  } catch (e) { numerologyResult.value = '生命数字解读失败，请重试' }
+  numerologyLoading.value = false
 }
 
 const queryConstellation = async () => {
@@ -1726,7 +2113,44 @@ onMounted(() => {
   initStats() // 初始化统计数据
   initPromoCountdown() // 初始化倒计时
   loadLocalReviews() // 加载本地评论
+  
+  // 根据路由 meta 设置默认 tab
+  if (route.meta?.defaultTab) {
+    currentTab.value = route.meta.defaultTab
+  }
+  
+  // 埋点：页面浏览 + 启动心跳
+  trackPV()
+  startHeartbeat()
+  
+  // 获取实时统计数据
+  loadRealTimeStats()
 })
+
+// 监听路由变化，更新 tab
+watch(() => route.meta?.defaultTab, (newTab) => {
+  if (newTab) {
+    currentTab.value = newTab
+  }
+})
+
+onUnmounted(() => {
+  stopHeartbeat()
+  if (statsTimer) {
+    clearInterval(statsTimer)
+    statsTimer = null
+  }
+})
+
+// 加载实时统计数据
+const loadRealTimeStats = async () => {
+  const stats = await getRealTimeStats()
+  if (stats) {
+    todayCount.value = stats.todayCount || todayCount.value
+    onlineCount.value = stats.onlineCount || onlineCount.value
+    useRealStats = true // 标记使用真实数据
+  }
+}
 </script>
 
 
@@ -2332,10 +2756,445 @@ onMounted(() => {
 .person-section { margin-bottom: 25px; padding: 22px; background: var(--bgCardHover, rgba(240,147,251,0.08)); border-radius: 16px; border: 1px solid var(--border, rgba(240,147,251,0.15)); }
 .person-section h4 { color: var(--accent, #f5a5c8); margin-bottom: 18px; font-size: 16px; }
 
-.divination-tab h2 { 
-  background: var(--primaryGradient, linear-gradient(90deg, #f093fb, #f5576c)); 
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-  text-align: center; margin-bottom: 25px; font-size: 26px;
+.divination-tab {
+  padding: 0;
+}
+
+/* ========== 天机问答侧边栏布局 ========== */
+.divination-layout {
+  display: flex;
+  min-height: 600px;
+  background: var(--bgCard, rgba(255,255,255,0.03));
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.div-sidebar {
+  width: 200px;
+  background: var(--bgCard, rgba(255,255,255,0.05));
+  border-right: 1px solid var(--border, rgba(200,165,217,0.15));
+  padding: 16px 0;
+  flex-shrink: 0;
+}
+
+.sidebar-title {
+  font-size: 18px;
+  font-weight: 600;
+  padding: 0 16px 16px;
+  background: var(--primaryGradient, linear-gradient(90deg, #f093fb, #f5576c));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border-bottom: 1px solid var(--border, rgba(200,165,217,0.1));
+  margin-bottom: 8px;
+}
+
+.sidebar-section {
+  margin-bottom: 8px;
+}
+
+.section-label {
+  font-size: 12px;
+  color: var(--textMuted, rgba(200,165,217,0.5));
+  padding: 8px 16px 4px;
+  text-transform: uppercase;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  color: var(--textSecondary, #e8d5f2);
+  position: relative;
+}
+
+.sidebar-item:hover {
+  background: var(--bgCardHover, rgba(240,147,251,0.08));
+}
+
+.sidebar-item.active {
+  background: var(--primaryGradient, linear-gradient(90deg, rgba(240,147,251,0.2), rgba(245,87,108,0.2)));
+  color: var(--primary, #f093fb);
+  border-left: 3px solid var(--primary, #f093fb);
+}
+
+.sidebar-item .item-icon {
+  font-size: 16px;
+}
+
+.sidebar-item .badge-hot,
+.sidebar-item .badge-new,
+.sidebar-item .badge-free {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: auto;
+}
+
+.sidebar-item .badge-hot {
+  background: #ff4757;
+  color: #fff;
+}
+
+.sidebar-item .badge-new {
+  background: #2ed573;
+  color: #fff;
+}
+
+.sidebar-item .badge-free {
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+  color: #fff;
+}
+
+.div-mobile-tabs {
+  display: none;
+  padding: 12px 16px;
+  background: var(--bgCard, rgba(255,255,255,0.05));
+  border-bottom: 1px solid var(--border, rgba(200,165,217,0.15));
+}
+
+.mobile-tabs-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-tab {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  background: var(--bgInput, rgba(255,255,255,0.08));
+  border: 1px solid var(--border, rgba(200,165,217,0.2));
+  border-radius: 20px;
+  color: var(--textSecondary, #e8d5f2);
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mobile-tab:hover {
+  background: var(--bgHover, rgba(200,165,217,0.15));
+}
+
+.mobile-tab.active {
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  border-color: #9b59b6;
+  color: #fff;
+  font-weight: 500;
+}
+
+.div-main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.content-header {
+  margin-bottom: 20px;
+}
+
+.content-header h3 {
+  font-size: 20px;
+  margin: 0 0 6px;
+  color: var(--text, #f8f4ff);
+}
+
+.content-header p {
+  font-size: 14px;
+  color: var(--textSecondary, #e8d5f2);
+  margin: 0;
+}
+
+/* 今日运势 */
+.daily-fortune-card {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.fortune-draw {
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.fortune-draw:hover {
+  transform: scale(1.05);
+}
+
+.draw-icon {
+  font-size: 80px;
+  margin-bottom: 16px;
+}
+
+.draw-text {
+  color: var(--textSecondary, #e8d5f2);
+}
+
+.fortune-result {
+  text-align: center;
+}
+
+.fortune-level {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  padding: 16px 32px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.fortune-level.大吉 { background: linear-gradient(135deg, #ff6b6b, #feca57); color: #fff; }
+.fortune-level.中吉 { background: linear-gradient(135deg, #ff9ff3, #feca57); color: #fff; }
+.fortune-level.小吉 { background: linear-gradient(135deg, #48dbfb, #1dd1a1); color: #fff; }
+.fortune-level.吉 { background: linear-gradient(135deg, #54a0ff, #5f27cd); color: #fff; }
+.fortune-level.末吉 { background: linear-gradient(135deg, #576574, #222f3e); color: #fff; }
+.fortune-level.凶 { background: linear-gradient(135deg, #2d3436, #636e72); color: #fff; }
+
+.fortune-text {
+  color: var(--textSecondary, #e8d5f2);
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.redraw-btn {
+  padding: 10px 24px;
+  background: var(--bgCard, rgba(255,255,255,0.1));
+  border: 1px solid var(--border, rgba(200,165,217,0.2));
+  border-radius: 20px;
+  color: var(--textSecondary, #e8d5f2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.redraw-btn:hover {
+  background: var(--bgCardHover, rgba(240,147,251,0.15));
+}
+
+/* 塔罗牌 */
+.tarot-container {
+  text-align: center;
+}
+
+.tarot-question {
+  margin-bottom: 24px;
+}
+
+.tarot-question label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--textSecondary, #e8d5f2);
+}
+
+.tarot-question input {
+  width: 100%;
+  max-width: 300px;
+  padding: 12px 16px;
+  background: var(--bgInput, rgba(255,255,255,0.08));
+  border: 1px solid var(--border, rgba(200,165,217,0.2));
+  border-radius: 10px;
+  color: var(--text, #f8f4ff);
+}
+
+.tarot-spread {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.tarot-card {
+  width: 100px;
+  height: 150px;
+  background: linear-gradient(135deg, #2d3436, #636e72);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  perspective: 1000px;
+}
+
+.tarot-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(240,147,251,0.3);
+}
+
+.tarot-card .card-back {
+  font-size: 48px;
+}
+
+.tarot-card.flipped {
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+.tarot-card .card-front {
+  font-size: 14px;
+  color: #fff;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.tarot-hint {
+  color: var(--textMuted, rgba(200,165,217,0.5));
+  margin-bottom: 20px;
+}
+
+/* 天使数字 */
+.angel-container {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.angel-input {
+  margin-bottom: 20px;
+}
+
+.angel-input label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--textSecondary, #e8d5f2);
+}
+
+.angel-input input {
+  width: 100%;
+  padding: 16px;
+  background: var(--bgInput, rgba(255,255,255,0.08));
+  border: 1px solid var(--border, rgba(200,165,217,0.2));
+  border-radius: 12px;
+  color: var(--text, #f8f4ff);
+  font-size: 24px;
+  text-align: center;
+  letter-spacing: 8px;
+}
+
+/* 北欧符文 */
+.rune-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.rune-draw {
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.rune-draw:hover {
+  transform: scale(1.05);
+}
+
+.rune-bag {
+  font-size: 80px;
+  margin-bottom: 16px;
+}
+
+.rune-text {
+  color: var(--textSecondary, #e8d5f2);
+}
+
+.rune-result {
+  text-align: center;
+}
+
+.rune-symbol {
+  font-size: 80px;
+  margin-bottom: 8px;
+  color: var(--primary, #f093fb);
+}
+
+.rune-name {
+  font-size: 18px;
+  color: var(--text, #f8f4ff);
+  margin-bottom: 16px;
+}
+
+/* 灵签容器 */
+.lottery-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.lottery-draw {
+  cursor: pointer;
+  transition: transform 0.3s;
+  padding: 40px;
+}
+
+.lottery-draw:hover {
+  transform: scale(1.05);
+}
+
+.lottery-draw .lottery-icon {
+  font-size: 80px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.lottery-draw .lottery-text {
+  color: var(--textSecondary, #e8d5f2);
+}
+
+.lottery-number {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--primary, #f093fb);
+  margin-bottom: 16px;
+}
+
+/* 生命数字 */
+.numerology-container {
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.numerology-result {
+  margin: 24px 0;
+}
+
+.num-display {
+  font-size: 72px;
+  font-weight: bold;
+  background: var(--primaryGradient, linear-gradient(90deg, #f093fb, #f5576c));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.num-name {
+  font-size: 16px;
+  color: var(--textSecondary, #e8d5f2);
+}
+
+/* ========== 工具箱页面样式 ========== */
+.tools-tab {
+  padding: 20px;
+}
+.tools-page-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.tools-page-header h2 {
+  font-size: 28px;
+  margin: 0 0 10px;
+  background: var(--primaryGradient, linear-gradient(90deg, #f093fb, #f5576c));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.tools-page-header p {
+  color: var(--textSecondary, #e8d5f2);
+  font-size: 15px;
+  margin: 0;
 }
 
 /* ========== 天机问答标签页样式 ========== */
@@ -2544,20 +3403,22 @@ onMounted(() => {
 .chat-messages { height: 350px; overflow-y: auto; padding: 20px; background: var(--bgInput, rgba(255,255,255,0.03)); }
 .chat-messages::-webkit-scrollbar { width: 6px; }
 .chat-messages::-webkit-scrollbar-thumb { background: var(--shadow, rgba(240,147,251,0.3)); border-radius: 3px; }
-.chat-msg { margin-bottom: 15px; display: flex; }
+.chat-msg { margin-bottom: 15px; display: flex; gap: 10px; align-items: flex-start; }
 .chat-msg.user { justify-content: flex-end; }
 .chat-msg.assistant { justify-content: flex-start; }
-.msg-content { max-width: 80%; padding: 12px 16px; border-radius: 16px; line-height: 1.6; font-size: 14px; }
-.chat-msg.user .msg-content { 
+.msg-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--bgCard, rgba(255,255,255,0.1)); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.msg-avatar.user-avatar { background: var(--primaryGradient, linear-gradient(135deg, #f093fb, #f5576c)); }
+.msg-content { max-width: 75%; }
+.msg-name { font-size: 12px; color: var(--textMuted, rgba(200,165,217,0.6)); margin-bottom: 4px; }
+.msg-text { padding: 12px 16px; border-radius: 16px; line-height: 1.7; font-size: 14px; background: var(--bgCard, rgba(255,255,255,0.1)); color: var(--textSecondary, #e8d5f2); border-bottom-left-radius: 4px; }
+.chat-msg.user .msg-text { 
   background: var(--primaryGradient, linear-gradient(135deg, #f093fb, #f5576c)); 
   color: #fff; 
   border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 16px;
 }
-.chat-msg.assistant .msg-content { 
-  background: var(--bgCard, rgba(255,255,255,0.1)); 
-  color: var(--textSecondary, #e8d5f2); 
-  border-bottom-left-radius: 4px;
-}
+.master-link { color: var(--primary, #f093fb); cursor: pointer; text-decoration: underline; }
+.master-link:hover { color: var(--accent, #f5a5c8); }
 .chat-input-area { display: flex; gap: 10px; padding: 15px; background: rgba(0,0,0,0.15); }
 .chat-input-area input { 
   flex: 1; padding: 12px 18px; 
@@ -2575,6 +3436,111 @@ onMounted(() => {
   font-weight: bold; cursor: pointer; 
   font-size: 14px;
 }
+
+/* AI问答功能亮点 */
+.ai-features {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--bgCard, rgba(255,255,255,0.05));
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--textSecondary, #e8d5f2);
+}
+.feature-icon { font-size: 16px; }
+
+/* 内容头部描述 */
+.header-desc {
+  color: var(--text, #f8f4ff);
+}
+.header-desc strong {
+  color: #f093fb;
+  font-weight: 600;
+}
+
+/* 热门问题 */
+.hot-questions {
+  margin-bottom: 16px;
+  padding: 16px;
+  background: var(--bgCard, rgba(255,255,255,0.03));
+  border-radius: 12px;
+}
+.hot-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text, #f8f4ff);
+  margin-bottom: 12px;
+}
+.hot-count {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--textSecondary, #c8a5d9);
+}
+.hot-list-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.hot-list-scroll::-webkit-scrollbar { display: none; }
+.hot-item {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  background: rgba(139, 90, 43, 0.08);
+  border: 1px solid rgba(139, 90, 43, 0.2);
+  border-radius: 20px;
+  font-size: 13px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.hot-item:hover {
+  background: rgba(139, 90, 43, 0.15);
+  border-color: #8b5a2b;
+  color: #8b5a2b;
+}
+
+/* 大师引导 */
+.master-guide {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(240,147,251,0.1), rgba(245,87,108,0.1));
+  border: 1px solid rgba(240,147,251,0.2);
+  border-radius: 12px;
+}
+.guide-icon { font-size: 32px; }
+.guide-content { flex: 1; }
+.guide-title { font-size: 15px; font-weight: 600; color: var(--text, #f8f4ff); margin-bottom: 4px; }
+.guide-desc { font-size: 13px; color: var(--textSecondary, #e8d5f2); }
+.guide-btn {
+  padding: 10px 20px;
+  background: var(--primaryGradient, linear-gradient(135deg, #f093fb, #f5576c));
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.guide-btn:hover { transform: scale(1.05); }
 
 /* 保留旧样式兼容 */
 .constellation-select, .zodiac-select { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
@@ -2981,6 +3947,7 @@ onMounted(() => {
   .mobile-header-right { display: flex; }
   .mobile-menu-btn { display: block; font-size: 24px; cursor: pointer; color: var(--accent, #f5a5c8); }
   .mobile-nav { display: block; }
+  
   .form-row { grid-template-columns: 1fr; }
   .plans-grid { grid-template-columns: 1fr; }
   .theme-panel { top: 60px; right: 10px; width: 150px; }
@@ -3019,13 +3986,22 @@ onMounted(() => {
   .merit-option { padding: 12px 8px; }
   .opt-icon { font-size: 24px; }
   
-  /* 天机问答移动端优化 */
-  .divination-tab h2 { font-size: 22px; margin-bottom: 15px; }
-  .div-tabs { gap: 8px; }
-  .div-tab { padding: 8px 12px; }
-  .tab-icon { font-size: 16px; }
-  .tab-name { font-size: 12px; }
-  .div-content { padding: 15px; }
+  /* 天机问答移动端优化 - 侧边栏布局 */
+  .divination-layout {
+    flex-direction: column;
+    min-height: auto;
+  }
+  .div-sidebar {
+    display: none;
+  }
+  .div-mobile-tabs {
+    display: block;
+  }
+  .div-main {
+    padding: 16px;
+  }
+  .content-header h3 { font-size: 18px; }
+  .content-header p { font-size: 13px; }
   .select-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .select-item { padding: 10px 5px; }
   .item-icon { font-size: 20px; }
@@ -3033,14 +4009,62 @@ onMounted(() => {
   .action-bar { padding: 12px; gap: 10px; }
   .action-btn { padding: 10px 25px; font-size: 14px; }
   .time-tabs span { padding: 6px 14px; font-size: 12px; }
-  .lottery-grid { gap: 10px; }
-  .lottery-item { padding: 15px 20px; }
-  .lottery-icon { font-size: 28px; }
-  .lottery-name { font-size: 13px; }
+  .lottery-draw { padding: 30px; }
+  .lottery-draw .lottery-icon { font-size: 60px; }
+  .draw-icon { font-size: 60px; }
+  .tarot-spread { gap: 12px; }
+  .tarot-card { width: 80px; height: 120px; }
+  .tarot-card .card-back { font-size: 36px; }
+  .tarot-card .card-front { font-size: 12px; }
+  .rune-bag, .rune-symbol { font-size: 60px; }
+  .num-display { font-size: 56px; }
   .birthday-btns { gap: 8px; }
   .birthday-btn { padding: 8px 15px; font-size: 13px; }
   .chat-messages { height: 300px; padding: 15px; }
   .chat-input-area { padding: 12px; }
+  
+  /* 移动端 AI 问答优化 */
+  .ai-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .feature-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 10px;
+    font-size: 11px;
+    justify-content: center;
+    gap: 4px;
+  }
+  .ai-features .feature-icon { font-size: 14px; }
+  .hot-questions {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .hot-title { font-size: 13px; margin-bottom: 10px; }
+  .hot-count { font-size: 11px; }
+  .hot-list-scroll { gap: 6px; }
+  .hot-item { padding: 6px 12px; font-size: 12px; }
+  .master-guide {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+    padding: 12px;
+  }
+  .guide-icon { font-size: 24px; }
+  .guide-title { font-size: 13px; color: #333; }
+  .guide-desc { font-size: 11px; color: #666; }
+  .guide-btn { width: auto; padding: 8px 24px; font-size: 13px; }
+  
+  /* 移动端字体颜色增强 */
+  .content-header h3 { color: #333; }
+  .content-header p, .header-desc { color: #555; }
+  .header-desc strong { color: #e74c3c; }
+  .msg-name { color: #333; }
+  .msg-text { color: #444; }
   
   /* 移动端日期选择器和按钮优化 */
   .date-selects {
@@ -3188,5 +4212,10 @@ onMounted(() => {
   .today-lunar { text-align: center; }
   .yiji-card { grid-template-columns: 1fr; }
   .calendar-cta .cta-btn { display: block; width: 100%; margin: 8px 0; }
+}
+
+/* 全局工具弹窗容器 - 隐藏工具列表只保留弹窗 */
+.global-tools-modal :deep(.tools-section) {
+  display: none !important;
 }
 </style>

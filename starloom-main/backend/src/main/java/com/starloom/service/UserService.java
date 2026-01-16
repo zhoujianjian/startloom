@@ -57,6 +57,8 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         data.put("user_id", user.getId());
         data.put("account", getAccountIdentifier(user));
         data.put("nickname", user.getNickname());
+        data.put("role", user.getRole() != null ? user.getRole() : "user");
+        data.put("isAdmin", user.isAdmin());
         return Result.success(data);
     }
 
@@ -253,6 +255,8 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         data.put("email", user.getEmail());
         data.put("phone", user.getPhone());
         data.put("wechat", user.getWechat());
+        data.put("role", user.getRole() != null ? user.getRole() : "user");
+        data.put("isAdmin", user.isAdmin());
         return Result.success(data);
     }
 

@@ -434,9 +434,9 @@ defineExpose({
 .close-success-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; border-radius: 10px; color: #fff; font-size: 15px; font-weight: 500; cursor: pointer; }
 .close-success-btn:hover { opacity: 0.9; }
 @media (max-width: 768px) {
-  /* 收起状态 - 移动端更小巧 */
+  /* 收起状态 - 移动端更小巧，避免遮挡输入框 */
   .float-collapsed { 
-    bottom: 70px; /* 避免遮挡底部内容 */
+    bottom: 100px; /* 提高位置避免遮挡发送按钮 */
     right: 12px; 
     padding: 8px 14px;
     border-radius: 24px;

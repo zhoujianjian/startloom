@@ -28,6 +28,9 @@ public class User {
     
     private LocalDateTime vipExpireTime;
     
+    // 用户角色: user-普通用户, admin-管理员
+    private String role;
+    
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
     
@@ -36,4 +39,9 @@ public class User {
     
     @TableLogic
     private Integer deleted;
+    
+    // 判断是否是管理员
+    public boolean isAdmin() {
+        return "admin".equals(this.role);
+    }
 }

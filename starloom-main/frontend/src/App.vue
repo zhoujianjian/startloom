@@ -1,12 +1,12 @@
 <template>
-  <!-- 新首页独立布局 -->
-  <div v-if="pathName === 'home' || pathName === 'learn' || pathName === 'articleDetail'" class="home-layout">
+  <!-- 新首页独立布局 - HomePage组件、Learn、ArticleDetail、Tools、AdminStats 使用独立布局 -->
+  <div v-if="useHomeLayout" class="home-layout">
     <router-view></router-view>
     <!-- 底部悬浮大师服务横幅 - 非首页显示（首页已有） -->
     <MasterFloatBar v-if="pathName !== 'home'" />
   </div>
   
-  <!-- 原有AI聊天布局 -->
+  <!-- 原有AI聊天布局 - Index、AskDivination、Chat 等使用 -->
   <div v-else class="main-app">
     <!-- 深邃星空背景 -->
     <div class="cosmic-bg">
@@ -87,6 +87,21 @@ export default {
     const pathName = computed( () => {
       return route.name
     })
+    
+    // 判断是否使用新首页布局
+    // HomePage组件的路由、Learn、ArticleDetail、Tools、AdminStats 使用独立布局
+    const useHomeLayout = computed(() => {
+      const homeLayoutRoutes = [
+        'home', 'paipan', 'hepan', 'calendar', 'divination', 'master', 'naming',
+        'nameTest', 'babyName', 'companyName', 'dream', 'zodiacMatch', 
+        'constellationMatch', 'dailySign', 'fateTest', 'phoneTest', 'plateTest',
+        'pastLife', 'luckyDay', 'taisui', 'peachBlossom', 'wealthTest', 'mbtiTest',
+        'luckyNumber', 'birthdayFlower', 'fengshuiTest', 'nameMatch', 'wuxing',
+        'tarot', 'guanyin',
+        'learn', 'articleDetail', 'articleByCat', 'tools', 'adminStats'
+      ]
+      return homeLayoutRoutes.includes(route.name)
+    })
     const checkLoginHandle = async() => {
       const res = await checkLogin({
         timestamp:new Date().getTime()
@@ -118,6 +133,7 @@ export default {
       pathName,
       showModelDialog,
       showBrandCollapsed,
+      useHomeLayout,
     }
   },
   methods: {

@@ -58,6 +58,13 @@
     
     <script src="/sse.js"></script>
     
+    <!-- 防止被iframe嵌套 -->
+    <script>
+    if (window.top !== window.self) {
+      window.top.location.href = window.self.location.href;
+    }
+    </script>
+    
     <!-- 百度统计 -->
     <script>
     var _hmt = _hmt || [];
