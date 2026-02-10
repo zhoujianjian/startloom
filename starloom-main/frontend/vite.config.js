@@ -69,6 +69,11 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': { target: 'http://localhost:8080', changeOrigin: true },
+      '/sysAdmApi': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/sysAdmApi/, '/sysAdm'),
+      },
       '/xingzuo': { target: 'http://localhost:8080', changeOrigin: true },
       '/shengxiao': { target: 'http://localhost:8080', changeOrigin: true },
       '/chat': { target: 'http://localhost:8080', changeOrigin: true },

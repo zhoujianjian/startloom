@@ -175,7 +175,10 @@ const store = createStore({
         address: '',
         chainId: '',
         type: ''
-      }
+      },
+      // 管理员相关状态
+      adminUser: null,  // 当前登录的管理员用户
+      adminToken: null  // 管理员token
     }
   },
   mutations: {
@@ -195,7 +198,12 @@ const store = createStore({
       state.tabList = list
     },
     setLoginStatus(state, loginStatus) {
-      state.loginStatus = loginStatus
+      console.log('🏪 Store - 设置登录状态:', {
+        newStatus: loginStatus,
+        previousStatus: state.loginStatus,
+        timestamp: new Date().toISOString()
+      });
+      state.loginStatus = loginStatus;
     },
     setAccount(state, account) {
       state.account = account
@@ -244,6 +252,24 @@ const store = createStore({
     },
     setWalltChainId(state, val) {
       state.wallet.chainId = val
+    },
+    // 管理员相关mutations
+    setAdminUser(state, user) {
+      console.log('🏪 Store - 设置管理员用户:', {
+        user: user,
+        previousUser: state.adminUser,
+        timestamp: new Date().toISOString()
+      });
+      state.adminUser = user;
+    },
+    setAdminToken(state, token) {
+      console.log('🏪 Store - 设置管理员token:', {
+        hasToken: !!token,
+        token: token ? token.substring(0, 20) + '...' : 'null',
+        previousToken: state.adminToken ? state.adminToken.substring(0, 20) + '...' : 'null',
+        timestamp: new Date().toISOString()
+      });
+      state.adminToken = token;
     }
   },
 })

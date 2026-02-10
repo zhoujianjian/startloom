@@ -1,6 +1,12 @@
 <template>
+  <div v-if="isAdminRoute">
+    <router-view></router-view>
+  </div>
+  <!-- 西方版本独立布局 -->
+  <WesternLayout v-else-if="isWesternVersion" />
+  
   <!-- 新首页独立布局 - HomePage组件、Learn、ArticleDetail、Tools、AdminStats 使用独立布局 -->
-  <div v-if="useHomeLayout" class="home-layout">
+  <div v-else-if="useHomeLayout" class="home-layout">
     <router-view></router-view>
     <!-- 底部悬浮大师服务横幅 - 非首页显示（首页已有） -->
     <MasterFloatBar v-if="pathName !== 'home'" />
@@ -66,6 +72,7 @@ import TypeTab from '/@/components/TypeTab.vue'
 import InputContent from '/@/components/Input.vue'
 import BrandShowcase from '/@/components/BrandShowcase.vue'
 import MasterFloatBar from '/@/components/MasterFloatBar.vue'
+import WesternLayout from '/@/layouts/WesternLayout.vue'
 import { checkLogin } from '/@/api/api.js'
 import EventBus from '/@/utils/EventBus.js'
 export default {
@@ -86,6 +93,19 @@ export default {
     // const pathName = route.name
     const pathName = computed( () => {
       return route.name
+    })
+
+    const isAdminRoute = computed(() => {
+      return route.path?.startsWith('/sysAdm')
+    })
+    
+    // 判断是否为西方版本
+    const isWesternVersion = computed(() => {
+      const westernRoutes = [
+        'western-home', 'western-tarot', 'western-astrology', 'western-horoscope',
+        'western-numerology', 'western-tools', 'western-ai', 'western-chat'
+      ]
+      return westernRoutes.includes(route.name)
     })
     
     // 判断是否使用新首页布局
@@ -134,6 +154,8 @@ export default {
       showModelDialog,
       showBrandCollapsed,
       useHomeLayout,
+      isWesternVersion,
+      isAdminRoute,
     }
   },
   methods: {
@@ -199,6 +221,7 @@ export default {
     selectModelDialog,
     BrandShowcase,
     MasterFloatBar,
+    WesternLayout,
   },
   watch: {
     $route: {
@@ -512,6 +535,23 @@ export default {
       position: relative;
       height: 100%;
     }
+  }
+}
+
+// 西方版本样式覆盖 - 禁用 lib-flexible 的 rem 缩放
+:deep(.western-layout) {
+  font-size: 16px !important;
+  
+  * {
+    font-size: inherit;
+  }
+  
+  html {
+    font-size: 16px !important;
+  }
+  
+  body {
+    font-size: 16px !important;
   }
 }
 

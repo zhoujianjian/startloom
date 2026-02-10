@@ -4,6 +4,22 @@ spring:
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:2c5b9fa2aa5f0a42}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  # Redis配置
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:redis123456}
+      database: ${REDIS_DATABASE:0}
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 320
+          max-wait: 3000ms
+          max-idle: 16
+          min-idle: 8
+  
   mail:
     host: ${MAIL_HOST:smtp.qq.com}
     port: ${MAIL_PORT:587}

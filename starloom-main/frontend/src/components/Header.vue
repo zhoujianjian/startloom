@@ -118,7 +118,8 @@ import { useRouter } from "vue-router";
 import EventBus from "/@/utils/EventBus.js";
 import Login from "/@/components/Login.vue";
 import { useI18n } from "vue-i18n";
-import { loginOut, payCardInfo, payAccount } from "/@/api/api";
+import { ElMessageBox } from "element-plus";
+import { loginOut, payCardInfo, payAccount, checkLogin } from "/@/api/api";
 export default {
   name: "",
   setup() {
@@ -154,6 +155,9 @@ export default {
     const loginSuccess = (account) => {
       store.commit("setLoginStatus", true);
       store.commit("setAccount", account);
+      // 注意：这里无法获取到登录返回的完整数据，因为Login组件只传递了account参数
+      // 需要重新检查用户信息来判断是否为管理员
+      checkAdminAndRedirect();
     };
     const logout = () => {
       userPopover.value = false;
@@ -218,6 +222,55 @@ export default {
     const closeSubscribeDialog = () => {
       subscribeDialog.value = false;
     };
+
+    // 检查是否为管理员并跳转
+    const checkAdminAndRedirect = async () => {
+      console.log('开始检查管理员状态')
+      
+      try {
+        const res = await checkLogin({
+          timestamp: new Date().getTime()
+        });
+        
+        console.log('checkLogin响应:', {
+          code: res.code,
+          data: res.data,
+          isAdmin: res.data?.isAdmin
+        })
+        
+        if (res.code === 200 && res.data && res.data.isAdmin) {
+          console.log('检测到管理员用户，显示选择对话框')
+          
+          // 显示选择对话框
+          ElMessageBox.confirm('检测到您是管理员，请选择要进入的页面', '登录成功', {
+            confirmButtonText: '进入管理后台',
+            cancelButtonText: '进入前台页面',
+            type: 'success',
+            center: true
+          }).then(() => {
+            console.log('用户选择进入管理后台')
+            // 使用统一的token，无需重新设置
+            window.location.href = '/sysAdm/dashboard'
+          }).catch(() => {
+            console.log('用户选择进入前台页面')
+            // 用户选择留在前台，不需要额外操作
+          })
+        } else {
+          console.log('非管理员用户或检查失败:', {
+            code: res.code,
+            hasData: !!res.data,
+            isAdmin: res.data?.isAdmin
+          })
+        }
+      } catch (error) {
+        console.error('检查管理员状态失败:', {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status
+        })
+      }
+    };
+
     watch(
       () => userPopover.value,
       async (val, old) => {
@@ -332,19 +385,21 @@ export default {
       var ca = document.cookie.split(";");
       for (var i = 0; i < ca.length; i++) {
         var c = ca[i];
-        while (c.charAt(0) == " ") c = c.substring(1);
-        if (c.indexOf(name) != -1) return c.substring(name.length, c.length);
+        while (c.charAt(0) == " ") {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
+        }
       }
       return "";
     },
-    cutAddress(account) {
-      if (account.indexOf(".com") > -1) {
-        return account;
-      } else {
-        const beforeAdr = account.substring(0, 4);
-        const afterAdr = account.substring(account.length - 4, account.length);
-        return beforeAdr + "..." + afterAdr;
-      }
+    // 截取地址显示
+    cutAddress(address) {
+      if (!address) return '';
+      const beforeAdr = address.substring(0, 4);
+      const afterAdr = address.substring(address.length - 4, address.length);
+      return beforeAdr + "..." + afterAdr;
     },
   },
   mounted() {

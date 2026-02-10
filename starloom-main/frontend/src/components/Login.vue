@@ -176,6 +176,7 @@ import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
 import { Aim, Back } from "@element-plus/icons-vue";
+import { ElMessage, ElMessageBox } from "element-plus";
 import VueHcaptcha from "@hcaptcha/vue3-hcaptcha";
 import EventBus from "/@/utils/EventBus.js";
 import walletList from "/@/utils/walletConfig.js";
@@ -360,6 +361,14 @@ export default {
       });
     },
     async loginHandle(signature, account, timestamp) {
+      console.log('🚀 前台登录开始:', {
+        loginType: this.loginType,
+        email: this.formData.email,
+        hasPassword: !!this.formData.password,
+        hasSignature: !!signature,
+        account: account ? account.substring(0, 10) + '...' : 'none'
+      })
+      
       this.loading = true;
       let loginParams = {
         email: this.formData.email,
@@ -373,19 +382,52 @@ export default {
           timestamp: timestamp.toString(),
         };
       }
+      
+      console.log('📤 登录参数:', {
+        params: loginParams,
+        loginType: this.loginType
+      })
+      
       const res = await userLogin(loginParams);
       this.loading = false;
+      console.log('📨 登录返回数据:', res); // 调试信息
+      
       if (res.code == 200 && res.data) {
+        console.log('✅ 登录成功:', {
+          account: res.data.account,
+          isAdmin: res.data.isAdmin,
+          hasToken: !!res.data.user_token,
+          token: res.data.user_token ? res.data.user_token.substring(0, 20) + '...' : 'null'
+        }); // 调试信息
+        
         localStorage.setItem("starloomAI-token", res.data.user_token);
         this.$emit("loginSuccess", res.data.account);
         localStorage.setItem("userId", res.data.user_id);
         this.$store.commit("setUserModel", "4");
+        
+        // 检查是否是管理员
+        if (res.data.isAdmin) {
+          console.log('检测到管理员，直接跳转到管理后台'); // 调试信息
+          
+          // 设置管理员token并直接跳转到管理后台
+          localStorage.setItem("adminToken", res.data.user_token);
+          
+          // 延迟跳转，确保token设置完成
+          setTimeout(() => {
+            window.location.href = '/sysAdm/dashboard';
+          }, 100);
+          
+        } else {
+          console.log('普通用户登录'); // 调试信息
+          // 普通用户直接关闭登录框
+          this.show = false;
+          this.$emit("closeLogin", "closeLogin");
+        }
+        
         this.formData.verifyCode = "";
         this.formData.email = "";
         this.formData.password = "";
         this.formData.password2 = "";
-        this.show = false;
-        this.$emit("closeLogin", "closeLogin");
         // if(!this.firstLogin){
         //   EventBus.$emit('showModelDialogHandle')
         //   this.setCookie('firstLogin', 1, 365)

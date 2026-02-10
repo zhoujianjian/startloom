@@ -1,0 +1,426 @@
+// 西方版本响应式样式
+// Western Version Responsive Styles
+
+@import './western-variables.scss';
+
+// 移动优先 - Mobile First Approach
+
+// 超小屏幕 - Extra Small (xs: 320px)
+@media (max-width: #{$breakpoint-sm - 1px}) {
+  html {
+    font-size: 14px;
+  }
+
+  body {
+    font-size: $font-size-sm;
+  }
+
+  h1 {
+    font-size: $font-size-3xl;
+  }
+
+  h2 {
+    font-size: $font-size-2xl;
+  }
+
+  h3 {
+    font-size: $font-size-xl;
+  }
+
+  .container {
+    padding: 0 $spacing-md;
+  }
+
+  .grid {
+    &.grid-2,
+    &.grid-3,
+    &.grid-4 {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  button, .btn {
+    width: 100%;
+    min-height: 44px;  // 触摸友好的最小高度
+    padding: $spacing-md;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    min-height: 44px;  // 触摸友好的最小高度
+  }
+
+  .hidden-xs {
+    display: none;
+  }
+
+  .visible-xs {
+    display: block;
+  }
+
+  // 导航菜单 - Navigation Menu
+  .nav-menu {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100vh;
+    background-color: $bg-primary;
+    transition: left $transition-base;
+    z-index: 1000;
+    padding-top: 60px;
+
+    &.active {
+      left: 0;
+    }
+  }
+
+  // 汉堡菜单 - Hamburger Menu
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: $spacing-md;
+
+    span {
+      width: 24px;
+      height: 2px;
+      background-color: $primary-gold;
+      transition: all $transition-base;
+    }
+
+    &.active {
+      span:nth-child(1) {
+        transform: rotate(45deg) translate(8px, 8px);
+      }
+
+      span:nth-child(2) {
+        opacity: 0;
+      }
+
+      span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -7px);
+      }
+    }
+  }
+
+  // 卡片网格 - Card Grid
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  // 模态框 - Modal
+  .modal {
+    width: 100%;
+    max-height: 90vh;
+    border-radius: $radius-2xl $radius-2xl 0 0;
+  }
+
+  // 侧边栏 - Sidebar
+  .sidebar {
+    display: none;
+  }
+
+  // 表格 - Table
+  table {
+    font-size: $font-size-sm;
+
+    th, td {
+      padding: $spacing-sm;
+    }
+  }
+}
+
+// 小屏幕 - Small (sm: 640px)
+@media (min-width: $breakpoint-sm) {
+  .hidden-sm {
+    display: none;
+  }
+
+  .visible-sm {
+    display: block;
+  }
+
+  .grid {
+    &.grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    &.grid-3,
+    &.grid-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  button, .btn {
+    min-height: 40px;
+  }
+
+  input, textarea, select {
+    min-height: 40px;
+  }
+}
+
+// 中等屏幕 - Medium (md: 768px)
+@media (min-width: $breakpoint-md) {
+  html {
+    font-size: 16px;
+  }
+
+  body {
+    font-size: $font-size-base;
+  }
+
+  h1 {
+    font-size: $font-size-5xl;
+  }
+
+  h2 {
+    font-size: $font-size-4xl;
+  }
+
+  h3 {
+    font-size: $font-size-3xl;
+  }
+
+  .hidden-md {
+    display: none;
+  }
+
+  .visible-md {
+    display: block;
+  }
+
+  .grid {
+    &.grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    &.grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    &.grid-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  button, .btn {
+    width: auto;
+    min-height: 40px;
+  }
+
+  input, textarea, select {
+    width: auto;
+    min-height: 40px;
+  }
+
+  // 导航菜单 - Navigation Menu
+  .nav-menu {
+    position: static;
+    width: auto;
+    height: auto;
+    background-color: transparent;
+    padding-top: 0;
+    display: flex;
+    gap: $spacing-lg;
+  }
+
+  // 汉堡菜单 - Hamburger Menu
+  .hamburger {
+    display: none;
+  }
+
+  // 侧边栏 - Sidebar
+  .sidebar {
+    display: block;
+  }
+
+  // 两列布局 - Two Column Layout
+  .layout-two-col {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: $spacing-lg;
+  }
+}
+
+// 大屏幕 - Large (lg: 1024px)
+@media (min-width: $breakpoint-lg) {
+  .hidden-lg {
+    display: none;
+  }
+
+  .visible-lg {
+    display: block;
+  }
+
+  .grid {
+    &.grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    &.grid-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  // 三列布局 - Three Column Layout
+  .layout-three-col {
+    display: grid;
+    grid-template-columns: 250px 1fr 300px;
+    gap: $spacing-lg;
+  }
+}
+
+// 超大屏幕 - Extra Large (xl: 1280px)
+@media (min-width: $breakpoint-xl) {
+  .hidden-xl {
+    display: none;
+  }
+
+  .visible-xl {
+    display: block;
+  }
+
+  .container {
+    max-width: 1280px;
+  }
+}
+
+// 2K 屏幕 - 2XL (2xl: 1536px)
+@media (min-width: $breakpoint-2xl) {
+  .hidden-2xl {
+    display: none;
+  }
+
+  .visible-2xl {
+    display: block;
+  }
+
+  .container {
+    max-width: 1536px;
+  }
+}
+
+// 横屏模式 - Landscape Mode
+@media (orientation: landscape) and (max-height: 500px) {
+  h1 {
+    font-size: $font-size-2xl;
+  }
+
+  h2 {
+    font-size: $font-size-xl;
+  }
+
+  .container {
+    padding: 0 $spacing-md;
+  }
+
+  button, .btn {
+    padding: $spacing-sm $spacing-md;
+  }
+}
+
+// 高分辨率屏幕 - High DPI Screens
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  // 优化字体渲染
+  body {
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+
+  // 优化图片
+  img {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+// 暗色模式 - Dark Mode (如果需要)
+@media (prefers-color-scheme: dark) {
+  // 已经是暗色主题，无需修改
+}
+
+// 浅色模式 - Light Mode (如果需要)
+@media (prefers-color-scheme: light) {
+  // 可选：提供浅色主题
+  // body {
+  //   background-color: #FFFFFF;
+  //   color: #000000;
+  // }
+}
+
+// 减少动画 - Reduced Motion
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// 触摸设备 - Touch Devices
+@media (hover: none) and (pointer: coarse) {
+  button, .btn, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  // 移除 hover 效果，使用 active 效果
+  button:hover, .btn:hover, a:hover {
+    // 不应用 hover 效果
+  }
+
+  button:active, .btn:active, a:active {
+    opacity: 0.8;
+  }
+}
+
+// 非触摸设备 - Non-Touch Devices
+@media (hover: hover) and (pointer: fine) {
+  button, .btn, a {
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+// 打印样式 - Print Styles
+@media print {
+  .no-print {
+    display: none;
+  }
+
+  body {
+    background-color: white;
+    color: black;
+  }
+
+  a {
+    color: black;
+    text-decoration: underline;
+  }
+
+  button, .btn {
+    border: 1px solid black;
+  }
+}
+
+// 响应式字体大小 - Responsive Font Sizes
+@media (max-width: #{$breakpoint-md - 1px}) {
+  h1 { font-size: clamp(1.875rem, 5vw, 3rem); }
+  h2 { font-size: clamp(1.5rem, 4vw, 2.25rem); }
+  h3 { font-size: clamp(1.25rem, 3vw, 1.875rem); }
+}
+
+// 响应式间距 - Responsive Spacing
+@media (max-width: #{$breakpoint-md - 1px}) {
+  .container {
+    padding: 0 clamp(0.5rem, 2vw, 1.5rem);
+  }
+
+  .grid {
+    gap: clamp(0.5rem, 2vw, 1.5rem);
+  }
+}

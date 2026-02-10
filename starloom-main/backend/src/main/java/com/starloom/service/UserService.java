@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +30,48 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 
     private static final String CODE_PREFIX = "email:code:";
     private static final String RESET_CODE_PREFIX = "email:reset:code:";
+
+    /**
+     * 管理员登录
+     */
+    public Result<?> adminLogin(String username, String password, String ip) {
+        if (username == null || username.trim().isEmpty()) {
+            return Result.error(ResultCode.PARAM_ERROR, "用户名不能为空");
+        }
+        if (password == null || password.trim().isEmpty()) {
+            return Result.error(ResultCode.PARAM_ERROR, "密码不能为空");
+        }
+        
+        // 查找管理员用户（role为admin或super_admin）
+        User admin = findUserByAccount(username.trim());
+        if (admin == null) {
+            return Result.error(ResultCode.ACCOUNT_NOT_EXIST, "用户名或密码错误");
+        }
+        
+        // 检查是否为管理员
+        if (!admin.isAdmin()) {
+            return Result.error(ResultCode.PERMISSION_DENIED, "无管理员权限");
+        }
+        
+        if (!BCrypt.checkpw(password, admin.getPassword())) {
+            return Result.error(ResultCode.PASSWORD_ERROR, "用户名或密码错误");
+        }
+        
+        // 生成管理员Token
+        String token = jwtUtil.generateAdminToken(admin.getId(), getAccountIdentifier(admin));
+        
+        // 更新登录信息
+        admin.setUpdateTime(LocalDateTime.now());
+        updateById(admin);
+        
+        Map<String, Object> data = new HashMap<>();
+        data.put("token", token);
+        data.put("user", admin);
+        admin.setPassword(null); // 清除密码
+        data.put("user", admin);
+        
+        return Result.success(data);
+    }
 
     /**
      * 简化登录 - 支持手机号/邮箱/微信号 + 密码

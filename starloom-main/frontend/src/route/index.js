@@ -1,5 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router"
 import { setSEO, setStructuredData, setCanonical } from '../utils/seo'
+import { westernRoutes } from './western-routes'
+import i18n from '../locales'
+import store from '../store'
 
 const HomePage = () => import("../components/HomePage.vue")
 const Index = () => import("../page/Index.vue")
@@ -283,6 +286,85 @@ const routes = [
     name: "adminStats",
     component: AdminStats,
     meta: { title: '数据统计' }
+  },
+  // 管理后台路由
+  {
+    path: "/sysAdm",
+    component: () => import("../page/admin/Layout.vue"),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: "",
+        redirect: "/sysAdm/dashboard"
+      },
+      {
+        path: "dashboard",
+        name: "adminDashboard",
+        component: () => import("../page/admin/Dashboard.vue"),
+        meta: { requiresAuth: true, title: '仪表板' }
+      },
+      {
+        path: "users",
+        name: "adminUsers",
+        component: () => import("../page/admin/Users.vue"),
+        meta: { requiresAuth: true, title: '用户管理' }
+      },
+      {
+        path: "articles",
+        name: "adminArticles",
+        component: () => import("../page/admin/Articles.vue"),
+        meta: { requiresAuth: true, title: '文章管理' }
+      },
+      {
+        path: "orders",
+        name: "adminOrders",
+        component: () => import("../page/admin/Orders.vue"),
+        meta: { requiresAuth: true, title: '订单管理' }
+      },
+      {
+        path: "feedback",
+        name: "adminFeedback",
+        component: () => import("../page/admin/Feedback.vue"),
+        meta: { requiresAuth: true, title: '反馈管理' }
+      },
+      {
+        path: "analytics",
+        name: "adminAnalytics",
+        component: () => import("../page/admin/Analytics.vue"),
+        meta: { requiresAuth: true, title: '数据分析' }
+      },
+      {
+        path: "settings",
+        name: "adminSettings",
+        component: () => import("../page/admin/Settings.vue"),
+        meta: { requiresAuth: true, title: '系统设置' }
+      },
+      {
+        path: "sys-config",
+        name: "adminSysConfig",
+        component: () => import("../page/admin/SysConfig.vue"),
+        meta: { requiresAuth: true, title: '系统配置' }
+      },
+      {
+        path: "products",
+        name: "adminProducts",
+        component: () => import("../page/admin/Products.vue"),
+        meta: { requiresAuth: true, title: '产品管理' }
+      }
+    ]
+  },
+  {
+    path: "/sysAdm/login",
+    name: "adminLogin",
+    component: () => import("../page/admin/Login.vue"),
+    meta: { title: '管理员登录' }
+  },
+  // 西方版本路由
+  ...westernRoutes,
+  // 根路由重定向
+  {
+    path: "/cn",
+    redirect: "/"
   }
 ]
 
@@ -295,16 +377,97 @@ const router = createRouter({
   }
 })
 
-// 路由守卫 - 自动设置 SEO
+// 路由守卫 - 自动设置 SEO 和语言
 router.beforeEach((to, from, next) => {
-  const seoKey = to.meta?.seoKey
-  if (seoKey) {
-    setSEO(seoKey)
+  console.log('🚀 路由守卫触发:', {
+    from: from.path,
+    to: to.path,
+    requiresAuth: to.meta?.requiresAuth,
+    timestamp: new Date().toISOString()
+  });
+
+  if (to.path.startsWith('/sysAdm')) {
+    if (typeof window !== 'undefined') {
+      document.documentElement.style.fontSize = '16px'
+    }
   }
+  
+  // 检查管理员页面权限
+  if (to.meta.requiresAuth) {
+    const raw = localStorage.getItem('starloomAI-token') || '';
+    let token = '';
+    if (raw.trim().startsWith('{')) {
+      try {
+        token = JSON.parse(raw).adminToken || '';
+      } catch (e) {
+        token = '';
+      }
+    }
+    console.log('🔑 管理员权限检查:', {
+      path: to.path,
+      hasToken: !!token,
+      token: token ? token.substring(0, 20) + '...' : 'null',
+      localStorageKeys: Object.keys(localStorage),
+      storeAdminUser: store.state.adminUser,
+      storeAdminToken: store.state.adminToken
+    });
+    
+    if (!token) {
+      console.log('❌ 无token，跳转到登录页');
+      next('/sysAdm/login');
+      return;
+    } else {
+      console.log('✅ 有token，允许访问:', to.path);
+    }
+  }
+
+  const seoKey = to.meta?.seoKey;
+  if (seoKey) {
+    console.log('🔍 设置SEO:', seoKey);
+    setSEO(seoKey);
+  }
+  
   // 设置 canonical URL
-  setCanonical(to.path)
-  next()
-})
+  setCanonical(to.path);
+  
+  // 根据路由前缀设置语言和字体大小
+  if (to.path.startsWith('/en')) {
+    console.log('🌍 设置为西方版本');
+    // 西方版本
+    i18n.global.locale.value = 'en';
+    if (typeof window !== 'undefined') {
+      import('vue').then(({ nextTick }) => {
+        nextTick(() => {
+          document.documentElement.style.fontSize = '16px';
+          console.log('📝 西方版本字体大小已设置为16px');
+        });
+      });
+    }
+  } else {
+    console.log('🌏 设置为东方版本');
+    // 东方版本
+    i18n.global.locale.value = 'zh';
+    if (typeof window !== 'undefined') {
+      import('vue').then(({ nextTick }) => {
+        nextTick(() => {
+          if (to.path.startsWith('/sysAdm')) {
+            document.documentElement.style.fontSize = '16px'
+            return
+          }
+          const clientWidth = document.documentElement.clientWidth;
+          if (clientWidth !== undefined) {
+            const fontSize = (clientWidth / 10) + 'px';
+            document.documentElement.style.fontSize = fontSize;
+            console.log('📝 东方版本字体大小已设置为:', fontSize);
+          }
+        });
+      });
+    }
+  }
+  
+  console.log('✅ 路由守卫检查完成，允许导航到:', to.path);
+  next();
+});
 
 // 页面加载后设置结构化数据
 router.afterEach((to) => {

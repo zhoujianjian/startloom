@@ -1,0 +1,121 @@
+// 西方版本颜色变量
+// Western Version Color Variables
+
+// 主色调 - Primary Colors
+$primary-purple: #6B46C1;      // 深紫色 - Deep Purple (Mystical)
+$primary-gold: #F59E0B;        // 金色 - Gold (Luxury, Wisdom)
+$primary-teal: #14B8A6;        // 青绿色 - Teal (Balance, Healing)
+$primary-navy: #0F172A;        // 深蓝色 - Dark Navy (Cosmic Depth)
+
+// 辅助色 - Secondary Colors
+$secondary-light-purple: #8B5CF6;    // 浅紫色
+$secondary-light-gold: #FBBF24;      // 浅金色
+$secondary-light-teal: #2DD4BF;      // 浅青绿色
+$secondary-dark-navy: #0C0E1A;       // 更深的蓝色
+
+// 中性色 - Neutral Colors
+$neutral-cream: #F5F3FF;       // 奶油色 - Cream (Text)
+$neutral-light: #F3F4F6;       // 浅灰色
+$neutral-medium: #9CA3AF;      // 中灰色
+$neutral-dark: #374151;        // 深灰色
+$neutral-black: #111827;       // 黑色
+
+// 功能色 - Functional Colors
+$success-color: #10B981;       // 成功 - Success
+$warning-color: #F59E0B;       // 警告 - Warning
+$error-color: #EF4444;         // 错误 - Error
+$info-color: #3B82F6;          // 信息 - Info
+
+// 背景色 - Background Colors
+$bg-primary: $primary-navy;    // 主背景
+$bg-secondary: #1A202C;        // 次背景
+$bg-tertiary: #2D3748;         // 三级背景
+$bg-light: #F9FAFB;            // 浅背景
+
+// 文本色 - Text Colors
+$text-primary: $neutral-cream; // 主文本
+$text-secondary: #D1D5DB;      // 次文本
+$text-tertiary: #9CA3AF;       // 三级文本
+$text-dark: $neutral-black;    // 深色文本
+
+// 边框色 - Border Colors
+$border-light: #E5E7EB;        // 浅边框
+$border-medium: #D1D5DB;       // 中边框
+$border-dark: #9CA3AF;         // 深边框
+
+// 字体 - Typography
+$font-family-display: 'Playfair Display', serif;  // 标题字体 - Elegant, Mystical
+$font-family-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;  // 正文字体 - Modern, Clean
+$font-family-decorative: 'Cinzel', serif;  // 装饰字体 - Tarot-inspired
+
+// 字体大小 - Font Sizes
+$font-size-xs: 0.75rem;        // 12px
+$font-size-sm: 0.875rem;       // 14px
+$font-size-base: 1rem;         // 16px
+$font-size-lg: 1.125rem;       // 18px
+$font-size-xl: 1.25rem;        // 20px
+$font-size-2xl: 1.5rem;        // 24px
+$font-size-3xl: 1.875rem;      // 30px
+$font-size-4xl: 2.25rem;       // 36px
+$font-size-5xl: 3rem;          // 48px
+
+// 字体权重 - Font Weights
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+
+// 行高 - Line Heights
+$line-height-tight: 1.25;
+$line-height-snug: 1.375;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.625;
+$line-height-loose: 2;
+
+// 间距 - Spacing
+$spacing-xs: 0.25rem;          // 4px
+$spacing-sm: 0.5rem;           // 8px
+$spacing-md: 1rem;             // 16px
+$spacing-lg: 1.5rem;           // 24px
+$spacing-xl: 2rem;             // 32px
+$spacing-2xl: 3rem;            // 48px
+$spacing-3xl: 4rem;            // 64px
+
+// 圆角 - Border Radius
+$radius-none: 0;
+$radius-sm: 0.25rem;           // 4px
+$radius-md: 0.375rem;          // 6px
+$radius-lg: 0.5rem;            // 8px
+$radius-xl: 0.75rem;           // 12px
+$radius-2xl: 1rem;             // 16px
+$radius-3xl: 1.5rem;           // 24px
+$radius-full: 9999px;
+
+// 阴影 - Shadows
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+// 过渡 - Transitions
+$transition-fast: 150ms ease-in-out;
+$transition-base: 200ms ease-in-out;
+$transition-slow: 300ms ease-in-out;
+
+// 响应式断点 - Breakpoints
+$breakpoint-xs: 320px;
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+// 梯度 - Gradients
+$gradient-purple-gold: linear-gradient(135deg, $primary-purple 0%, $primary-gold 100%);
+$gradient-purple-teal: linear-gradient(135deg, $primary-purple 0%, $primary-teal 100%);
+$gradient-teal-purple: linear-gradient(135deg, $primary-teal 0%, $primary-purple 100%);
+$gradient-gold-teal: linear-gradient(135deg, $primary-gold 0%, $primary-teal 100%);
+$gradient-dark-to-light: linear-gradient(180deg, $primary-navy 0%, $secondary-dark-navy 100%);

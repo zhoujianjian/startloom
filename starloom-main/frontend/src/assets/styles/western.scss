@@ -1,0 +1,422 @@
+// 西方版本基础样式
+// Western Version Base Styles
+
+@import './western-variables.scss';
+
+// 全局样式 - Global Styles
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: $bg-primary;
+  color: $text-primary;
+  font-family: $font-family-body;
+  font-size: $font-size-base;
+  line-height: $line-height-normal;
+  font-weight: $font-weight-normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// 链接样式 - Link Styles
+a {
+  color: $primary-gold;
+  text-decoration: none;
+  transition: color $transition-base;
+
+  &:hover {
+    color: $secondary-light-gold;
+  }
+
+  &:active {
+    color: $primary-gold;
+  }
+}
+
+// 标题样式 - Heading Styles
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-family-display;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+  margin-bottom: $spacing-md;
+  color: $text-primary;
+}
+
+h1 {
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 1.3rem;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 1.1rem;
+}
+
+h4 {
+  font-size: 1rem;
+}
+
+h5 {
+  font-size: 0.95rem;
+}
+
+h6 {
+  font-size: 0.9rem;
+}
+
+// 段落样式 - Paragraph Styles
+p {
+  margin-bottom: $spacing-md;
+  line-height: $line-height-relaxed;
+  color: $text-secondary;
+}
+
+// 列表样式 - List Styles
+ul, ol {
+  margin-left: $spacing-lg;
+  margin-bottom: $spacing-md;
+
+  li {
+    margin-bottom: $spacing-sm;
+    color: $text-secondary;
+  }
+}
+
+// 按钮样式 - Button Styles
+button, .btn {
+  font-family: $font-family-body;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  padding: $spacing-md $spacing-lg;
+  border: none;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition: all $transition-base;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  // 主按钮 - Primary Button
+  &.btn-primary {
+    background: $gradient-purple-gold;
+    color: $text-primary;
+    box-shadow: $shadow-lg;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: $shadow-xl;
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+
+  // 次按钮 - Secondary Button
+  &.btn-secondary {
+    background-color: $bg-secondary;
+    color: $primary-gold;
+    border: 2px solid $primary-gold;
+
+    &:hover:not(:disabled) {
+      background-color: $primary-gold;
+      color: $bg-primary;
+    }
+  }
+
+  // 文本按钮 - Text Button
+  &.btn-text {
+    background-color: transparent;
+    color: $primary-gold;
+    padding: $spacing-sm $spacing-md;
+
+    &:hover:not(:disabled) {
+      color: $secondary-light-gold;
+    }
+  }
+}
+
+// 表单样式 - Form Styles
+input, textarea, select {
+  font-family: $font-family-body;
+  font-size: $font-size-base;
+  padding: $spacing-md;
+  border: 2px solid $border-medium;
+  border-radius: $radius-lg;
+  background-color: $bg-secondary;
+  color: $text-primary;
+  transition: all $transition-base;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-gold;
+    box-shadow: 0 0 0 3px rgba($primary-gold, 0.1);
+  }
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+
+  &:disabled {
+    background-color: $bg-tertiary;
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+// 卡片样式 - Card Styles
+.card {
+  background-color: $bg-secondary;
+  border-radius: $radius-xl;
+  padding: $spacing-lg;
+  box-shadow: $shadow-md;
+  transition: all $transition-base;
+  border: 1px solid rgba($primary-gold, 0.1);
+
+  &:hover {
+    box-shadow: $shadow-lg;
+    border-color: rgba($primary-gold, 0.2);
+  }
+}
+
+// 容器样式 - Container Styles
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 $spacing-lg;
+}
+
+// 网格系统 - Grid System
+.grid {
+  display: grid;
+  gap: $spacing-lg;
+
+  &.grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  &.grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  &.grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+// Flexbox 工具 - Flexbox Utilities
+.flex {
+  display: flex;
+
+  &.flex-center {
+    align-items: center;
+    justify-content: center;
+  }
+
+  &.flex-between {
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &.flex-col {
+    flex-direction: column;
+  }
+
+  &.gap-sm {
+    gap: $spacing-sm;
+  }
+
+  &.gap-md {
+    gap: $spacing-md;
+  }
+
+  &.gap-lg {
+    gap: $spacing-lg;
+  }
+}
+
+// 文本工具 - Text Utilities
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-primary {
+  color: $text-primary;
+}
+
+.text-secondary {
+  color: $text-secondary;
+}
+
+.text-gold {
+  color: $primary-gold;
+}
+
+.text-purple {
+  color: $primary-purple;
+}
+
+.text-teal {
+  color: $primary-teal;
+}
+
+// 间距工具 - Spacing Utilities
+.mt-sm { margin-top: $spacing-sm; }
+.mt-md { margin-top: $spacing-md; }
+.mt-lg { margin-top: $spacing-lg; }
+.mt-xl { margin-top: $spacing-xl; }
+
+.mb-sm { margin-bottom: $spacing-sm; }
+.mb-md { margin-bottom: $spacing-md; }
+.mb-lg { margin-bottom: $spacing-lg; }
+.mb-xl { margin-bottom: $spacing-xl; }
+
+.p-sm { padding: $spacing-sm; }
+.p-md { padding: $spacing-md; }
+.p-lg { padding: $spacing-lg; }
+.p-xl { padding: $spacing-xl; }
+
+// 显示工具 - Display Utilities
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: block;
+}
+
+.inline {
+  display: inline;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+// 不透明度工具 - Opacity Utilities
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.opacity-75 {
+  opacity: 0.75;
+}
+
+// 加载动画 - Loading Animation
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+// 淡入淡出动画 - Fade Animation
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.fade-in {
+  animation: fadeIn $transition-base;
+}
+
+.fade-out {
+  animation: fadeOut $transition-base;
+}
+
+// 滑动动画 - Slide Animation
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.slide-in-up {
+  animation: slideInUp $transition-base;
+}
+
+// 神秘学元素样式 - Mystical Elements
+.mystical-border {
+  border: 2px solid $primary-gold;
+  border-radius: $radius-xl;
+  box-shadow: 0 0 20px rgba($primary-gold, 0.2);
+}
+
+.mystical-glow {
+  box-shadow: 0 0 30px rgba($primary-purple, 0.3), 0 0 60px rgba($primary-gold, 0.1);
+}
+
+.gradient-text {
+  background: $gradient-purple-gold;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+// 打印样式 - Print Styles
+@media print {
+  body {
+    background-color: white;
+    color: black;
+  }
+
+  .no-print {
+    display: none;
+  }
+}

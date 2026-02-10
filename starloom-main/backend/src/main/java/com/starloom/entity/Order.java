@@ -22,8 +22,9 @@ public class Order {
     private String tradeNo;      // 第三方交易号
     private LocalDateTime payTime;
     private LocalDateTime confirmTime;  // 确认时间
+    private LocalDateTime completeTime; // 完成时间
     private String confirmBy;    // 确认人(admin/system)
-    private Integer status;      // 0待支付/1已支付/2已取消/3已退款/10待确认
+    private Integer status;      // 0待支付/1已支付/2已取消/3已退款/4已完成/10待确认
     private String remark;
     private String userRemark;   // 用户备注(如转账备注)
     private String adminRemark;  // 管理员备注

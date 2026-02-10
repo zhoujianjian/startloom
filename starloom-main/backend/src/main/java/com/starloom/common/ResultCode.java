@@ -10,4 +10,5 @@ public class ResultCode {
     public static final int CODE_ERROR = 2009;
     public static final int PARAM_ERROR = 2019;
 
+    public static final Integer PERMISSION_DENIED = 2029;
 }

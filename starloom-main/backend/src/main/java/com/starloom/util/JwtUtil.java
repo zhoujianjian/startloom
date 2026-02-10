@@ -27,6 +27,18 @@ public class JwtUtil {
         return Jwts.builder()
                 .subject(userId.toString())
                 .claim("email", email)
+                .claim("type", "user")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    public String generateAdminToken(Long userId, String email) {
+        return Jwts.builder()
+                .subject(userId.toString())
+                .claim("email", email)
+                .claim("type", "admin")
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
@@ -53,5 +65,18 @@ public class JwtUtil {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public String getTokenType(String token) {
+        try {
+            Claims claims = parseToken(token);
+            return claims.get("type", String.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public boolean isAdminToken(String token) {
+        return "admin".equals(getTokenType(token));
     }
 }

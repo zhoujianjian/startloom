@@ -4,6 +4,22 @@ spring:
     username: root
     password: DP123456
     driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  # Redis配置
+  data:
+    redis:
+      host: 192.168.110.58
+      port: 6379
+      password: redis_x3a24p
+      database: 15
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 320
+          max-wait: 3000ms
+          max-idle: 16
+          min-idle: 8
+  
   mail:
     host: smtp.qq.com
     port: 587

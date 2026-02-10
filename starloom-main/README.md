@@ -1,75 +1,135 @@
+# StarLoom 部署指南
+
+## 📋 快速开始
+
+### 一键部署（新服务器）
+
+```bash
+sudo bash deploy.sh
+```
+
+这个脚本会：
+1. 检查 Docker 和 Docker Compose
+2. 验证必要文件
+3. 启动 MySQL、Backend、Frontend 容器
+4. 自动配置 Nginx
+
+### 单独更新后端
+
+```bash
+sudo bash update-backend.sh
+```
+
+### 单独更新前端
+
+```bash
+sudo bash update-frontend.sh
+```
 
 ---
 
-### 🌌 **StarLoom.ai：AI赋能的跨文化智慧占卜系统**  
-**探索命运，洞见未来——让古老玄学与前沿AI共舞**  
+## 🌐 访问方式
 
-[![Starloom](./images/mainpage2.jpg)](https://starloom.ai)
-
-#### 🔮 **关于 StarLoom**  
-StarLoom.ai 是全球首个 **多文化、全场景** 的AI占卜平台，融合东方玄学与西方神秘学，覆盖：  
-✅ **东方体系**：八字命理、周易八卦、六爻占卜、梅花易数、解梦、测名、抽签  
-✅ **西方体系**：星座运势、塔罗牌阵、生命灵数
-✅ **创新功能**：AI星盘分析、实时事件占卜、个性化命运指南  
-
-**数据驱动，专家背书**：  
-基于全球顶尖命理师、占星师、玄学学者的千年智慧库，通过AI深度学习与实时数据更新，确保每一次解读都 **精准、专业、有温度**。  
+- **域名访问**：https://ibazi.site
+- **IP 访问**：http://10.60.215.165
+- **API 地址**：http://10.60.215.165/api
 
 ---
 
-### 🌟 **为何选择 StarLoom？**  
-#### 🚀 **核心优势**  
-1. **全栈式占卜体验**  
-   - 一站解锁 **50+种占卜工具**，从日常决策到人生规划，AI为你提供多维视角。  
-   - **实时数据更新**：通过API与爬虫技术，确保星象、运势、解梦库与当下时空同步。  
+## 📁 项目结构
 
-2. **个性化深度对话**  
-   - 告别机械式回答！AI根据用户输入动态调整解读逻辑，提供 **贴合场景的定制化建议**。  
-   - 支持 **中英双语切换**，全球用户无障碍使用。  
-
-3. **开发者友好生态**  
-   - **零代码部署**：一键启动私有化语言模型，支持本地化知识库嵌入。  
-   - **流式传输与Finetune**：实时优化交互体验，适配PC/Mac/移动端全平台。  
-
----
-
-### 🛠️ **技术亮点**  
-| **功能**         | **描述**                                                                 |  
-|------------------|--------------------------------------------------------------------------|  
-| **StarLoom助理**  | 全能占卜AI，支持从星座到解梦的跨领域咨询                                  |  
-| **智能知识库**   | 嵌入专业文档与数据集，支持自定义Prompt导入与修改                          |  
-| **对话管理**     | 自动保存聊天记录、支持评论分享、多设备同步                                |  
-| **模型切换**     | 界面化切换不同AI模型（如GPT-4/Claude/本地模型），灵活应对复杂需求          |  
+```
+starloom-main/
+├── deploy.sh                 # 一键部署脚本
+├── update-backend.sh         # 后端更新脚本
+├── update-frontend.sh        # 前端更新脚本
+├── docker-compose.yml        # Docker 编排配置
+├── nginx-ip.conf            # Nginx 配置（支持域名和IP）
+├── starloom.sql             # 数据库初始化脚本
+├── starloom-backend-1.0.0.jar  # 后端 JAR 文件
+├── dist/                    # 前端构建输出
+├── backend/                 # 后端源代码
+└── frontend/                # 前端源代码
+```
 
 ---
 
-### 🎯 **适用场景**  
-- **个人用户**：每日运势、情感分析、职业决策、梦境解析  
-- **玄学从业者**：快速生成占卜报告、客户案例管理、知识库扩展  
-- **开发者**：基于StarLoom API构建定制化应用，或部署私有化占卜服务  
+## 🔧 常用命令
+
+```bash
+# 查看所有容器日志
+docker-compose logs -f
+
+# 查看特定容器日志
+docker-compose logs -f backend
+docker-compose logs -f frontend
+docker-compose logs -f mysql
+
+# 停止所有服务
+docker-compose down
+
+# 重启所有服务
+docker-compose restart
+
+# 重启特定服务
+docker-compose restart backend
+docker-compose restart frontend
+```
 
 ---
 
-### 🚀 **快速开始**  
-1. **在线体验**：[访问 StarLoom.ai](https://starloom.ai/#/)  
-2. **本地部署**：  
-   ```bash
-   git clone https://github.com/starloom/starloom.git  
-   npm install && pip install -r requirements.txt  
-   # 配置.env.local文件后运行  
-   npm run serve  
-   ```  
-3. **关联产品**：[YuanFen.ai - 预见占星](https://yuanfen.ai/#/)  
+## 📝 配置说明
 
-**📱 连接我们**  
-- 微信：`tianjige_ai`  
-- 推特：[@StarLoom_ai](https://x.com/StarLoom_ai)  
-- 抖音：42861761849
-- 快手：4216154596
-- 微博：https://weibo.com/u/7926851450  
+### Nginx 配置（nginx-ip.conf）
+
+- 支持 HTTPS 域名访问（https://ibazi.site）
+- 支持 HTTP IP 访问（http://10.60.215.165）
+- 自动将 HTTP 域名请求重定向到 HTTPS
+- 配置了 API 代理和 WebSocket 支持
+
+### Docker Compose 配置（docker-compose.yml）
+
+- **MySQL**：数据库服务，端口 3306
+- **Backend**：Java 应用，端口 8080
+- **Frontend**：Nginx 服务，端口 80/443
 
 ---
 
-**✨ 让AI成为你的命运解读者，而非预言者——StarLoom.ai，开启智慧占卜新时代！**  
+## ⚠️ 注意事项
+
+1. **SSL 证书**：如需使用 HTTPS，需要配置 SSL 证书路径在 nginx-ip.conf 中
+2. **数据库初始化**：首次部署时，starloom.sql 会自动导入到 MySQL
+3. **文件权限**：部署脚本需要 sudo 权限
+4. **端口占用**：确保 80、443、3306、8080 端口未被占用
 
 ---
+
+## 🐛 故障排查
+
+### 容器无法启动
+
+```bash
+# 查看详细日志
+docker-compose logs backend
+
+# 重新构建并启动
+docker-compose down
+docker-compose up -d
+```
+
+### API 连接失败
+
+- 检查 Nginx 配置中的 `proxy_pass http://backend:8080`
+- 确保 Backend 容器正常运行：`docker ps | grep backend`
+
+### 数据库连接失败
+
+- 检查 MySQL 容器是否运行：`docker ps | grep mysql`
+- 验证数据库凭证：用户名 `starloom`，密码 `starloom123456`
+
+---
+
+## 📞 支持
+
+如有问题，请查看容器日志或联系开发团队。
+
