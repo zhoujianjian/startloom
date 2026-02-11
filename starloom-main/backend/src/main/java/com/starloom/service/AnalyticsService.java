@@ -37,6 +37,9 @@ public class AnalyticsService {
     @Async
     public void trackEvent(EventLog event) {
         try {
+            if (event.getCreatedAt() == null) {
+                event.setCreatedAt(LocalDateTime.now());
+            }
             // 记录日志
             eventLogMapper.insert(event);
             

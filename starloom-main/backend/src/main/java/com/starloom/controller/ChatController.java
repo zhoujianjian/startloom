@@ -5,14 +5,15 @@ import com.starloom.entity.ChatGroup;
 import com.starloom.service.ChatService;
 import com.starloom.service.LlmStreamService;
 import com.starloom.util.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -63,13 +64,13 @@ public class ChatController {
     public void chat(@RequestHeader(value = "Authorization", required = false) String token,
                      @RequestBody Map<String, Object> params,
                      HttpServletResponse response) throws IOException {
-        response.setContentType("text/event-stream");
-        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/event-stream;charset=UTF-8");
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setHeader("Cache-Control", "no-cache");
         response.setHeader("Connection", "keep-alive");
         response.setHeader("X-Accel-Buffering", "no");
         
-        PrintWriter writer = response.getWriter();
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(response.getOutputStream(), StandardCharsets.UTF_8), true);
         
         String message = extractMessage(params);
         if (message == null || message.trim().isEmpty()) {

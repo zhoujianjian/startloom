@@ -12,6 +12,11 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.PrintWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -37,13 +42,13 @@ public class LogAspect {
         long start = System.currentTimeMillis();
         String signature = joinPoint.getSignature().toShortString();
 
-        String argsJson = safeToJson(joinPoint.getArgs());
+        String argsJson = safeToJson(sanitize(joinPoint.getArgs()));
         log.info("[AOP-IN] {} args={}", signature, argsJson);
 
         try {
             Object result = joinPoint.proceed();
             long cost = System.currentTimeMillis() - start;
-            log.info("[AOP-OUT] {} costMs={} result={}", signature, cost, safeToJson(result));
+            log.info("[AOP-OUT] {} costMs={} result={}", signature, cost, safeToJson(sanitize(result)));
             return result;
         } catch (Throwable ex) {
             long cost = System.currentTimeMillis() - start;
@@ -53,6 +58,26 @@ public class LogAspect {
             log.error("[AOP-ERR] {} costMs={} ex={}", signature, cost, safeToJson(err), ex);
             throw ex;
         }
+    }
+
+    private Object sanitize(Object obj) {
+        if (obj == null) return null;
+        if (obj instanceof HttpServletRequest) return "<HttpServletRequest>";
+        if (obj instanceof HttpServletResponse) return "<HttpServletResponse>";
+        if (obj instanceof MultipartFile) return "<MultipartFile>";
+        if (obj instanceof java.io.InputStream) return "<InputStream>";
+        if (obj instanceof java.io.OutputStream) return "<OutputStream>";
+        if (obj instanceof java.io.Reader) return "<Reader>";
+        if (obj instanceof java.io.Writer) return "<Writer>";
+        if (obj instanceof PrintWriter) return "<PrintWriter>";
+        if (obj.getClass().isArray()) {
+            if (obj instanceof Object[] arr) {
+                Object[] out = new Object[arr.length];
+                for (int i = 0; i < arr.length; i++) out[i] = sanitize(arr[i]);
+                return out;
+            }
+        }
+        return obj;
     }
 
     private String safeToJson(Object obj) {

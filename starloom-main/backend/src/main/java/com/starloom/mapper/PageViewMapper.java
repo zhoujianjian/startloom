@@ -13,23 +13,23 @@ import java.util.Map;
 @Mapper
 public interface PageViewMapper extends BaseMapper<PageView> {
     
-    @Select("SELECT DATE(createTime) as date, COUNT(*) as views, COUNT(DISTINCT sessionId) as visitors " +
-            "FROM page_view WHERE createTime >= #{startTime} AND createTime <= #{endTime} " +
-            "GROUP BY DATE(createTime) ORDER BY date DESC")
+    @Select("SELECT DATE(create_time) as date, COUNT(*) as views, COUNT(DISTINCT session_id) as visitors " +
+            "FROM page_view WHERE create_time >= #{startTime} AND create_time <= #{endTime} " +
+            "GROUP BY DATE(create_time) ORDER BY date DESC")
     List<Map<String, Object>> getDailyStats(@Param("startTime") LocalDateTime startTime, 
                                             @Param("endTime") LocalDateTime endTime);
     
-    @Select("SELECT pageUrl, COUNT(*) as views FROM page_view " +
-            "WHERE createTime >= #{startTime} GROUP BY pageUrl ORDER BY views DESC LIMIT 10")
+    @Select("SELECT page_url AS pageUrl, COUNT(*) as views FROM page_view " +
+            "WHERE create_time >= #{startTime} GROUP BY page_url ORDER BY views DESC LIMIT 10")
     List<Map<String, Object>> getTopPages(@Param("startTime") LocalDateTime startTime);
     
-    @Select("SELECT deviceType, COUNT(*) as count FROM page_view " +
-            "WHERE createTime >= #{startTime} GROUP BY deviceType ORDER BY count DESC")
+    @Select("SELECT device_type AS deviceType, COUNT(*) as count FROM page_view " +
+            "WHERE create_time >= #{startTime} GROUP BY device_type ORDER BY count DESC")
     List<Map<String, Object>> getDeviceStats(@Param("startTime") LocalDateTime startTime);
     
-    @Select("SELECT COUNT(*) FROM page_view WHERE createTime >= #{startTime}")
+    @Select("SELECT COUNT(*) FROM page_view WHERE create_time >= #{startTime}")
     Integer getTodayViews(@Param("startTime") LocalDateTime startTime);
     
-    @Select("SELECT COUNT(DISTINCT sessionId) FROM page_view WHERE createTime >= #{startTime}")
+    @Select("SELECT COUNT(DISTINCT session_id) FROM page_view WHERE create_time >= #{startTime}")
     Integer getTodayVisitors(@Param("startTime") LocalDateTime startTime);
 }

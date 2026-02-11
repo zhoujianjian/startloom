@@ -130,6 +130,7 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import { setSEO, setCanonical, setBreadcrumb, setStructuredData, setHreflang } from '../../utils/seo'
+import { trackToolUse } from '../../utils/analytics'
 
 export default {
   name: 'TarotReading',
@@ -210,6 +211,8 @@ export default {
       try {
         this.isRitualing = true
         this.flippedCards = []
+
+        trackToolUse('tarot')
 
         // light haptic feedback on supported mobile devices
         if (typeof navigator !== 'undefined' && navigator.vibrate) {

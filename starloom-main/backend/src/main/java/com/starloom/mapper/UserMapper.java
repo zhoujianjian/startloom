@@ -13,18 +13,18 @@ import java.util.Map;
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
     
-    @Select("SELECT COUNT(*) FROM t_user WHERE vipLevel > 0")
+    @Select("SELECT COUNT(*) FROM t_user WHERE vip_level > 0")
     Long getVipUserCount();
     
-    @Select("SELECT COUNT(*) FROM t_user WHERE createTime >= #{startTime}")
+    @Select("SELECT COUNT(*) FROM t_user WHERE create_time >= #{startTime}")
     Integer getTodayNewUsers(@Param("startTime") LocalDateTime startTime);
     
-    @Select("SELECT COUNT(*) FROM t_user WHERE lastLoginTime >= #{startTime}")
+    @Select("SELECT COUNT(*) FROM t_user WHERE last_login_time >= #{startTime}")
     Integer getActiveUserCount(@Param("startTime") LocalDateTime startTime);
     
-    @Select("SELECT DATE(createTime) as date, COUNT(*) as users " +
-            "FROM t_user WHERE createTime >= #{startTime} AND createTime <= #{endTime} " +
-            "GROUP BY DATE(createTime) ORDER BY date DESC")
+    @Select("SELECT DATE(create_time) as date, COUNT(*) as users " +
+            "FROM t_user WHERE create_time >= #{startTime} AND create_time <= #{endTime} " +
+            "GROUP BY DATE(create_time) ORDER BY date DESC")
     List<Map<String, Object>> getUserGrowthStats(@Param("startTime") LocalDateTime startTime, 
                                                  @Param("endTime") LocalDateTime endTime);
 }

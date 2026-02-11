@@ -13,25 +13,25 @@ import java.util.Map;
 @Mapper
 public interface UserBehaviorMapper extends BaseMapper<UserBehavior> {
     
-    @Select("SELECT eventType, COUNT(*) as count FROM user_behavior " +
-            "WHERE createTime >= #{startTime} GROUP BY eventType ORDER BY count DESC")
+    @Select("SELECT event_type AS eventType, COUNT(*) AS count FROM user_behavior " +
+            "WHERE create_time >= #{startTime} GROUP BY event_type ORDER BY count DESC")
     List<Map<String, Object>> getEventStats(@Param("startTime") LocalDateTime startTime);
     
-    @Select("SELECT eventName, COUNT(*) as count FROM user_behavior " +
-            "WHERE createTime >= #{startTime} AND eventType = #{eventType} " +
-            "GROUP BY eventName ORDER BY count DESC LIMIT 10")
+    @Select("SELECT event_name AS eventName, COUNT(*) AS count FROM user_behavior " +
+            "WHERE create_time >= #{startTime} AND event_type = #{eventType} " +
+            "GROUP BY event_name ORDER BY count DESC LIMIT 10")
     List<Map<String, Object>> getTopEvents(@Param("startTime") LocalDateTime startTime, 
                                           @Param("eventType") String eventType);
     
-    @Select("SELECT HOUR(createTime) as hour, COUNT(*) as count FROM user_behavior " +
-            "WHERE createTime >= #{startTime} GROUP BY HOUR(createTime) ORDER BY hour")
+    @Select("SELECT HOUR(create_time) AS hour, COUNT(*) AS count FROM user_behavior " +
+            "WHERE create_time >= #{startTime} GROUP BY HOUR(create_time) ORDER BY hour")
     List<Map<String, Object>> getHourlyStats(@Param("startTime") LocalDateTime startTime);
     
-    @Select("SELECT COUNT(*) FROM user_behavior WHERE createTime >= #{startTime} AND success = false")
+    @Select("SELECT COUNT(*) FROM user_behavior WHERE create_time >= #{startTime} AND success = false")
     Integer getErrorCount(@Param("startTime") LocalDateTime startTime);
     
-    @Select("SELECT eventType, eventName, createTime, ip, deviceType " +
-            "FROM user_behavior WHERE createTime >= #{startTime} " +
-            "ORDER BY createTime DESC LIMIT 20")
+    @Select("SELECT event_type AS eventType, event_name AS eventName, create_time AS createTime, ip, device_type AS deviceType " +
+            "FROM user_behavior WHERE create_time >= #{startTime} " +
+            "ORDER BY create_time DESC LIMIT 20")
     List<Map<String, Object>> getRecentActivities(@Param("startTime") LocalDateTime startTime);
 }

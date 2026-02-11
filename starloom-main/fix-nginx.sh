@@ -99,6 +99,20 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Connection "";
     }
+
+    location ~ ^/(chat|v1/chat)$ {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 10s;
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_set_header Connection "";
+        proxy_http_version 1.1;
+    }
     
     # 前端路由
     location / {
@@ -116,6 +130,19 @@ server {
     
     # API 代理
     location /api/ {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 30s;
+        proxy_connect_timeout 10s;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+
+    # Analytics 埋点代理
+    location /analytics/ {
         proxy_pass http://backend;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -199,6 +226,20 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Connection "";
     }
+
+    location ~ ^/(chat|v1/chat)$ {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 10s;
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_set_header Connection "";
+        proxy_http_version 1.1;
+    }
     
     # 前端路由
     location / {
@@ -216,6 +257,19 @@ server {
     
     # API 代理
     location /api/ {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 30s;
+        proxy_connect_timeout 10s;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+
+    # Analytics 埋点代理
+    location /analytics/ {
         proxy_pass http://backend;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

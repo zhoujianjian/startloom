@@ -20,6 +20,7 @@ public class AdminStatsServiceImpl implements AdminStatsService {
     private final PageViewMapper pageViewMapper;
     private final UserBehaviorMapper userBehaviorMapper;
     private final DailyStatsMapper dailyStatsMapper;
+    private final EventLogMapper eventLogMapper;
     private final OrderMapper orderMapper;
     private final UserMapper userMapper;
     
@@ -30,20 +31,21 @@ public class AdminStatsServiceImpl implements AdminStatsService {
     public Map<String, Object> getDashboardStats() {
         LocalDateTime todayStart = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
         LocalDateTime yesterdayStart = todayStart.minusDays(1);
+        LocalDateTime now = LocalDateTime.now();
         
         Map<String, Object> dashboard = new HashMap<>();
         
         // 今日访问
-        Integer todayViews = pageViewMapper.getTodayViews(todayStart);
-        Integer yesterdayViews = pageViewMapper.getTodayViews(yesterdayStart);
+        Long todayViews = eventLogMapper.countPv(todayStart, now);
+        Long yesterdayViews = eventLogMapper.countPv(yesterdayStart, todayStart.minusNanos(1));
         dashboard.put("todayViews", todayViews);
-        dashboard.put("viewsGrowth", calculateGrowth(todayViews, yesterdayViews));
+        dashboard.put("viewsGrowth", calculateGrowth(todayViews.intValue(), yesterdayViews.intValue()));
         
         // 今日访客
-        Integer todayVisitors = pageViewMapper.getTodayVisitors(todayStart);
-        Integer yesterdayVisitors = pageViewMapper.getTodayVisitors(yesterdayStart);
+        Long todayVisitors = eventLogMapper.countUniqueVisitors(todayStart, now);
+        Long yesterdayVisitors = eventLogMapper.countUniqueVisitors(yesterdayStart, todayStart.minusNanos(1));
         dashboard.put("todayVisitors", todayVisitors);
-        dashboard.put("visitorsGrowth", calculateGrowth(todayVisitors, yesterdayVisitors));
+        dashboard.put("visitorsGrowth", calculateGrowth(todayVisitors.intValue(), yesterdayVisitors.intValue()));
         
         // 总用户数
         Long totalUsers = userMapper.selectCount(null);
@@ -70,17 +72,30 @@ public class AdminStatsServiceImpl implements AdminStatsService {
     
     @Override
     public List<Map<String, Object>> getPageViewStats(LocalDateTime startTime, LocalDateTime endTime) {
-        return pageViewMapper.getDailyStats(startTime, endTime);
+        return eventLogMapper.getDailyPvStats(startTime, endTime);
     }
     
     @Override
     public List<Map<String, Object>> getTopPagesStats(LocalDateTime startTime) {
-        return pageViewMapper.getTopPages(startTime);
+        LocalDateTime endTime = LocalDateTime.now();
+        List<Map<String, Object>> topTools = eventLogMapper.getTopTools(startTime, endTime, 10);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Map<String, Object> row : topTools) {
+            Map<String, Object> item = new HashMap<>();
+            Object toolId = row.get("toolId");
+            Object views = row.get("views");
+            item.put("pageUrl", toolId != null ? String.valueOf(toolId) : "");
+            item.put("pageTitle", toolId != null ? String.valueOf(toolId) : "");
+            item.put("views", views instanceof Number ? ((Number) views).longValue() : 0L);
+            item.put("avgStayTime", 0);
+            result.add(item);
+        }
+        return result;
     }
     
     @Override
     public List<Map<String, Object>> getDeviceStats(LocalDateTime startTime) {
-        return pageViewMapper.getDeviceStats(startTime);
+        return eventLogMapper.getDeviceStats(startTime, LocalDateTime.now());
     }
     
     @Override
@@ -175,12 +190,12 @@ public class AdminStatsServiceImpl implements AdminStatsService {
     
     @Override
     public List<Map<String, Object>> getBehaviorStats(LocalDateTime startTime) {
-        return userBehaviorMapper.getEventStats(startTime);
+        return eventLogMapper.getBehaviorStats(startTime, LocalDateTime.now());
     }
     
     @Override
     public List<Map<String, Object>> getHourlyActivityStats(LocalDateTime startTime) {
-        return userBehaviorMapper.getHourlyStats(startTime);
+        return eventLogMapper.getHourlyStats(startTime, LocalDateTime.now());
     }
     
     @Override
@@ -191,13 +206,13 @@ public class AdminStatsServiceImpl implements AdminStatsService {
         LocalDateTime oneHourAgo = now.minusHours(1);
         
         // 最近1小时访问量
-        metrics.put("hourlyViews", pageViewMapper.getTodayViews(oneHourAgo));
+        metrics.put("hourlyViews", eventLogMapper.countPv(oneHourAgo, now));
         
         // 当前在线数
         metrics.put("currentOnline", getOnlineUserCount());
         
         // 最近1小时错误数
-        metrics.put("hourlyErrors", userBehaviorMapper.getErrorCount(oneHourAgo));
+        metrics.put("hourlyErrors", 0);
         
         // 系统负载（简化版）
         metrics.put("systemLoad", "normal");
@@ -208,7 +223,7 @@ public class AdminStatsServiceImpl implements AdminStatsService {
     @Override
     public List<Map<String, Object>> getRecentActivities() {
         LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
-        return userBehaviorMapper.getRecentActivities(oneHourAgo);
+        return eventLogMapper.getRecentEvents(oneHourAgo, LocalDateTime.now());
     }
     
     private Double calculateGrowth(Integer current, Integer previous) {

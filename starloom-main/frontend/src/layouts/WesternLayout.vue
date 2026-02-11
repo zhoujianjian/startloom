@@ -16,12 +16,42 @@
 <script>
 import WesternHeader from '../components/Western/WesternHeader.vue'
 import WesternFooter from '../components/Western/WesternFooter.vue'
+import { trackPV, startHeartbeat, stopHeartbeat, trackToolOpen } from '../utils/analytics'
 
 export default {
   name: 'WesternLayout',
   components: {
     WesternHeader,
     WesternFooter
+  },
+  methods: {
+    trackRoute(route) {
+      trackPV()
+
+      const path = route?.path || ''
+      let toolId = null
+
+      if (path.startsWith('/en/tarot')) toolId = 'tarot'
+      else if (path.startsWith('/en/compatibility')) toolId = 'compatibility'
+      else if (path.startsWith('/en/horoscope')) toolId = 'horoscope'
+      else if (path.startsWith('/en/astrology')) toolId = 'astrology'
+      else if (path.startsWith('/en/numerology')) toolId = 'numerology'
+      else if (path.startsWith('/en/tools')) toolId = 'western_tools'
+
+      if (toolId) trackToolOpen(toolId)
+    }
+  },
+  watch: {
+    $route(to) {
+      this.trackRoute(to)
+    }
+  },
+  mounted() {
+    startHeartbeat()
+    this.trackRoute(this.$route)
+  },
+  beforeUnmount() {
+    stopHeartbeat()
   }
 }
 </script>

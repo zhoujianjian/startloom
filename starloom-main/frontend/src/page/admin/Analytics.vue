@@ -319,10 +319,13 @@ export default {
       try {
         const res = await this.$api.analytics.getRealTimeMetrics()
         if (res?.code === 200) {
-          this.metrics = res.data
+          this.metrics = {
+            ...this.metrics,
+            ...(res.data || {})
+          }
         }
       } catch (error) {
-        this.metrics = {}
+        this.metrics = { ...this.metrics }
       }
     },
 
@@ -334,13 +337,34 @@ export default {
         })
         
         if (res?.code === 200) {
-          this.pageViewStats = [{
-            date: this.formatDate(new Date()),
-            views: res.data.total || 0,
-            uniqueVisitors: res.data.unique || 0
-          }]
-          this.maxPageViews = res.data.total || 0
-          this.maxUniqueVisitors = res.data.unique || 0
+          const data = res.data
+
+          if (Array.isArray(data)) {
+            this.pageViewStats = data.map(item => ({
+              date: item.date,
+              views: item.views ?? 0,
+              uniqueVisitors: item.uniqueVisitors ?? item.visitors ?? 0
+            }))
+          } else {
+            this.pageViewStats = [{
+              date: this.formatDate(new Date()),
+              views: data?.total || 0,
+              uniqueVisitors: data?.unique || 0
+            }]
+          }
+
+          const viewsMax = Math.max(0, ...this.pageViewStats.map(i => Number(i.views) || 0))
+          const uvMax = Math.max(0, ...this.pageViewStats.map(i => Number(i.uniqueVisitors) || 0))
+          this.maxPageViews = viewsMax
+          this.maxUniqueVisitors = uvMax
+
+          const totalViews = this.pageViewStats.reduce((sum, i) => sum + (Number(i.views) || 0), 0)
+          const totalUv = this.pageViewStats.reduce((sum, i) => sum + (Number(i.uniqueVisitors) || 0), 0)
+          this.metrics = {
+            ...this.metrics,
+            totalPageViews: totalViews,
+            uniqueVisitors: totalUv,
+          }
         }
       } catch (error) {
         this.pageViewStats = []
@@ -356,7 +380,11 @@ export default {
         })
         
         if (res?.code === 200) {
-          this.deviceStats = res.data
+          const data = res.data
+          this.deviceStats = (Array.isArray(data) ? data : []).map(item => ({
+            ...item,
+            type: item.type || item.deviceType || item.device
+          }))
         }
       } catch (error) {
         this.deviceStats = []
@@ -370,7 +398,8 @@ export default {
         })
         
         if (res?.code === 200) {
-          this.topPages = (res.data || []).slice(0, 10)
+          const data = res.data
+          this.topPages = (Array.isArray(data) ? data : []).slice(0, 10)
         }
       } catch (error) {
         this.topPages = []
@@ -384,7 +413,11 @@ export default {
         })
         
         if (res?.code === 200) {
-          this.behaviorStats = res.data
+          const data = res.data
+          this.behaviorStats = (Array.isArray(data) ? data : []).map(item => ({
+            ...item,
+            type: item.type || item.eventType
+          }))
         }
       } catch (error) {
         this.behaviorStats = []
@@ -454,10 +487,13 @@ export default {
     },
 
     formatNumber(num) {
+      if (num === null || num === undefined) return '0'
+      const n = Number(num)
+      if (!Number.isFinite(n)) return '0'
       if (num >= 10000) {
-        return (num / 10000).toFixed(1) + '万'
+        return (n / 10000).toFixed(1) + '万'
       }
-      return num.toLocaleString()
+      return n.toLocaleString()
     },
 
     formatDate(date) {
@@ -757,17 +793,24 @@ export default {
 .device-name {
   font-weight: 500;
   color: #262626;
+  font-size: 16px;
 }
 
 .device-count {
-  font-size: 12px;
+  font-size: 14px;
   color: #8c8c8c;
 }
 
 .device-percentage {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   color: #262626;
+}
+
+.device-icon {
+  width: 44px;
+  height: 44px;
+  font-size: 22px;
 }
 
 .analysis-section {
