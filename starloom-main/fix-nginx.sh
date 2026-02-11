@@ -5,6 +5,10 @@
 
 set -e
 
+if [ -z "${BASH_VERSION:-}" ]; then
+    exec bash "$0" "$@"
+fi
+
 echo "=========================================="
 echo "修复 Nginx 配置文件"
 echo "=========================================="
@@ -19,6 +23,16 @@ cd "$DEPLOY_DIR"
 
 echo "📁 部署目录: $DEPLOY_DIR"
 echo ""
+
+COMPOSE_CMD=""
+if docker compose version >/dev/null 2>&1; then
+    COMPOSE_CMD="docker compose"
+elif command -v docker-compose >/dev/null 2>&1; then
+    COMPOSE_CMD="docker-compose"
+else
+    echo "❌ 未找到 Docker Compose（请安装 docker compose 插件或 docker-compose）"
+    exit 1
+fi
 
 # 检查 nginx.conf 是否为目录
 if [ -d "nginx.conf" ]; then
@@ -40,22 +54,10 @@ upstream backend {
     keepalive 32;
 }
 
-# HTTP 重定向到 HTTPS（仅域名）
 server {
     listen 80;
     server_name ibazi.site www.ibazi.site;
-    return 301 https://$server_name$request_uri;
-}
 
-# HTTPS 服务（域名）
-server {
-    listen 443 ssl http2;
-    server_name ibazi.site www.ibazi.site;
-    
-    # SSL 证书配置（需要自行配置）
-    # ssl_certificate /etc/nginx/ssl/ibazi.site.crt;
-    # ssl_certificate_key /etc/nginx/ssl/ibazi.site.key;
-    
     root /usr/share/nginx/html;
     index index.html;
 
@@ -114,6 +116,19 @@ server {
     
     # API 代理
     location /api/ {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 30s;
+        proxy_connect_timeout 10s;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+
+    location /sysAdmApi/ {
+        rewrite ^/sysAdmApi/(.*)$ /sysAdm/$1 break;
         proxy_pass http://backend;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -211,6 +226,19 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Connection "";
     }
+
+    location /sysAdmApi/ {
+        rewrite ^/sysAdmApi/(.*)$ /sysAdm/$1 break;
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 30s;
+        proxy_connect_timeout 10s;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
     
     # WebSocket 支持
     location /ws/ {
@@ -248,13 +276,13 @@ fi
 # 停止前端容器
 echo ""
 echo "4️⃣  停止前端容器..."
-docker-compose stop frontend || true
+$COMPOSE_CMD stop frontend || true
 sleep 2
 
 # 启动前端容器
 echo ""
 echo "5️⃣  启动前端容器..."
-docker-compose up -d frontend
+$COMPOSE_CMD up -d frontend
 
 # 等待启动
 echo ""
@@ -268,7 +296,7 @@ if docker ps | grep -q starloom-frontend; then
     echo "✅ 前端已启动"
 else
     echo "❌ 前端启动失败"
-    docker-compose logs frontend | tail -30
+    $COMPOSE_CMD logs frontend | tail -30
     exit 1
 fi
 
@@ -278,5 +306,5 @@ echo "✅ Nginx 配置修复完成！"
 echo "=========================================="
 echo ""
 echo "📱 访问地址: http://10.60.215.165"
-echo "🔍 查看日志: docker-compose logs -f frontend"
+echo "🔍 查看日志: $COMPOSE_CMD logs -f frontend"
 echo ""

@@ -5,6 +5,10 @@
 
 set -e
 
+if [ -z "${BASH_VERSION:-}" ]; then
+    exec bash "$0" "$@"
+fi
+
 echo "=========================================="
 echo "StarLoom 前端更新"
 echo "=========================================="
@@ -26,9 +30,19 @@ fi
 echo "📁 部署目录: $DEPLOY_DIR"
 echo ""
 
+COMPOSE_CMD=""
+if docker compose version >/dev/null 2>&1; then
+    COMPOSE_CMD="docker compose"
+elif command -v docker-compose >/dev/null 2>&1; then
+    COMPOSE_CMD="docker-compose"
+else
+    echo "❌ 未找到 Docker Compose（请安装 docker compose 插件或 docker-compose）"
+    exit 1
+fi
+
 # 停止前端容器
 echo "1️⃣  停止前端容器..."
-docker-compose stop frontend || true
+$COMPOSE_CMD stop frontend || true
 
 # 等待容器停止
 sleep 3
@@ -36,7 +50,7 @@ sleep 3
 # 启动前端容器
 echo ""
 echo "2️⃣  启动前端容器..."
-docker-compose up -d frontend
+$COMPOSE_CMD up -d frontend
 
 # 等待启动
 echo ""
@@ -50,7 +64,7 @@ if docker ps | grep -q starloom-frontend; then
     echo "✅ 前端已启动"
 else
     echo "❌ 前端启动失败"
-    docker-compose logs frontend | tail -30
+    $COMPOSE_CMD logs frontend | tail -30
     exit 1
 fi
 
@@ -60,5 +74,5 @@ echo "✅ 前端更新完成！"
 echo "=========================================="
 echo ""
 echo "📱 访问地址: http://10.60.215.165"
-echo "🔍 查看日志: docker-compose logs -f frontend"
+echo "🔍 查看日志: $COMPOSE_CMD logs -f frontend"
 echo ""
