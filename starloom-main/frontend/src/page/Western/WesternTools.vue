@@ -17,41 +17,12 @@
             v-for="tool in tools"
             :key="tool.id"
             class="tool-card"
-            @click="selectTool(tool)"
+            @click="openTool(tool)"
           >
             <div class="tool-icon">{{ tool.icon }}</div>
             <h3>{{ tool.name }}</h3>
             <p>{{ tool.description }}</p>
             <button class="btn btn-text">Explore →</button>
-          </div>
-        </div>
-
-        <!-- Tool Detail Modal -->
-        <div v-if="selectedTool" class="tool-modal" @click="closeTool">
-          <div class="modal-content" @click.stop>
-            <button class="close-btn" @click="closeTool">✕</button>
-            
-            <div class="modal-header">
-              <div class="modal-icon">{{ selectedTool.icon }}</div>
-              <h2>{{ selectedTool.name }}</h2>
-            </div>
-
-            <div class="modal-body">
-              <p>{{ selectedTool.fullDescription }}</p>
-
-              <div class="tool-features">
-                <h4>Features:</h4>
-                <ul>
-                  <li v-for="(feature, index) in selectedTool.features" :key="index">
-                    {{ feature }}
-                  </li>
-                </ul>
-              </div>
-
-              <button class="btn btn-primary" @click="useTool">
-                Use {{ selectedTool.name }}
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -60,17 +31,19 @@
 </template>
 
 <script>
+import { setSEO, setCanonical, setBreadcrumb, setHreflang } from '../../utils/seo'
+
 export default {
   name: 'WesternTools',
   data() {
     return {
-      selectedTool: null,
       tools: [
         {
           id: 'chakra-quiz',
           name: 'Chakra Quiz',
           icon: '🔮',
           description: 'Find your chakra balance',
+          route: '/en/tools/chakra-quiz',
           fullDescription: 'Discover which of your seven chakras needs attention and healing. This interactive quiz will help you understand your energy centers.',
           features: [
             'Identify blocked chakras',
@@ -84,6 +57,7 @@ export default {
           name: 'Crystal Guide',
           icon: '💎',
           description: 'Choose your healing crystal',
+          route: '/en/tools/crystal-guide',
           fullDescription: 'Find the perfect crystal for your needs. Our guide will help you select crystals based on your intentions and goals.',
           features: [
             'Browse crystal database',
@@ -97,6 +71,7 @@ export default {
           name: 'Affirmation Generator',
           icon: '✨',
           description: 'Daily affirmations for you',
+          route: '/en/tools/affirmation-generator',
           fullDescription: 'Generate personalized affirmations tailored to your goals and aspirations. Start your day with positive energy.',
           features: [
             'Personalized affirmations',
@@ -110,6 +85,7 @@ export default {
           name: 'Meditation Timer',
           icon: '🧘',
           description: 'Guided meditation sessions',
+          route: '/en/tools/meditation-timer',
           fullDescription: 'Meditate with our guided sessions and timer. Choose from various meditation styles and durations.',
           features: [
             'Multiple meditation styles',
@@ -123,6 +99,7 @@ export default {
           name: 'Energy Reading',
           icon: '⚡',
           description: 'Analyze your energy field',
+          route: '/en/tools/energy-reading',
           fullDescription: 'Get insights into your current energy state. Our AI will analyze your energy and provide recommendations.',
           features: [
             'Energy field analysis',
@@ -136,6 +113,7 @@ export default {
           name: 'Moon Calendar',
           icon: '🌙',
           description: 'Track moon phases',
+          route: '/en/tools/moon-phase',
           fullDescription: 'Follow the lunar cycle and plan your activities accordingly. Understand how moon phases affect your energy.',
           features: [
             'Current moon phase',
@@ -148,23 +126,24 @@ export default {
     }
   },
   methods: {
-    selectTool(tool) {
-      this.selectedTool = tool
-    },
-    closeTool() {
-      this.selectedTool = null
-    },
-    useTool() {
-      alert(`Opening ${this.selectedTool.name}...`)
-      this.closeTool()
+    openTool(tool) {
+      if (tool?.route) {
+        this.$router.push(tool.route)
+      }
     }
   },
   mounted() {
-    document.title = this.$t('seo_tools_title')
-    const metaDescription = document.querySelector('meta[name="description"]')
-    if (metaDescription) {
-      metaDescription.setAttribute('content', this.$t('seo_tools_desc'))
-    }
+    setSEO('home', {
+      title: 'Spiritual Tools (Free) | Chakra Quiz, Crystal Guide & More | StarLoom',
+      description: 'Explore free spiritual tools: chakra quiz, crystal guide, affirmation generator, meditation timer, energy reading, and moon phase checker.',
+      keywords: 'spiritual tools, chakra quiz, crystal guide, affirmation generator, meditation timer, moon phase'
+    })
+    setCanonical(this.$route.path)
+    setHreflang({ en: `https://ibazi.site${this.$route.path}` })
+    setBreadcrumb([
+      { name: 'Home', url: 'https://ibazi.site/en' },
+      { name: 'Tools', url: 'https://ibazi.site/en/tools' }
+    ])
   }
 }
 </script>
@@ -185,13 +164,13 @@ export default {
   text-align: center;
 
   h1 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     margin-bottom: 12px;
     color: $text-primary;
   }
 
   p {
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: $text-secondary;
   }
 }
@@ -230,12 +209,12 @@ export default {
     }
 
     h3 {
-      font-size: 1rem;
+      font-size: 1.15rem;
       margin: 0;
     }
 
     p {
-      font-size: 0.8rem;
+      font-size: 0.95rem;
       color: $text-secondary;
       margin: 0;
       flex-grow: 1;
@@ -244,129 +223,8 @@ export default {
     .btn {
       align-self: center;
       padding: 8px 20px;
-      font-size: 0.85rem;
+      font-size: 0.95rem;
     }
-  }
-}
-
-// Tool Modal
-.tool-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 20px;
-  animation: fadeIn $transition-base;
-
-  .modal-content {
-    background-color: $bg-secondary;
-    border-radius: $radius-2xl;
-    padding: 24px;
-    max-width: 600px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-    border: 2px solid $primary-gold;
-    box-shadow: $shadow-2xl;
-
-    .close-btn {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: none;
-      border: none;
-      font-size: 1.3rem;
-      color: $primary-gold;
-      cursor: pointer;
-      transition: all $transition-base;
-
-      &:hover {
-        transform: scale(1.2);
-      }
-    }
-
-    .modal-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 2px solid rgba($primary-gold, 0.2);
-
-      .modal-icon {
-        font-size: 3rem;
-      }
-
-      h2 {
-        margin: 0;
-        font-size: 1.75rem;
-      }
-    }
-
-    .modal-body {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-
-      p {
-        font-size: 0.95rem;
-        line-height: 1.6;
-        color: $text-secondary;
-      }
-
-      .tool-features {
-        background-color: $bg-primary;
-        padding: 20px;
-        border-radius: $radius-lg;
-        border-left: 4px solid $primary-gold;
-
-        h4 {
-          font-size: 1rem;
-          margin-bottom: 12px;
-          color: $primary-gold;
-        }
-
-        ul {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-
-          li {
-            padding: 8px 0;
-            font-size: 0.875rem;
-            color: $text-secondary;
-
-            &:before {
-              content: '✓ ';
-              color: $primary-gold;
-              font-weight: $font-weight-bold;
-              margin-right: 8px;
-            }
-          }
-        }
-      }
-
-      .btn {
-        padding: 12px 32px;
-        align-self: center;
-      }
-    }
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
   }
 }
 
@@ -407,22 +265,7 @@ export default {
     }
   }
 
-  .tool-modal {
-    .modal-content {
-      padding: 24px;
-      max-width: 90%;
-
-      .modal-header {
-        flex-direction: column;
-        text-align: center;
-        gap: 12px;
-
-        h2 {
-          font-size: 1.5rem;
-        }
-      }
-    }
-  }
+  
 }
 
 @media (max-width: 640px) {
@@ -457,62 +300,11 @@ export default {
       }
 
       p {
-        font-size: 0.8rem;
+        font-size: 0.92rem;
       }
     }
   }
 
-  .tool-modal {
-    padding: 10px;
-
-    .modal-content {
-      padding: 20px;
-      max-width: 100%;
-
-      .close-btn {
-        top: 10px;
-        right: 10px;
-        font-size: 1.25rem;
-      }
-
-      .modal-header {
-        margin-bottom: 20px;
-        gap: 12px;
-
-        .modal-icon {
-          font-size: 2rem;
-        }
-
-        h2 {
-          font-size: 1.25rem;
-        }
-      }
-
-      .modal-body {
-        gap: 16px;
-
-        p {
-          font-size: 0.875rem;
-        }
-
-        .tool-features {
-          padding: 16px;
-
-          h4 {
-            font-size: 0.95rem;
-          }
-
-          ul li {
-            font-size: 0.8rem;
-          }
-        }
-
-        .btn {
-          padding: 10px 24px;
-          font-size: 0.875rem;
-        }
-      }
-    }
-  }
+  
 }
 </style>

@@ -15,6 +15,30 @@ $cosmic-pink: #E056A0;
 $ethereal-cyan: #4ECDC4;
 $blood-moon: #8B0000;
 
+// Western pages design tokens
+$bg-primary: $deep-space;
+$bg-secondary: $nebula-purple;
+$text-primary: $star-white;
+$text-secondary: rgba($star-white, 0.75);
+$border-medium: rgba($star-white, 0.22);
+
+$radius-md: 10px;
+$radius-lg: 14px;
+$radius-xl: 18px;
+$radius-2xl: 22px;
+
+$transition-base: 0.25s ease;
+
+$shadow-lg: 0 10px 26px rgba(0, 0, 0, 0.35);
+$shadow-xl: 0 14px 34px rgba(0, 0, 0, 0.45);
+$shadow-2xl: 0 18px 44px rgba(0, 0, 0, 0.55);
+
+$gradient-purple-gold: linear-gradient(135deg, $primary-purple 0%, $primary-gold 100%);
+$gradient-teal-purple: linear-gradient(135deg, $ethereal-cyan 0%, $secondary-purple 100%);
+
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
 // 神秘渐变
 $gradient-cosmic: linear-gradient(135deg, #050510 0%, #12122a 40%, #1a0a2e 70%, #0d0d20 100%);
 $gradient-gold: linear-gradient(135deg, #F5D547 0%, #C9A227 50%, #8B6914 100%);

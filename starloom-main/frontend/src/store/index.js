@@ -1,8 +1,12 @@
 import { createStore } from 'vuex'
+import western from './modules/western'
 // import { i18n } from '/@/locales/index.js'
 // const { t } = i18n.global;
 
 const store = createStore({
+  modules: {
+    western
+  },
   // state 提供唯一的公共数据源
   state() {
     return {

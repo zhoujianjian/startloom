@@ -3,7 +3,25 @@
 # StarLoom 一键部署脚本（支持 Ubuntu/CentOS，自动选择镜像源）
 # 用法: sudo bash deploy.sh
 
+if [ -z "$BASH_VERSION" ]; then
+    exec bash "$0" "$@"
+fi
+
 set -e
+
+COMPOSE_CMD=""
+
+detect_compose_cmd() {
+    if docker compose version >/dev/null 2>&1; then
+        COMPOSE_CMD="docker compose"
+        return 0
+    fi
+    if command -v docker-compose >/dev/null 2>&1; then
+        COMPOSE_CMD="docker-compose"
+        return 0
+    fi
+    return 1
+}
 
 echo "=========================================="
 echo "StarLoom 全自动部署脚本"
@@ -35,12 +53,12 @@ fi
 # 检测网络环境（国内/国外）
 echo ""
 echo "2️⃣  检测网络环境..."
-if curl -s --connect-timeout 5 http://mirrors.aliyun.com >/dev/null 2>&1; then
-    echo "🇨🇳 检测到国内网络环境，使用国内镜像源"
-    CHINA=true
-else
-    echo "🌍 检测到国外网络环境，使用官方镜像源"
+if curl -fsS --connect-timeout 5 https://github.com >/dev/null 2>&1; then
+    echo "� 检测到国外网络环境，使用官方镜像源"
     CHINA=false
+else
+    echo "�🇳 检测到国内网络环境，使用国内镜像源"
+    CHINA=true
 fi
 
 # 安装 Docker 和 Docker Compose
@@ -61,9 +79,11 @@ install_docker_ubuntu() {
     
     # 添加 Docker GPG 密钥
     if [ "$CHINA" = true ]; then
+        rm -f /usr/share/keyrings/docker-archive-keyring.gpg
         curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
     else
+        rm -f /usr/share/keyrings/docker-archive-keyring.gpg
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
     fi
@@ -72,13 +92,8 @@ install_docker_ubuntu() {
     apt-get update
     apt-get install -y docker-ce docker-ce-cli containerd.io
     
-    # 安装 Docker Compose
-    if [ "$CHINA" = true ]; then
-        curl -L "https://get.daocloud.io/docker/compose/releases/download/v2.12.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    else
-        curl -L "https://github.com/docker/compose/releases/download/v2.12.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    fi
-    chmod +x /usr/local/bin/docker-compose
+    # 安装 Docker Compose v2 插件（推荐，避免 API 版本过旧）
+    apt-get install -y docker-compose-plugin
 }
 
 install_docker_centos() {
@@ -100,13 +115,8 @@ install_docker_centos() {
     # 安装 Docker
     yum install -y docker-ce docker-ce-cli containerd.io
     
-    # 安装 Docker Compose
-    if [ "$CHINA" = true ]; then
-        curl -L "https://get.daocloud.io/docker/compose/releases/download/v2.12.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    else
-        curl -L "https://github.com/docker/compose/releases/download/v2.12.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    fi
-    chmod +x /usr/local/bin/docker-compose
+    # 安装 Docker Compose v2 插件
+    yum install -y docker-compose-plugin || true
 }
 
 # 根据操作系统安装 Docker
@@ -124,6 +134,23 @@ echo ""
 echo "4️⃣  启动 Docker 服务..."
 systemctl enable docker
 systemctl start docker
+
+echo ""
+echo "4️⃣➕ 检测 Docker Compose..."
+if ! detect_compose_cmd; then
+    echo "⚠️  未检测到 Docker Compose，尝试安装..."
+    if command -v apt-get >/dev/null 2>&1; then
+        apt-get update
+        apt-get install -y docker-compose-plugin
+    elif command -v yum >/dev/null 2>&1; then
+        yum install -y docker-compose-plugin || true
+    fi
+    if ! detect_compose_cmd; then
+        echo "❌ Docker Compose 安装失败，请手动安装后重试"
+        exit 1
+    fi
+fi
+echo "✅ 使用 Compose 命令: $COMPOSE_CMD"
 
 # 配置 Docker 镜像加速器（国内）
 if [ "$CHINA" = true ]; then
@@ -164,16 +191,39 @@ echo "✅ 所有必要文件都存在"
 echo ""
 echo "7️⃣  复制部署文件..."
 cp starloom-backend-1.0.0.jar /opt/suanming/deploy/
-cp -r dist /opt/suanming/
-cp nginx-ip.conf /opt/suanming/nginx.conf
-cp docker-compose.yml /opt/suanming/
-cp starloom.sql /opt/suanming/
+chmod 644 /opt/suanming/deploy/starloom-backend-1.0.0.jar || true
+if [ "$(realpath dist 2>/dev/null || echo '')" = "$(realpath /opt/suanming/dist 2>/dev/null || echo '')" ]; then
+    echo "ℹ️  dist 已在 /opt/suanming/dist，跳过复制"
+else
+    rm -rf /opt/suanming/dist
+    cp -r dist /opt/suanming/
+fi
+if [ "$(realpath nginx-ip.conf 2>/dev/null || echo '')" = "$(realpath /opt/suanming/nginx.conf 2>/dev/null || echo '')" ]; then
+    echo "ℹ️  nginx.conf 已在 /opt/suanming/nginx.conf，跳过复制"
+else
+    cp nginx-ip.conf /opt/suanming/nginx.conf
+fi
+chmod 644 /opt/suanming/nginx.conf || true
+
+if [ "$(realpath docker-compose.yml 2>/dev/null || echo '')" = "$(realpath /opt/suanming/docker-compose.yml 2>/dev/null || echo '')" ]; then
+    echo "ℹ️  docker-compose.yml 已在 /opt/suanming/docker-compose.yml，跳过复制"
+else
+    cp docker-compose.yml /opt/suanming/
+fi
+chmod 644 /opt/suanming/docker-compose.yml || true
+
+if [ "$(realpath starloom.sql 2>/dev/null || echo '')" = "$(realpath /opt/suanming/starloom.sql 2>/dev/null || echo '')" ]; then
+    echo "ℹ️  starloom.sql 已在 /opt/suanming/starloom.sql，跳过复制"
+else
+    cp starloom.sql /opt/suanming/
+fi
+chmod 644 /opt/suanming/starloom.sql || true
 
 # 停止现有容器
 echo ""
 echo "8️⃣  停止现有容器..."
 cd /opt/suanming
-docker-compose down 2>/dev/null || true
+$COMPOSE_CMD down 2>/dev/null || true
 
 # 启动容器
 echo ""
@@ -182,7 +232,7 @@ echo "   - MySQL 数据库"
 echo "   - Redis 缓存" 
 echo "   - 后端服务"
 echo "   - 前端服务"
-docker-compose up -d
+$COMPOSE_CMD up -d
 
 # 等待服务启动
 echo ""
@@ -210,7 +260,7 @@ for service_info in "${services[@]}"; do
         echo "✅ $name 运行中"
     else
         echo "❌ $name 未运行"
-        docker-compose logs $container | tail -10
+        $COMPOSE_CMD logs $container | tail -10
         all_running=false
     fi
 done

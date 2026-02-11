@@ -7,7 +7,16 @@ const AstrologyHub = () => import("../page/Western/AstrologyHub.vue")
 const DailyHoroscope = () => import("../page/Western/DailyHoroscope.vue")
 const Numerology = () => import("../page/Western/Numerology.vue")
 const WesternTools = () => import("../page/Western/WesternTools.vue")
-const Index = () => import("../page/Index.vue")
+const ChakraQuizTool = () => import("../page/Western/Tools/ChakraQuizTool.vue")
+const CrystalGuideTool = () => import("../page/Western/Tools/CrystalGuideTool.vue")
+const AffirmationTool = () => import("../page/Western/Tools/AffirmationTool.vue")
+const MeditationTimerTool = () => import("../page/Western/Tools/MeditationTimerTool.vue")
+const EnergyReadingTool = () => import("../page/Western/Tools/EnergyReadingTool.vue")
+const MoonCalendarTool = () => import("../page/Western/Tools/MoonCalendarTool.vue")
+const ZodiacCompatibility = () => import("../page/Western/ZodiacCompatibility.vue")
+const ZodiacCompatibilityDetail = () => import("../page/Western/ZodiacCompatibilityDetail.vue")
+const TarotCards = () => import("../page/Western/TarotCards.vue")
+const TarotCardDetail = () => import("../page/Western/TarotCardDetail.vue")
 const Chat = () => import("../page/Chat.vue")
 
 export const westernRoutes = [
@@ -78,13 +87,94 @@ export const westernRoutes = [
     }
   },
   {
-    path: "/en/ai",
-    name: "western-ai",
-    component: Index,
+    path: "/en/tools/chakra-quiz",
+    name: "western-tools-chakra-quiz",
+    component: ChakraQuizTool,
     meta: {
-      seoKey: 'western-ai',
-      title: 'AI Spiritual Guide | Ask Questions | StarLoom',
-      description: 'Chat with our AI spiritual guide. Ask questions about tarot, astrology, numerology, and get personalized guidance.',
+      locale: 'en'
+    }
+  },
+  {
+    path: "/en/tools/crystal-guide",
+    name: "western-tools-crystal-guide",
+    component: CrystalGuideTool,
+    meta: {
+      locale: 'en'
+    }
+  },
+  {
+    path: "/en/tools/affirmation-generator",
+    name: "western-tools-affirmation",
+    component: AffirmationTool,
+    meta: {
+      locale: 'en'
+    }
+  },
+  {
+    path: "/en/tools/meditation-timer",
+    name: "western-tools-meditation-timer",
+    component: MeditationTimerTool,
+    meta: {
+      locale: 'en'
+    }
+  },
+  {
+    path: "/en/tools/energy-reading",
+    name: "western-tools-energy-reading",
+    component: EnergyReadingTool,
+    meta: {
+      locale: 'en'
+    }
+  },
+  {
+    path: "/en/tools/moon-phase",
+    name: "western-tools-moon-phase",
+    component: MoonCalendarTool,
+    meta: {
+      locale: 'en'
+    }
+  },
+  {
+    path: "/en/compatibility",
+    name: "western-compatibility",
+    component: ZodiacCompatibility,
+    meta: {
+      seoKey: 'western-compatibility',
+      title: 'Zodiac Compatibility Calculator | StarLoom',
+      description: 'Check love compatibility for any two zodiac signs. Free, fast, and mobile-friendly.',
+      locale: 'en'
+    }
+  },
+  {
+    path: "/en/compatibility/:signA/:signB",
+    name: "western-compatibility-detail",
+    component: ZodiacCompatibilityDetail,
+    meta: {
+      seoKey: 'western-compatibility-detail',
+      title: 'Zodiac Compatibility | StarLoom',
+      description: 'Compatibility insights for two zodiac signs: strengths, challenges, and a quick score.',
+      locale: 'en'
+    }
+  },
+  {
+    path: "/en/tarot/cards",
+    name: "western-tarot-cards",
+    component: TarotCards,
+    meta: {
+      seoKey: 'western-tarot-cards',
+      title: 'Tarot Card Meanings (Major & Minor Arcana) | StarLoom',
+      description: 'Browse tarot card meanings, keywords, upright and reversed interpretations. Free and easy to read.',
+      locale: 'en'
+    }
+  },
+  {
+    path: "/en/tarot/cards/:slug",
+    name: "western-tarot-card-detail",
+    component: TarotCardDetail,
+    meta: {
+      seoKey: 'western-tarot-card-detail',
+      title: 'Tarot Card Meaning | StarLoom',
+      description: 'Learn tarot card meanings, keywords, upright and reversed interpretations, and quick reflections.',
       locale: 'en'
     }
   },

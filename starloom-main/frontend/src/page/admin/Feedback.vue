@@ -15,7 +15,7 @@
     </div>
 
     <!-- 搜索筛选 -->
-    <div class="search-section">
+    <div v-if="!isMobile" class="search-section">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="反馈类型">
           <el-select v-model="searchForm.type" placeholder="请选择类型" clearable>
@@ -50,6 +50,19 @@
           <el-button @click="resetSearch">重置</el-button>
         </el-form-item>
       </el-form>
+    </div>
+
+    <div v-else class="mobile-toolbar">
+      <el-tabs v-model="mobileStatusTab" class="mobile-tabs" @tab-change="onMobileStatusTabChange">
+        <el-tab-pane label="待处理" name="0" />
+        <el-tab-pane label="处理中" name="1" />
+        <el-tab-pane label="已解决" name="2" />
+        <el-tab-pane label="全部" name="" />
+      </el-tabs>
+      <div class="mobile-actions">
+        <el-button size="small" @click="mobileFilterOpen = true">筛选</el-button>
+        <el-button size="small" type="primary" @click="loadFeedback">刷新</el-button>
+      </div>
     </div>
 
     <!-- 统计卡片 -->
@@ -96,7 +109,7 @@
 
     <!-- 反馈列表 -->
     <div class="table-section">
-      <el-table :data="feedback" v-loading="loading" stripe>
+      <el-table v-if="!isMobile" :data="feedback" v-loading="loading" stripe>
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="type" label="类型" width="100">
           <template #default="{ row }">
@@ -137,6 +150,39 @@
         </el-table-column>
       </el-table>
 
+      <div v-else class="mobile-list" v-loading="loading">
+        <el-empty v-if="!feedback || feedback.length === 0" description="暂无反馈" />
+        <el-card v-for="row in feedback" :key="row.id" class="feedback-card" shadow="never">
+          <div class="feedback-card-header">
+            <el-tag size="small" :type="getTypeColor(row.type)">{{ getTypeText(row.type) }}</el-tag>
+            <el-tag size="small" :type="getStatusColor(row.status)">{{ getStatusText(row.status) }}</el-tag>
+          </div>
+          <div class="feedback-card-body">
+            <div class="line">
+              <span class="label">用户</span>
+              <span class="value">{{ row.username || '-' }}</span>
+            </div>
+            <div class="line">
+              <span class="label">时间</span>
+              <span class="value">{{ formatTime(row.createTime) }}</span>
+            </div>
+            <div class="content">{{ row.content }}</div>
+          </div>
+          <div class="feedback-card-actions">
+            <el-button size="small" @click="viewFeedback(row)">查看</el-button>
+            <el-button
+              size="small"
+              type="primary"
+              @click="updateStatus(row)"
+              :disabled="row.status === 2 || row.status === 3"
+            >
+              处理
+            </el-button>
+            <el-button size="small" type="danger" @click="deleteFeedback(row)">删除</el-button>
+          </div>
+        </el-card>
+      </div>
+
       <!-- 分页 -->
       <div class="pagination">
         <el-pagination
@@ -156,10 +202,11 @@
       v-model="showDetailDialog"
       title="反馈详情"
       width="60%"
+      :fullscreen="isMobile"
       destroy-on-close
     >
       <div v-if="currentFeedback" class="feedback-detail">
-        <el-descriptions :column="2" border>
+        <el-descriptions :column="isMobile ? 1 : 2" border>
           <el-descriptions-item label="反馈ID">{{ currentFeedback.id }}</el-descriptions-item>
           <el-descriptions-item label="类型">
             <el-tag :type="getTypeColor(currentFeedback.type)">
@@ -202,6 +249,7 @@
       v-model="showReplyDialog"
       title="回复反馈"
       width="50%"
+      :fullscreen="isMobile"
       destroy-on-close
     >
       <el-form :model="replyForm" :rules="replyRules" ref="replyFormRef" label-width="80px">
@@ -227,15 +275,52 @@
       </template>
     </el-dialog>
   </div>
+
+  <el-drawer v-model="mobileFilterOpen" title="筛选" direction="btt" size="70%" destroy-on-close>
+    <el-form :model="searchForm" label-width="80px">
+      <el-form-item label="类型">
+        <el-select v-model="searchForm.type" placeholder="请选择类型" clearable>
+          <el-option label="问题反馈" value="feedback" />
+          <el-option label="功能建议" value="suggestion" />
+          <el-option label="问题反馈" value="bug" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="状态">
+        <el-select v-model="searchForm.status" placeholder="请选择状态" clearable>
+          <el-option label="待处理" :value="0" />
+          <el-option label="处理中" :value="1" />
+          <el-option label="已解决" :value="2" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="用户">
+        <el-input v-model="searchForm.username" placeholder="请输入用户名" clearable />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="drawer-footer">
+        <el-button @click="resetSearch">重置</el-button>
+        <el-button type="primary" @click="applyMobileFilter">应用</el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount, getCurrentInstance } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Download, Refresh, Document, Clock, Loading, CircleCheck } from '@element-plus/icons-vue'
 
 // 获取当前实例
 const { proxy } = getCurrentInstance()
+
+const isMobile = ref(false)
+const mobileFilterOpen = ref(false)
+const mobileStatusTab = ref('0')
+
+const updateIsMobile = () => {
+  if (typeof window === 'undefined') return
+  isMobile.value = window.innerWidth <= 768
+}
 
 // 响应式数据
 const loading = ref(false)
@@ -316,6 +401,19 @@ const loadFeedback = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const onMobileStatusTabChange = (name) => {
+  mobileStatusTab.value = name
+  searchForm.status = name === '' ? '' : Number(name)
+  pagination.current = 1
+  loadFeedback()
+}
+
+const applyMobileFilter = () => {
+  mobileFilterOpen.value = false
+  pagination.current = 1
+  loadFeedback()
 }
 
 const updateStats = () => {
@@ -473,7 +571,17 @@ const formatTime = (time) => {
 
 // 生命周期
 onMounted(() => {
+  updateIsMobile()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', updateIsMobile)
+  }
   loadFeedback()
+})
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', updateIsMobile)
+  }
 })
 </script>
 
@@ -508,6 +616,117 @@ onMounted(() => {
 
 .search-form {
   margin: 0;
+}
+
+.mobile-toolbar {
+  background: #f5f7fa;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.mobile-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feedback-card {
+  border: 1px solid #ebeef5;
+}
+
+.feedback-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.feedback-card-body .line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.feedback-card-body .label {
+  color: #909399;
+}
+
+.feedback-card-body .value {
+  color: #303133;
+  text-align: right;
+}
+
+.feedback-card-body .content {
+  margin-top: 8px;
+  color: #303133;
+  line-height: 1.6;
+}
+
+.feedback-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .feedback-management {
+    padding: 12px;
+  }
+
+  .stats-section :deep(.el-col) {
+    flex: 0 0 50%;
+    max-width: 50%;
+    margin-bottom: 12px;
+  }
+
+  .stats-card :deep(.el-card__body) {
+    padding: 12px;
+  }
+
+  .stats-card {
+    cursor: pointer;
+  }
+
+  .stats-card:active {
+    transform: scale(0.99);
+  }
+
+  .stats-content {
+    text-align: center;
+  }
+
+  .stats-icon {
+    display: none;
+  }
+
+  .stats-number {
+    font-size: 22px;
+  }
+
+  .stats-label {
+    font-size: 12px;
+    white-space: nowrap;
+    word-break: keep-all;
+  }
+
+  .table-section {
+    padding: 12px;
+  }
 }
 
 .stats-section {

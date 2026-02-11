@@ -88,6 +88,42 @@ public class SitemapController {
         xml.append("</urlset>");
         return xml.toString();
     }
+
+    /**
+     * 生成英文站 sitemap-en.xml (/en)
+     */
+    @GetMapping(value = "/sitemap-en.xml", produces = MediaType.APPLICATION_XML_VALUE)
+    public String generateEnglishSitemap() {
+        StringBuilder xml = new StringBuilder();
+        xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        xml.append("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n");
+
+        String today = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE);
+
+        // English core pages (static)
+        addUrl(xml, "/en", today, "daily", "0.95");
+        addUrl(xml, "/en/tarot", today, "weekly", "0.9");
+        addUrl(xml, "/en/tarot/cards", today, "weekly", "0.85");
+        addUrl(xml, "/en/compatibility", today, "weekly", "0.9");
+        addUrl(xml, "/en/astrology", today, "weekly", "0.75");
+        addUrl(xml, "/en/horoscope", today, "daily", "0.8");
+        addUrl(xml, "/en/numerology", today, "weekly", "0.75");
+        addUrl(xml, "/en/tools", today, "weekly", "0.8");
+
+        // English tools pages
+        addUrl(xml, "/en/tools/chakra-quiz", today, "monthly", "0.65");
+        addUrl(xml, "/en/tools/crystal-guide", today, "monthly", "0.65");
+        addUrl(xml, "/en/tools/affirmation-generator", today, "monthly", "0.6");
+        addUrl(xml, "/en/tools/meditation-timer", today, "monthly", "0.6");
+        addUrl(xml, "/en/tools/energy-reading", today, "monthly", "0.6");
+        addUrl(xml, "/en/tools/moon-phase", today, "monthly", "0.6");
+
+        // NOTE: For large-scale pages (e.g. /en/compatibility/:a/:b and /en/tarot/cards/:slug),
+        // we intentionally do not include them here yet to avoid huge sitemaps.
+
+        xml.append("</urlset>");
+        return xml.toString();
+    }
     
     private void addUrl(StringBuilder xml, String path, String lastmod, String freq, String priority) {
         xml.append("  <url>\n");
@@ -120,6 +156,7 @@ public class SitemapController {
                "Disallow: /api/\n" +
                "Disallow: /admin/\n" +
                "Disallow: /*.json$\n\n" +
-               "Sitemap: " + siteUrl + "/sitemap.xml\n";
+               "Sitemap: " + siteUrl + "/sitemap.xml\n" +
+               "Sitemap: " + siteUrl + "/sitemap-en.xml\n";
     }
 }

@@ -10,13 +10,14 @@
 
         <!-- Navigation Menu -->
         <nav class="nav-menu" :class="{ active: mobileMenuOpen }">
-          <router-link to="/en" class="nav-link">{{ $t('home') }}</router-link>
-          <router-link to="/en/tarot" class="nav-link">{{ $t('tarot') }}</router-link>
-          <router-link to="/en/astrology" class="nav-link">{{ $t('astrology') }}</router-link>
-          <router-link to="/en/horoscope" class="nav-link">{{ $t('horoscope') }}</router-link>
-          <router-link to="/en/numerology" class="nav-link">{{ $t('numerology') }}</router-link>
-          <router-link to="/en/tools" class="nav-link">{{ $t('tools') }}</router-link>
-          <router-link to="/en/ai" class="nav-link">{{ $t('ai') }}</router-link>
+          <router-link to="/en" class="nav-link" @click="closeMobileMenu">{{ $t('home') }}</router-link>
+          <router-link to="/en/tarot" class="nav-link" @click="closeMobileMenu">{{ $t('tarot') }}</router-link>
+          <router-link to="/en/tarot/cards" class="nav-link" @click="closeMobileMenu">Tarot Cards</router-link>
+          <router-link to="/en/astrology" class="nav-link" @click="closeMobileMenu">{{ $t('astrology') }}</router-link>
+          <router-link to="/en/horoscope" class="nav-link" @click="closeMobileMenu">{{ $t('horoscope') }}</router-link>
+          <router-link to="/en/numerology" class="nav-link" @click="closeMobileMenu">{{ $t('numerology') }}</router-link>
+          <router-link to="/en/compatibility" class="nav-link" @click="closeMobileMenu">Compatibility</router-link>
+          <router-link to="/en/tools" class="nav-link" @click="closeMobileMenu">{{ $t('tools') }}</router-link>
         </nav>
 
         <!-- Right Section -->
@@ -68,9 +69,17 @@ export default {
       currentLanguage: 'en'
     }
   },
+  watch: {
+    $route() {
+      this.mobileMenuOpen = false
+    }
+  },
   methods: {
     toggleMobileMenu() {
       this.mobileMenuOpen = !this.mobileMenuOpen
+    },
+    closeMobileMenu() {
+      this.mobileMenuOpen = false
     },
     switchLanguage(lang) {
       this.currentLanguage = lang
@@ -79,8 +88,10 @@ export default {
       
       // 切换版本
       if (lang === 'zh') {
+        this.mobileMenuOpen = false
         this.$router.push('/cn')
       } else {
+        this.mobileMenuOpen = false
         this.$router.push('/en')
       }
     }

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router"
-import { setSEO, setStructuredData, setCanonical } from '../utils/seo'
+import { setSEO, setStructuredData, setCanonical, setHreflang } from '../utils/seo'
 import { westernRoutes } from './western-routes'
 import i18n from '../locales'
 import store from '../store'
@@ -429,6 +429,41 @@ router.beforeEach((to, from, next) => {
   
   // 设置 canonical URL
   setCanonical(to.path);
+
+  // 多语言 hreflang：英文固定 /en，中文为根路径（best-effort 映射）
+  if (to.path.startsWith('/en')) {
+    const enUrl = `https://ibazi.site${to.path}`
+
+    const zhMap = {
+      '/en': '/',
+      '/en/tools': '/tools',
+      '/en/tarot': '/tool/tarot',
+      '/en/compatibility': '/tool/constellation-match',
+      '/en/horoscope': '/tool/daily-sign',
+    }
+
+    const exact = zhMap[to.path]
+    const fallback = to.path.startsWith('/en/compatibility/') ? '/tool/constellation-match' : null
+    const zhPath = exact || fallback
+    const zhUrl = zhPath ? `https://ibazi.site${zhPath}` : undefined
+
+    setHreflang({ en: enUrl, zh: zhUrl, xDefault: enUrl })
+  } else {
+    const zhUrl = `https://ibazi.site${to.path}`
+    const enReverseMap = {
+      '/': '/en',
+      '/tools': '/en/tools',
+      '/tool/tarot': '/en/tarot',
+      '/tool/constellation-match': '/en/compatibility',
+      '/tool/daily-sign': '/en/horoscope',
+    }
+
+    const enPath = enReverseMap[to.path]
+    if (enPath) {
+      const enUrl = `https://ibazi.site${enPath}`
+      setHreflang({ en: enUrl, zh: zhUrl, xDefault: zhUrl })
+    }
+  }
   
   // 根据路由前缀设置语言和字体大小
   if (to.path.startsWith('/en')) {
@@ -439,6 +474,7 @@ router.beforeEach((to, from, next) => {
       import('vue').then(({ nextTick }) => {
         nextTick(() => {
           document.documentElement.style.fontSize = '16px';
+          document.documentElement.lang = 'en'
           console.log('📝 西方版本字体大小已设置为16px');
         });
       });

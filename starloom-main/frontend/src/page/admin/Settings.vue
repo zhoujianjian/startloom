@@ -547,6 +547,29 @@ onMounted(() => {
   width: 200px;
 }
 
+@media (max-width: 768px) {
+  .settings-management {
+    padding: 12px;
+  }
+
+  :deep(.el-col) {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+
+  .settings-card {
+    min-height: auto;
+  }
+
+  .el-input-number {
+    width: 100%;
+  }
+
+  .el-select {
+    width: 100%;
+  }
+}
+
 .el-card__body {
   padding: 20px;
 }

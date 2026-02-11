@@ -1,7 +1,7 @@
 <template>
   <div class="admin-layout">
     <!-- 侧边栏 -->
-    <div class="sidebar" :class="{ collapsed: sidebarCollapsed }">
+    <div class="sidebar" :class="{ collapsed: sidebarCollapsed, open: mobileSidebarOpen }">
       <div class="logo">
         <h2 v-if="!sidebarCollapsed">StarLoom</h2>
         <h2 v-else>SL</h2>
@@ -77,7 +77,26 @@
       <main class="content">
         <router-view />
       </main>
+
+      <div class="mobile-tabbar">
+        <router-link to="/sysAdm/dashboard" class="tab-item" active-class="active">
+          <span class="tab-label">待办</span>
+        </router-link>
+        <router-link to="/sysAdm/orders" class="tab-item" active-class="active">
+          <span v-if="badgeOrders" class="tab-badge">{{ badgeOrders > 99 ? '99+' : badgeOrders }}</span>
+          <span class="tab-label">订单</span>
+        </router-link>
+        <router-link to="/sysAdm/feedback" class="tab-item" active-class="active">
+          <span v-if="badgeFeedback" class="tab-badge">{{ badgeFeedback > 99 ? '99+' : badgeFeedback }}</span>
+          <span class="tab-label">反馈</span>
+        </router-link>
+        <router-link to="/sysAdm/settings" class="tab-item" active-class="active">
+          <span class="tab-label">设置</span>
+        </router-link>
+      </div>
     </div>
+
+    <div class="mobile-mask" v-if="mobileSidebarOpen" @click="closeMobileSidebar"></div>
   </div>
 </template>
 
@@ -94,12 +113,42 @@ export default {
   },
   data() {
     return {
-      sidebarCollapsed: false
+      sidebarCollapsed: false,
+      mobileSidebarOpen: false,
+      badgeOrders: 0,
+      badgeFeedback: 0,
+      badgeTimer: null
     }
   },
   methods: {
+    isMobile() {
+      if (typeof window === 'undefined') return false
+      return window.innerWidth <= 768
+    },
     toggleSidebar() {
+      if (this.isMobile()) {
+        this.mobileSidebarOpen = !this.mobileSidebarOpen
+        return
+      }
       this.sidebarCollapsed = !this.sidebarCollapsed
+    },
+    closeMobileSidebar() {
+      this.mobileSidebarOpen = false
+    },
+    async refreshBadges() {
+      try {
+        if (!this.$api?.orders?.list || !this.$api?.feedback?.list) return
+
+        const [ordersRes, feedbackRes] = await Promise.all([
+          this.$api.orders.list({ page: 1, size: 1, status: 10 }),
+          this.$api.feedback.list({ page: 1, size: 1, status: 0 })
+        ])
+
+        this.badgeOrders = Number(ordersRes?.data?.total || 0)
+        this.badgeFeedback = Number(feedbackRes?.data?.total || 0)
+      } catch (e) {
+        // ignore badge errors
+      }
     },
     logout() {
       const raw = localStorage.getItem('starloomAI-token')
@@ -118,7 +167,19 @@ export default {
       this.$router.push('/sysAdm/login')
     }
   },
-  created() {}
+  created() {},
+  mounted() {
+    this.refreshBadges()
+    this.badgeTimer = setInterval(() => {
+      this.refreshBadges()
+    }, 30000)
+  },
+  beforeUnmount() {
+    if (this.badgeTimer) {
+      clearInterval(this.badgeTimer)
+      this.badgeTimer = null
+    }
+  }
 }
 </script>
 
@@ -246,6 +307,14 @@ export default {
   overflow-y: auto;
 }
 
+.mobile-tabbar {
+  display: none;
+}
+
+.mobile-mask {
+  display: none;
+}
+
 .collapsed .menu-item span {
   display: none;
 }
@@ -256,5 +325,87 @@ export default {
 
 .collapsed .menu-item i {
   margin: 0;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1001;
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+    width: 220px;
+  }
+
+  .sidebar.collapsed {
+    width: 220px;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    width: 100%;
+  }
+
+  .content {
+    padding: 12px;
+    padding-bottom: 76px;
+  }
+
+  .mobile-tabbar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 56px;
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb;
+    z-index: 1000;
+  }
+
+  .tab-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    text-decoration: none;
+    color: #6b7280;
+    font-size: 12px;
+  }
+
+  .tab-badge {
+    position: absolute;
+    top: 6px;
+    right: 18px;
+    background: #ff4d4f;
+    color: #fff;
+    border-radius: 999px;
+    padding: 0 6px;
+    height: 16px;
+    line-height: 16px;
+    font-size: 10px;
+    min-width: 16px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  .tab-item.active {
+    color: #1890ff;
+    font-weight: 600;
+  }
+
+  .mobile-mask {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1000;
+  }
 }
 </style>

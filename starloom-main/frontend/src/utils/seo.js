@@ -519,6 +519,38 @@ export function setCanonical(path = '') {
   link.href = `${SITE_URL}${path}`
 }
 
+/**
+ * 设置多语言 hreflang (rel=alternate)
+ * - en: 英文页面 URL
+ * - zh: 中文页面 URL（可选；仅当确实存在对应中文页时再传）
+ */
+export function setHreflang({ en, zh, xDefault } = {}) {
+  const upsert = (lang, href) => {
+    const selector = `link[rel="alternate"][hreflang="${lang}"]`
+    let link = document.querySelector(selector)
+    if (!link) {
+      link = document.createElement('link')
+      link.rel = 'alternate'
+      link.setAttribute('hreflang', lang)
+      document.head.appendChild(link)
+    }
+    link.href = href
+  }
+
+  const xDefaultUrl = xDefault || en || zh
+
+  if (en) {
+    upsert('en', en)
+  }
+  if (zh) {
+    upsert('zh-CN', zh)
+  }
+
+  if (xDefaultUrl) {
+    upsert('x-default', xDefaultUrl)
+  }
+}
+
 export default {
   setSEO,
   setArticleSEO,
@@ -526,5 +558,6 @@ export default {
   setStructuredData,
   setBreadcrumb,
   setCanonical,
+  setHreflang,
   SEO_CONFIG
 }

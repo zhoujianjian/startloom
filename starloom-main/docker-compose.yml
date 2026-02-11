@@ -5,6 +5,11 @@ services:
     image: mysql:8.0
     container_name: starloom-mysql
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
       MYSQL_ROOT_PASSWORD: root123456
       MYSQL_DATABASE: starloom
@@ -27,6 +32,11 @@ services:
     image: redis:7-alpine
     container_name: starloom-redis
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - "6379:6379"
     volumes:
@@ -43,12 +53,18 @@ services:
     image: eclipse-temurin:17-jdk
     container_name: starloom-backend
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"
     depends_on:
       mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
     environment:
+      APP_SITE_URL: https://ibazi.site
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/starloom?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: starloom
       SPRING_DATASOURCE_PASSWORD: starloom123456
@@ -79,7 +95,7 @@ services:
     networks:
       - starloom-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health", "||", "exit", "1"]
+      test: ["CMD-SHELL", "bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/8080'"]
       timeout: 10s
       retries: 5
       start_period: 30s
@@ -89,6 +105,11 @@ services:
     image: nginx:alpine
     container_name: starloom-frontend
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"
     depends_on:
       backend:
         condition: service_healthy

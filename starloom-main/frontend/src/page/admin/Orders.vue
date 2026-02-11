@@ -15,7 +15,7 @@
     </div>
 
     <!-- 搜索筛选 -->
-    <div class="search-section">
+    <div v-if="!isMobile" class="search-section">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="订单号">
           <el-input v-model="searchForm.orderNo" placeholder="请输入订单号" clearable />
@@ -50,11 +50,24 @@
       </el-form>
     </div>
 
+    <div v-else class="mobile-toolbar">
+      <el-tabs v-model="mobileStatusTab" class="mobile-tabs" @tab-change="onMobileStatusTabChange">
+        <el-tab-pane label="待确认" name="10" />
+        <el-tab-pane label="待支付" name="0" />
+        <el-tab-pane label="已支付" name="1" />
+        <el-tab-pane label="全部" name="" />
+      </el-tabs>
+      <div class="mobile-actions">
+        <el-button size="small" @click="mobileFilterOpen = true">筛选</el-button>
+        <el-button size="small" type="primary" @click="loadOrders">刷新</el-button>
+      </div>
+    </div>
+
     <!-- 统计卡片 -->
     <div class="stats-section">
       <el-row :gutter="20">
         <el-col :span="6">
-          <el-card class="stats-card">
+          <el-card class="stats-card" @click="quickFilter('')">
             <div class="stats-content">
               <div class="stats-number">{{ stats.total }}</div>
               <div class="stats-label">总订单数</div>
@@ -63,7 +76,7 @@
           </el-card>
         </el-col>
         <el-col :span="6">
-          <el-card class="stats-card">
+          <el-card class="stats-card" @click="quickFilter('0')">
             <div class="stats-content">
               <div class="stats-number">{{ stats.pending }}</div>
               <div class="stats-label">待支付</div>
@@ -72,7 +85,7 @@
           </el-card>
         </el-col>
         <el-col :span="6">
-          <el-card class="stats-card">
+          <el-card class="stats-card" @click="quickFilter('1')">
             <div class="stats-content">
               <div class="stats-number">¥{{ stats.totalRevenue }}</div>
               <div class="stats-label">总收入</div>
@@ -81,7 +94,7 @@
           </el-card>
         </el-col>
         <el-col :span="6">
-          <el-card class="stats-card">
+          <el-card class="stats-card" @click="quickFilter('')">
             <div class="stats-content">
               <div class="stats-number">{{ stats.todayOrders }}</div>
               <div class="stats-label">今日订单</div>
@@ -94,7 +107,7 @@
 
     <!-- 订单列表 -->
     <div class="table-section">
-      <el-table :data="orders" v-loading="loading" stripe>
+      <el-table v-if="!isMobile" :data="orders" v-loading="loading" stripe>
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="orderNo" label="订单号" width="180" show-overflow-tooltip />
         <el-table-column prop="userId" label="用户ID" width="100" />
@@ -152,6 +165,61 @@
         </el-table-column>
       </el-table>
 
+      <div v-else class="mobile-list" v-loading="loading">
+        <el-empty v-if="!orders || orders.length === 0" description="暂无订单" />
+        <el-card v-for="row in orders" :key="row.id" class="order-card" shadow="never">
+          <div class="order-card-header">
+            <div class="order-no">{{ row.orderNo }}</div>
+            <el-tag size="small" :type="getStatusColor(row.status)">{{ getStatusText(row.status) }}</el-tag>
+          </div>
+          <div class="order-card-body">
+            <div class="line">
+              <span class="label">金额</span>
+              <span class="value amount">¥{{ row.amount }}</span>
+            </div>
+            <div class="line">
+              <span class="label">商品</span>
+              <span class="value">{{ row.planName }}</span>
+            </div>
+            <div class="line">
+              <span class="label">用户ID</span>
+              <span class="value">{{ row.userId }}</span>
+            </div>
+            <div class="line">
+              <span class="label">时间</span>
+              <span class="value">{{ formatTime(row.createTime) }}</span>
+            </div>
+          </div>
+          <div class="order-card-actions">
+            <el-button size="small" @click="viewOrder(row)">查看</el-button>
+            <el-button
+              v-if="row.status === 10"
+              size="small"
+              type="success"
+              @click="confirmPayment(row)"
+            >
+              确认支付
+            </el-button>
+            <el-button
+              v-if="[0, 1, 10].includes(row.status)"
+              size="small"
+              type="danger"
+              @click="cancelOrder(row)"
+            >
+              取消
+            </el-button>
+            <el-button
+              v-if="row.status === 1"
+              size="small"
+              type="warning"
+              @click="refundOrder(row)"
+            >
+              退款
+            </el-button>
+          </div>
+        </el-card>
+      </div>
+
       <!-- 分页 -->
       <div class="pagination">
         <el-pagination
@@ -171,10 +239,11 @@
       v-model="showDetailDialog"
       title="订单详情"
       width="60%"
+      :fullscreen="isMobile"
       destroy-on-close
     >
       <div v-if="currentOrder" class="order-detail">
-        <el-descriptions :column="2" border>
+        <el-descriptions :column="isMobile ? 1 : 2" border>
           <el-descriptions-item label="订单号">{{ currentOrder.orderNo }}</el-descriptions-item>
           <el-descriptions-item label="状态">
             <el-tag :type="getStatusColor(currentOrder.status)">
@@ -222,15 +291,62 @@
       </template>
     </el-dialog>
   </div>
+
+  <el-drawer v-model="mobileFilterOpen" title="筛选" direction="btt" size="70%" destroy-on-close>
+    <el-form :model="searchForm" label-width="80px">
+      <el-form-item label="订单号">
+        <el-input v-model="searchForm.orderNo" placeholder="请输入订单号" clearable />
+      </el-form-item>
+      <el-form-item label="用户">
+        <el-input v-model="searchForm.username" placeholder="请输入用户名" clearable />
+      </el-form-item>
+      <el-form-item label="状态">
+        <el-select v-model="searchForm.status" placeholder="请选择状态" clearable>
+          <el-option label="待支付" :value="0" />
+          <el-option label="已支付" :value="1" />
+          <el-option label="已取消" :value="2" />
+          <el-option label="已退款" :value="3" />
+          <el-option label="已完成" :value="4" />
+          <el-option label="待确认" :value="10" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="时间">
+        <el-date-picker
+          v-model="searchForm.dateRange"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          format="YYYY-MM-DD"
+          value-format="YYYY-MM-DD"
+        />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="drawer-footer">
+        <el-button @click="resetSearch">重置</el-button>
+        <el-button type="primary" @click="applyMobileFilter">应用</el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount, getCurrentInstance } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Download, Refresh, Document, Clock, Money, Calendar } from '@element-plus/icons-vue'
 
 // 获取当前实例
 const { proxy } = getCurrentInstance()
+
+const isMobile = ref(false)
+const mobileFilterOpen = ref(false)
+const mobileStatusTab = ref('10')
+
+const updateIsMobile = () => {
+  if (typeof window === 'undefined') return
+  isMobile.value = window.innerWidth <= 768
+}
 
 // 响应式数据
 const loading = ref(false)
@@ -296,6 +412,27 @@ const loadOrders = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const onMobileStatusTabChange = (name) => {
+  mobileStatusTab.value = name
+  searchForm.status = name === '' ? '' : Number(name)
+  pagination.current = 1
+  loadOrders()
+}
+
+const applyMobileFilter = () => {
+  mobileFilterOpen.value = false
+  pagination.current = 1
+  loadOrders()
+}
+
+const quickFilter = (tabName) => {
+  if (!isMobile.value) return
+  mobileStatusTab.value = tabName
+  searchForm.status = tabName === '' ? '' : Number(tabName)
+  pagination.current = 1
+  loadOrders()
 }
 
 const updateStats = () => {
@@ -473,7 +610,17 @@ const formatTime = (time) => {
 
 // 生命周期
 onMounted(() => {
+  updateIsMobile()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', updateIsMobile)
+  }
   loadOrders()
+})
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', updateIsMobile)
+  }
 })
 </script>
 
@@ -510,6 +657,25 @@ onMounted(() => {
   margin: 0;
 }
 
+.mobile-toolbar {
+  background: #f5f7fa;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.mobile-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .stats-section {
   margin-bottom: 20px;
 }
@@ -522,17 +688,18 @@ onMounted(() => {
 .stats-content {
   position: relative;
   z-index: 2;
+  text-align: center;
 }
 
 .stats-number {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: bold;
   color: #303133;
   margin-bottom: 5px;
 }
 
 .stats-label {
-  font-size: 14px;
+  font-size: 12px;
   color: #909399;
 }
 
@@ -552,6 +719,59 @@ onMounted(() => {
   padding: 20px;
 }
 
+.mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.order-card {
+  border: 1px solid #ebeef5;
+}
+
+.order-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.order-no {
+  font-weight: 600;
+  color: #303133;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.order-card-body .line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.order-card-body .label {
+  color: #909399;
+  flex: 0 0 auto;
+}
+
+.order-card-body .value {
+  color: #303133;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.order-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
 .pagination {
   margin-top: 20px;
   text-align: right;
@@ -568,5 +788,49 @@ onMounted(() => {
 
 .el-dialog__body {
   padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .orders-management {
+    padding: 12px;
+  }
+
+  .stats-section :deep(.el-row) {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .stats-section :deep(.el-col) {
+    margin-bottom: 12px;
+  }
+
+  .stats-section :deep(.el-col) {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+
+  .stats-card :deep(.el-card__body) {
+    padding: 12px;
+  }
+
+  .stats-card {
+    cursor: pointer;
+  }
+
+  .stats-card:active {
+    transform: scale(0.99);
+  }
+
+  .stats-content {
+    text-align: center;
+  }
+
+  .table-section {
+    padding: 12px;
+  }
+
+  .order-card-actions :deep(.el-button) {
+    min-width: 72px;
+  }
 }
 </style>

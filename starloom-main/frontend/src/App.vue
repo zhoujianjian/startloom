@@ -101,11 +101,7 @@ export default {
     
     // 判断是否为西方版本
     const isWesternVersion = computed(() => {
-      const westernRoutes = [
-        'western-home', 'western-tarot', 'western-astrology', 'western-horoscope',
-        'western-numerology', 'western-tools', 'western-ai', 'western-chat'
-      ]
-      return westernRoutes.includes(route.name)
+      return route.path?.startsWith('/en')
     })
     
     // 判断是否使用新首页布局

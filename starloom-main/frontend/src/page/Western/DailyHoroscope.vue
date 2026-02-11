@@ -129,39 +129,17 @@ export default {
         'Capricorn': 'Dec 22 - Jan 19',
         'Aquarius': 'Jan 20 - Feb 18',
         'Pisces': 'Feb 19 - Mar 20'
-      },
-      horoscopes: [
-        {
-          zodiacSign: 'Aries',
-          dailyReading: 'Today brings new opportunities for growth and adventure. Your energy is high, and people are drawn to your enthusiasm. Take advantage of this positive momentum to pursue your goals.',
-          love: 'Romance is in the air. If you\'re single, you might meet someone interesting. If you\'re in a relationship, this is a great day to reconnect with your partner.',
-          career: 'Focus on your professional goals. Your hard work will be noticed, and you might receive recognition or a new opportunity.',
-          health: 'Take care of yourself. Exercise and eat well to maintain your energy levels.',
-          luckyNumber: 7,
-          luckyColor: 'Red',
-          luckyTime: '3 PM'
-        },
-        {
-          zodiacSign: 'Taurus',
-          dailyReading: 'Stability and security are your focus today. This is a good time to make practical decisions and plan for the future.',
-          love: 'Your loyalty and dependability are attractive qualities. Show your loved ones how much they mean to you.',
-          career: 'Steady progress is the theme. Keep working on your projects with patience and determination.',
-          health: 'Balance is key. Make sure to rest and relax as much as you work.',
-          luckyNumber: 4,
-          luckyColor: 'Green',
-          luckyTime: '10 AM'
-        }
-      ]
+      }
     }
   },
   computed: {
-    ...mapState('western', ['selectedZodiac']),
+    ...mapState('western', ['selectedZodiac', 'horoscopes']),
     currentHoroscope() {
-      return this.horoscopes.find(h => h.zodiacSign === this.selectedZodiac)
+      return (this.horoscopes || []).find(h => h.zodiacSign === this.selectedZodiac)
     }
   },
   methods: {
-    ...mapActions('western', ['setSelectedZodiac']),
+    ...mapActions('western', ['setSelectedZodiac', 'fetchHoroscopes']),
     selectZodiac(sign) {
       this.setSelectedZodiac(sign)
     },
@@ -217,6 +195,7 @@ export default {
     if (metaDescription) {
       metaDescription.setAttribute('content', this.$t('seo_horoscope_desc'))
     }
+    this.fetchHoroscopes()
     // 默认选择第一个星座
     if (!this.selectedZodiac) {
       this.selectZodiac('Aries')

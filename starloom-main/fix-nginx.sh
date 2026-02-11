@@ -58,6 +58,45 @@ server {
     
     root /usr/share/nginx/html;
     index index.html;
+
+    access_log /dev/stdout;
+    error_log /dev/stderr warn;
+
+    location = /robots.txt {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 30s;
+        proxy_connect_timeout 10s;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+
+    location = /sitemap.xml {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 30s;
+        proxy_connect_timeout 10s;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+
+    location = /sitemap-en.xml {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 30s;
+        proxy_connect_timeout 10s;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
     
     # 前端路由
     location / {
@@ -106,6 +145,45 @@ server {
     
     root /usr/share/nginx/html;
     index index.html;
+
+    access_log /dev/stdout;
+    error_log /dev/stderr warn;
+
+    location = /robots.txt {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 30s;
+        proxy_connect_timeout 10s;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+
+    location = /sitemap.xml {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 30s;
+        proxy_connect_timeout 10s;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+
+    location = /sitemap-en.xml {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 30s;
+        proxy_connect_timeout 10s;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
     
     # 前端路由
     location / {

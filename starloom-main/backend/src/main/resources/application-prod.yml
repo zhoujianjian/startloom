@@ -34,17 +34,9 @@ spring:
 
 # 日志配置
 logging:
-  file:
-    path: /app/logs
-    name: /app/logs/starloom.log
   level:
     root: INFO
     com.starloom: DEBUG
-  logback:
-    rollingpolicy:
-      max-file-size: 50MB
-      max-history: 30
-      total-size-cap: 1GB
 
 # LLM 多厂商配置 - 生产环境
 llm:
