@@ -61,6 +61,55 @@ public class SitemapController {
         addUrl(xml, "/tool/plate-test", today, "weekly", "0.7");
         addUrl(xml, "/tool/past-life", today, "weekly", "0.6");
         addUrl(xml, "/tool/lucky-day", today, "weekly", "0.8");
+
+        // 中文专题落地页（SEO）
+        String[] baziTopics = new String[]{
+                "bazi-ru-men",
+                "shi-shen-jie-du",
+                "wu-xing-qiang-ruo",
+                "xi-yong-shen",
+                "da-yun-liu-nian",
+                "hun-yin-he-hun",
+                "shi-ye-cai-yun",
+                "tao-hua-yuan",
+                "fan-tai-sui",
+                "ba-zi-chang-jian-wen-da"
+        };
+        for (String slug : baziTopics) {
+            addUrl(xml, "/zhuanti/" + slug, today, "weekly", "0.75");
+        }
+
+        String[] dreamTopics = new String[]{
+                "she", "diao-ya", "huai-yun", "qian-ren", "kao-shi",
+                "shui", "huo", "si-ren", "gui", "zhui",
+                "fei", "diao-xia", "xue", "gou", "mao",
+                "lao-shu", "yu", "zhu", "hu", "shi-zi",
+                "ma", "che", "fang-zi", "ban-jia", "jie-hun",
+                "sheng-bing", "yi-yuan", "qian", "diu-dong-xi", "zhao-bu-dao-lu",
+                "da-ren", "bei-da", "ku", "xiao", "si-wang",
+                "shang-xue", "lao-shi", "tong-shi", "ling-dao", "shou-ji",
+                "yao-si", "shu", "hua", "yu-san", "yu",
+                "xue-tian", "feng", "shan", "hai"
+        };
+        for (String slug : dreamTopics) {
+            addUrl(xml, "/zhuanti/meng-jian-" + slug, today, "weekly", "0.7");
+        }
+
+        String[] namingTopics = new String[]{
+                "xing-ming-da-fen",
+                "bao-bao-qi-ming",
+                "gong-si-qi-ming",
+                "ming-zi-zen-me-xuan",
+                "wu-xing-yong-zi",
+                "san-cai-wu-ge",
+                "nan-bao-bao-ming-zi",
+                "nv-bao-bao-ming-zi",
+                "dian-pu-qu-ming",
+                "ming-zi-ji-xiong"
+        };
+        for (String slug : namingTopics) {
+            addUrl(xml, "/zhuanti/" + slug, today, "weekly", "0.7");
+        }
         
         // 文章分类页
         List<Category> categories = categoryMapper.selectList(

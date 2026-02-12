@@ -114,8 +114,12 @@ export default {
         'pastLife', 'luckyDay', 'taisui', 'peachBlossom', 'wealthTest', 'mbtiTest',
         'luckyNumber', 'birthdayFlower', 'fengshuiTest', 'nameMatch', 'wuxing',
         'tarot', 'guanyin',
+        // 西方占卜
+        'angelNumber', 'rune', 'numerology', 'birthdayCode',
         'learn', 'articleDetail', 'articleByCat', 'tools', 'adminStats'
       ]
+      if (route.path?.startsWith('/zhuanti')) return true
+      if (String(route.name || '').startsWith('zhuanti-')) return true
       return homeLayoutRoutes.includes(route.name)
     })
     const checkLoginHandle = async() => {
