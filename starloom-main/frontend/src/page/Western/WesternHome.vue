@@ -18,6 +18,50 @@
       </div>
     </section>
 
+    <section class="popular">
+      <div class="container">
+        <h2>Popular</h2>
+        <div class="popular-grid">
+          <router-link to="/en/tarot-reading" class="popular-item">
+            <h3>Free Tarot Reading Online</h3>
+            <p>Instant AI guidance for love, career, and clarity.</p>
+          </router-link>
+          <router-link to="/en/how-to-do-a-tarot-reading" class="popular-item">
+            <h3>How to Do a Tarot Reading (Beginner Guide)</h3>
+            <p>Step-by-step guide: questions, spreads, and interpretations.</p>
+          </router-link>
+          <router-link to="/en/tarot-spreads-for-beginners" class="popular-item">
+            <h3>Tarot Spreads for Beginners</h3>
+            <p>Simple 1-card and 3-card layouts explained.</p>
+          </router-link>
+          <router-link to="/en/tarot-love-reading" class="popular-item">
+            <h3>Love Tarot Reading</h3>
+            <p>Relationship insights and next steps.</p>
+          </router-link>
+          <router-link to="/en/zodiac-compatibility" class="popular-item">
+            <h3>Zodiac Compatibility</h3>
+            <p>Check love compatibility for any two signs.</p>
+          </router-link>
+          <router-link to="/en/rising-sign" class="popular-item">
+            <h3>Rising Sign (Ascendant) Calculator</h3>
+            <p>Discover your first impression and outer personality.</p>
+          </router-link>
+          <router-link to="/en/moon-sign" class="popular-item">
+            <h3>Moon Sign Calculator</h3>
+            <p>Explore emotional needs and inner patterns.</p>
+          </router-link>
+          <router-link to="/en/how-to-read-a-birth-chart" class="popular-item">
+            <h3>How to Read a Birth Chart</h3>
+            <p>Beginner guide to planets, houses, and your Big Three.</p>
+          </router-link>
+          <router-link to="/en/tarot/cards" class="popular-item">
+            <h3>Tarot Card Meanings (78 Cards)</h3>
+            <p>Major & Minor Arcana meanings, keywords, and reflections.</p>
+          </router-link>
+        </div>
+      </div>
+    </section>
+
     <!-- Quick Access Cards -->
     <section class="quick-access">
       <div class="container">
@@ -166,6 +210,49 @@ export default {
   width: 100%;
   background-color: $bg-primary;
   color: $text-primary;
+}
+
+.popular {
+  padding: 26px 0 10px;
+
+  h2 {
+    font-size: 1.1rem;
+    margin: 0 0 14px;
+  }
+
+  .popular-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .popular-item {
+    background: $bg-secondary;
+    border: 2px solid rgba($primary-gold, 0.12);
+    border-radius: $radius-2xl;
+    padding: 16px;
+    text-decoration: none;
+    color: $text-primary;
+    transition: all $transition-base;
+
+    &:hover {
+      border-color: $primary-gold;
+      box-shadow: $shadow-lg;
+      transform: translateY(-4px);
+    }
+
+    h3 {
+      margin: 0 0 6px;
+      font-size: 1.05rem;
+    }
+
+    p {
+      margin: 0;
+      color: $text-secondary;
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+  }
 }
 
 // Hero Section

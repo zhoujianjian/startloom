@@ -106,6 +106,30 @@ const ranks = [
   { k: 'king', n: 'King' },
 ]
 
+const rankKeywords = {
+  ace: ['new start', 'seed', 'potential'],
+  two: ['choice', 'balance', 'duality'],
+  three: ['growth', 'collaboration', 'expansion'],
+  four: ['stability', 'rest', 'foundation'],
+  five: ['conflict', 'change', 'challenge'],
+  six: ['harmony', 'support', 'healing'],
+  seven: ['test', 'strategy', 'faith'],
+  eight: ['movement', 'progress', 'mastery'],
+  nine: ['wish', 'resilience', 'near completion'],
+  ten: ['completion', 'outcome', 'threshold'],
+  page: ['curiosity', 'messages', 'learning'],
+  knight: ['action', 'quest', 'drive'],
+  queen: ['embody', 'nurture', 'maturity'],
+  king: ['leadership', 'mastery', 'direction'],
+}
+
+const suitThemes = {
+  cups: { name: 'Cups', themes: ['love', 'feelings', 'connection'] },
+  wands: { name: 'Wands', themes: ['action', 'passion', 'growth'] },
+  swords: { name: 'Swords', themes: ['thought', 'truth', 'choice'] },
+  pentacles: { name: 'Pentacles', themes: ['money', 'work', 'stability'] },
+}
+
 const suitKeywords = {
   cups: ['love', 'feelings', 'connection'],
   wands: ['action', 'passion', 'growth'],
@@ -130,6 +154,22 @@ const buildMinor = () => {
 
 const allCards = [...majors, ...buildMinor()]
 
+const minorMeta = computed(() => {
+  const slug = String(route.params.slug || '').toLowerCase()
+  const m = slug.match(/^(ace|two|three|four|five|six|seven|eight|nine|ten|page|knight|queen|king)-of-(cups|wands|swords|pentacles)$/)
+  if (!m) return null
+  const rank = m[1]
+  const suit = m[2]
+  const suitInfo = suitThemes[suit] || { name: suit, themes: [] }
+  return {
+    rank,
+    suit,
+    suitName: suitInfo.name,
+    rankKeywords: rankKeywords[rank] || [],
+    suitKeywords: suitInfo.themes || [],
+  }
+})
+
 const card = computed(() => {
   const slug = String(route.params.slug || '').toLowerCase()
   return allCards.find(c => c.slug === slug) || { slug, name: 'Tarot Card', keywords: ['tarot'] }
@@ -137,11 +177,25 @@ const card = computed(() => {
 
 const uprightText = computed(() => {
   const k = card.value.keywords.join(', ')
+  if (minorMeta.value) {
+    const r = minorMeta.value.rank
+    const s = minorMeta.value.suitName
+    const rk = minorMeta.value.rankKeywords.join(', ')
+    const sk = minorMeta.value.suitKeywords.join(', ')
+    return `Upright, ${card.value.name} highlights ${rk} expressed through the element of ${s} (${sk}). It points to what is developing now and the most helpful next step you can take.`
+  }
   return `Upright, ${card.value.name} points to ${k}. It highlights what is opening up for you now, and what becomes possible when you act with clarity and intention.`
 })
 
 const reversedText = computed(() => {
   const k = card.value.keywords.join(', ')
+  if (minorMeta.value) {
+    const r = minorMeta.value.rank
+    const s = minorMeta.value.suitName
+    const rk = minorMeta.value.rankKeywords.join(', ')
+    const sk = minorMeta.value.suitKeywords.join(', ')
+    return `Reversed, ${card.value.name} can signal a blocked or imbalanced expression of ${rk} in the realm of ${s} (${sk}). It may suggest hesitation, misalignment, or a need to slow down and reset your priorities.`
+  }
   return `Reversed, ${card.value.name} suggests the shadow side of ${k}. It can indicate delay, inner resistance, or a lesson that needs gentleness before it moves forward.`
 })
 
@@ -155,7 +209,9 @@ const reflection = computed(() => {
 
 const related = computed(() => {
   const pool = allCards.filter(c => c.slug !== card.value.slug)
-  return pool.slice(0, 6)
+  const seed = card.value.slug.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0)
+  const start = pool.length ? (seed % pool.length) : 0
+  return [...pool.slice(start), ...pool.slice(0, start)].slice(0, 6)
 })
 
 const copyLink = async () => {
@@ -175,10 +231,13 @@ const copyLink = async () => {
 onMounted(() => {
   const title = `${card.value.name} Meaning (Upright & Reversed) | StarLoom`
   const description = `Learn the ${card.value.name} tarot meaning: keywords, upright and reversed interpretations, and quick reflection prompts. Free tarot guide for beginners.`
+  const extraKeywords = minorMeta.value
+    ? `${minorMeta.value.rankKeywords.join(', ')}, ${minorMeta.value.suitKeywords.join(', ')}`
+    : ''
   setSEO('home', {
     title,
     description,
-    keywords: `${card.value.name} meaning, ${card.value.name} tarot, tarot card meanings, upright meaning, reversed meaning`
+    keywords: `${card.value.name} meaning, ${card.value.name} tarot, tarot card meanings, upright meaning, reversed meaning${extraKeywords ? `, ${extraKeywords}` : ''}`
   })
   setCanonical(route.path)
   setHreflang({ en: `https://ibazi.site${route.path}` })

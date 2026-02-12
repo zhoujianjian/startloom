@@ -422,9 +422,14 @@ router.beforeEach((to, from, next) => {
   }
 
   const seoKey = to.meta?.seoKey;
-  if (seoKey) {
-    console.log('🔍 设置SEO:', seoKey);
-    setSEO(seoKey);
+  const hasCustomMeta = !!(to.meta?.title || to.meta?.description || to.meta?.keywords)
+  if (seoKey || hasCustomMeta) {
+    console.log('🔍 设置SEO:', { seoKey, hasCustomMeta });
+    setSEO(seoKey || 'home', {
+      title: to.meta?.title,
+      description: to.meta?.description,
+      keywords: to.meta?.keywords
+    });
   }
   
   // 设置 canonical URL

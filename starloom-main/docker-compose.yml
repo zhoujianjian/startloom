@@ -11,13 +11,13 @@ services:
         max-size: "10m"
         max-file: "3"
     environment:
-      MYSQL_ROOT_PASSWORD: root123456
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required}
       MYSQL_DATABASE: starloom
-      MYSQL_USER: starloom
-      MYSQL_PASSWORD: starloom123456
+      MYSQL_USER: ${MYSQL_USER:-starloom}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}
       TZ: Asia/Shanghai
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./starloom.sql:/docker-entrypoint-initdb.d/starloom.sql
@@ -39,7 +39,7 @@ services:
         max-size: "10m"
         max-file: "3"
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -48,7 +48,7 @@ services:
       test: ["CMD", "redis-cli", "ping"]
       timeout: 10s
       retries: 5
-    command: redis-server --appendonly yes --requirepass redis123456
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
 
   backend:
     image: eclipse-temurin:17-jdk
@@ -67,16 +67,16 @@ services:
     environment:
       APP_SITE_URL: https://ibazi.site
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/starloom?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&sessionVariables=character_set_client=utf8mb4,character_set_connection=utf8mb4,character_set_results=utf8mb4,collation_connection=utf8mb4_unicode_ci
-      SPRING_DATASOURCE_USERNAME: starloom
-      SPRING_DATASOURCE_PASSWORD: starloom123456
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-starloom}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
-      SPRING_DATA_REDIS_PASSWORD: redis123456
+      SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
       SPRING_DATA_REDIS_DATABASE: 0
       TZ: Asia/Shanghai
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     volumes:
       - /opt/suanming:/app/deploy:ro
       - /opt/suanming/logs:/app/logs

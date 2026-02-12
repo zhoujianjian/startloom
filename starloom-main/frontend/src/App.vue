@@ -140,6 +140,10 @@ export default {
       window.onresize = () => {
         return (() => {
           store.commit('setScreenWidth', document.body.clientWidth)
+          if (window.location?.pathname?.startsWith('/en')) {
+            document.documentElement.style.fontSize = '16px'
+            document.documentElement.lang = 'en'
+          }
         })()
       }
     })

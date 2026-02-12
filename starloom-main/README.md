@@ -125,7 +125,7 @@ docker-compose up -d
 ### 数据库连接失败
 
 - 检查 MySQL 容器是否运行：`docker ps | grep mysql`
-- 验证数据库凭证：用户名 `starloom`，密码 `starloom123456`
+- 验证数据库凭证：用户名默认 `starloom`（可通过环境变量修改），密码通过环境变量设置
 
 ---
 

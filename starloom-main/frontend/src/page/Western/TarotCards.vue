@@ -114,6 +114,23 @@ const minor = computed(() => {
     { k: 'king', n: 'King' },
   ]
 
+  const rankKeywords = {
+    ace: ['new start', 'seed', 'potential'],
+    two: ['choice', 'balance', 'duality'],
+    three: ['growth', 'collaboration', 'expansion'],
+    four: ['stability', 'rest', 'foundation'],
+    five: ['conflict', 'change', 'challenge'],
+    six: ['harmony', 'support', 'healing'],
+    seven: ['test', 'strategy', 'faith'],
+    eight: ['movement', 'progress', 'mastery'],
+    nine: ['wish', 'resilience', 'near completion'],
+    ten: ['completion', 'outcome', 'threshold'],
+    page: ['curiosity', 'messages', 'learning'],
+    knight: ['action', 'quest', 'drive'],
+    queen: ['embody', 'nurture', 'maturity'],
+    king: ['leadership', 'mastery', 'direction'],
+  }
+
   const suitKeywords = {
     Cups: ['love', 'feelings', 'connection'],
     Wands: ['action', 'passion', 'growth'],
@@ -128,7 +145,7 @@ const minor = computed(() => {
         slug: `${r.k}-of-${s.toLowerCase()}`,
         name: `${r.n} of ${s}`,
         suit: s,
-        keywords: suitKeywords[s],
+        keywords: [...(rankKeywords[r.k] || []), ...(suitKeywords[s] || [])],
       })
     }
   }
@@ -183,12 +200,14 @@ onMounted(() => {
 
   h1 {
     margin: 0 0 8px;
-    font-size: 1.8rem;
+    font-size: 2.05rem;
   }
 
   p {
     margin: 0;
     color: $text-secondary;
+    font-size: 1.05rem;
+    line-height: 1.7;
   }
 }
 
@@ -202,13 +221,14 @@ onMounted(() => {
     border: 2px solid rgba($primary-gold, 0.18);
     border-radius: 14px;
     color: $text-primary;
+    font-size: 1.02rem;
   }
 }
 
 .sections {
   h2 {
     margin: 18px 0 10px;
-    font-size: 1.1rem;
+    font-size: 1.25rem;
   }
 }
 
@@ -229,11 +249,13 @@ onMounted(() => {
   .name {
     font-weight: 800;
     margin-bottom: 6px;
+    font-size: 1.06rem;
   }
 
   .meta {
     color: $text-secondary;
-    font-size: 0.9rem;
+    font-size: 0.98rem;
+    line-height: 1.65;
   }
 }
 

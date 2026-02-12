@@ -61,6 +61,8 @@
 </template>
 
 <script>
+import i18n from '../../locales'
+
 export default {
   name: 'WesternHeader',
   data() {
@@ -83,21 +85,49 @@ export default {
     },
     switchLanguage(lang) {
       this.currentLanguage = lang
-      this.$i18n.global.locale.value = lang
+      i18n.global.locale.value = lang
       localStorage.setItem('lang', lang)
-      
-      // 切换版本
+
+      const path = this.$route?.path || '/en'
+      const toZh = (enPath) => {
+        const map = {
+          '/en': '/',
+          '/en/tools': '/tools',
+          '/en/tarot': '/tool/tarot',
+          '/en/compatibility': '/tool/constellation-match',
+          '/en/horoscope': '/tool/daily-sign',
+        }
+        if (map[enPath]) return map[enPath]
+        return '/'
+      }
+      const toEn = (zhPath) => {
+        const map = {
+          '/': '/en',
+          '/tools': '/en/tools',
+          '/tool/tarot': '/en/tarot',
+          '/tool/constellation-match': '/en/compatibility',
+          '/tool/daily-sign': '/en/horoscope',
+        }
+        if (map[zhPath]) return map[zhPath]
+        return '/en'
+      }
+
+      // 切换版本：尽量保持同类页面，否则回首页
+      this.mobileMenuOpen = false
       if (lang === 'zh') {
-        this.mobileMenuOpen = false
-        this.$router.push('/cn')
+        const target = path.startsWith('/en') ? toZh(path) : path
+        this.$router.push(target)
       } else {
-        this.mobileMenuOpen = false
-        this.$router.push('/en')
+        const target = path.startsWith('/en') ? path : toEn(path)
+        this.$router.push(target)
       }
     }
   },
   mounted() {
-    this.currentLanguage = this.$i18n.locale || 'en'
+    const saved = localStorage.getItem('lang')
+    const inferred = this.$route?.path?.startsWith('/en') ? 'en' : 'zh'
+    this.currentLanguage = saved || inferred
+    i18n.global.locale.value = this.currentLanguage
   }
 }
 </script>

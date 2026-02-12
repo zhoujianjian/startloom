@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:starloom}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=true
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:2c5b9fa2aa5f0a42}
+    password: ${DB_PASSWORD:?DB_PASSWORD is required}
     driver-class-name: com.mysql.cj.jdbc.Driver
   
   # Redis配置
@@ -10,7 +10,7 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:redis123456}
+      password: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
       database: ${REDIS_DATABASE:0}
       timeout: 3000ms
       lettuce:

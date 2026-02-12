@@ -104,11 +104,74 @@ public class SitemapController {
         addUrl(xml, "/en", today, "daily", "0.95");
         addUrl(xml, "/en/tarot", today, "weekly", "0.9");
         addUrl(xml, "/en/tarot/cards", today, "weekly", "0.85");
+        addUrl(xml, "/en/tarot-reading", today, "weekly", "0.85");
+        addUrl(xml, "/en/tarot-yes-no", today, "weekly", "0.8");
+        addUrl(xml, "/en/tarot-love-reading", today, "weekly", "0.8");
+        addUrl(xml, "/en/tarot-career-reading", today, "weekly", "0.75");
         addUrl(xml, "/en/compatibility", today, "weekly", "0.9");
+        addUrl(xml, "/en/zodiac-compatibility", today, "weekly", "0.85");
         addUrl(xml, "/en/astrology", today, "weekly", "0.75");
         addUrl(xml, "/en/horoscope", today, "daily", "0.8");
         addUrl(xml, "/en/numerology", today, "weekly", "0.75");
+        addUrl(xml, "/en/life-path-number", today, "weekly", "0.75");
+        addUrl(xml, "/en/destiny-number", today, "weekly", "0.7");
+        addUrl(xml, "/en/personal-year", today, "weekly", "0.7");
         addUrl(xml, "/en/tools", today, "weekly", "0.8");
+
+        // SEO landing pages (English)
+        addUrl(xml, "/en/birth-chart", today, "weekly", "0.75");
+        addUrl(xml, "/en/daily-horoscope", today, "weekly", "0.75");
+        addUrl(xml, "/en/spiritual-guidance", today, "weekly", "0.7");
+        addUrl(xml, "/en/rising-sign", today, "weekly", "0.7");
+        addUrl(xml, "/en/moon-sign", today, "weekly", "0.7");
+        addUrl(xml, "/en/sun-sign", today, "weekly", "0.65");
+        addUrl(xml, "/en/what-is-rising-sign", today, "weekly", "0.65");
+        addUrl(xml, "/en/how-to-read-a-birth-chart", today, "weekly", "0.65");
+        addUrl(xml, "/en/tarot-spreads-for-beginners", today, "weekly", "0.65");
+        addUrl(xml, "/en/how-to-do-a-tarot-reading", today, "weekly", "0.65");
+        addUrl(xml, "/en/zodiac-sign-dates", today, "weekly", "0.65");
+        addUrl(xml, "/en/mercury-retrograde", today, "weekly", "0.65");
+        addUrl(xml, "/en/angel-numbers", today, "weekly", "0.6");
+
+        // Angel numbers
+        String[] angelNumbers = new String[] {"111", "222", "333", "444", "555", "666", "777", "888", "8888", "999", "1010", "1111", "1212", "1313", "1414", "2020", "3030"};
+        for (String number : angelNumbers) {
+            addUrl(xml, "/en/" + number + "-meaning", today, "weekly", "0.6");
+        }
+
+        // Numerology long-tail (Life Path meanings)
+        for (int n = 1; n <= 9; n++) {
+            addUrl(xml, "/en/life-path-" + n + "-meaning", today, "weekly", "0.6");
+        }
+
+        // Numerology long-tail (Destiny meanings)
+        for (int n = 1; n <= 9; n++) {
+            addUrl(xml, "/en/destiny-number-" + n + "-meaning", today, "weekly", "0.6");
+        }
+
+        // Numerology long-tail (Personal Year meanings)
+        for (int n = 1; n <= 9; n++) {
+            addUrl(xml, "/en/personal-year-" + n + "-meaning", today, "weekly", "0.6");
+        }
+
+        // Astrology/tarot long-tail
+        addUrl(xml, "/en/venus-sign", today, "weekly", "0.6");
+        addUrl(xml, "/en/mars-sign", today, "weekly", "0.6");
+        addUrl(xml, "/en/saturn-return", today, "weekly", "0.6");
+        addUrl(xml, "/en/synastry-compatibility", today, "weekly", "0.6");
+        addUrl(xml, "/en/celtic-cross-tarot-spread", today, "weekly", "0.6");
+        addUrl(xml, "/en/three-card-tarot-spread", today, "weekly", "0.6");
+
+        // Compatibility matrix (12 x 12)
+        String[] signs = new String[]{
+                "aries", "taurus", "gemini", "cancer", "leo", "virgo",
+                "libra", "scorpio", "sagittarius", "capricorn", "aquarius", "pisces"
+        };
+        for (String a : signs) {
+            for (String b : signs) {
+                addUrl(xml, "/en/" + a + "-and-" + b + "-compatibility", today, "weekly", "0.55");
+            }
+        }
 
         // English tools pages
         addUrl(xml, "/en/tools/chakra-quiz", today, "monthly", "0.65");
@@ -117,6 +180,8 @@ public class SitemapController {
         addUrl(xml, "/en/tools/meditation-timer", today, "monthly", "0.6");
         addUrl(xml, "/en/tools/energy-reading", today, "monthly", "0.6");
         addUrl(xml, "/en/tools/moon-phase", today, "monthly", "0.6");
+        addUrl(xml, "/en/tools/personal-year", today, "monthly", "0.6");
+        addUrl(xml, "/en/tools/rising-sign", today, "monthly", "0.6");
 
         // NOTE: For large-scale pages (e.g. /en/compatibility/:a/:b and /en/tarot/cards/:slug),
         // we intentionally do not include them here yet to avoid huge sitemaps.

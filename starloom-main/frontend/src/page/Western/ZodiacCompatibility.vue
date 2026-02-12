@@ -141,13 +141,15 @@ onMounted(() => {
   margin-bottom: 18px;
 
   h1 {
-    font-size: 1.8rem;
+    font-size: 2.05rem;
     margin: 0 0 8px;
   }
 
   p {
     margin: 0;
     color: $text-secondary;
+    font-size: 1.05rem;
+    line-height: 1.7;
   }
 }
 
@@ -172,7 +174,8 @@ onMounted(() => {
 
   label {
     color: $text-secondary;
-    font-size: 0.9rem;
+    font-size: 1.02rem;
+    font-weight: 700;
   }
 
   select {
@@ -182,6 +185,7 @@ onMounted(() => {
     border: 2px solid rgba($primary-gold, 0.18);
     background: $bg-primary;
     color: $text-primary;
+    font-size: 1.02rem;
   }
 }
 
@@ -200,6 +204,7 @@ onMounted(() => {
   color: $text-primary;
   font-weight: 700;
   cursor: pointer;
+  font-size: 1rem;
 }
 
 .btn.secondary {
@@ -211,7 +216,7 @@ onMounted(() => {
   margin-top: 22px;
 
   h2 {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     margin: 0 0 10px;
   }
 }
@@ -229,6 +234,7 @@ onMounted(() => {
   border-radius: 999px;
   color: $text-primary;
   text-decoration: none;
+  font-size: 1.02rem;
 }
 
 @media (min-width: 720px) {

@@ -8,6 +8,46 @@
       </div>
     </section>
 
+    <section class="popular">
+      <div class="container">
+        <h2>Popular</h2>
+        <div class="popular-grid">
+          <router-link to="/en/spiritual-guidance" class="popular-item">
+            <h3>Spiritual Guidance Tools</h3>
+            <p>Chakra quiz, crystals, affirmations, meditation, and more.</p>
+          </router-link>
+          <router-link to="/en/rising-sign" class="popular-item">
+            <h3>Rising Sign (Ascendant) Calculator</h3>
+            <p>Find your Ascendant and learn your first impression energy.</p>
+          </router-link>
+          <router-link to="/en/moon-sign" class="popular-item">
+            <h3>Moon Sign Calculator</h3>
+            <p>Explore your emotional needs and inner patterns.</p>
+          </router-link>
+          <router-link to="/en/personal-year" class="popular-item">
+            <h3>Personal Year Number Calculator</h3>
+            <p>Get a simple numerology forecast for the year ahead.</p>
+          </router-link>
+          <router-link to="/en/tarot-reading" class="popular-item">
+            <h3>Free Tarot Reading Online</h3>
+            <p>Instant AI tarot guidance in seconds.</p>
+          </router-link>
+          <router-link to="/en/tarot-spreads-for-beginners" class="popular-item">
+            <h3>Tarot Spreads for Beginners</h3>
+            <p>Simple layouts and position meanings.</p>
+          </router-link>
+          <router-link to="/en/zodiac-compatibility" class="popular-item">
+            <h3>Zodiac Compatibility</h3>
+            <p>Check love match for any two signs.</p>
+          </router-link>
+          <router-link to="/en/tarot/cards" class="popular-item">
+            <h3>Tarot Card Meanings</h3>
+            <p>Explore 78 card meanings and keywords.</p>
+          </router-link>
+        </div>
+      </div>
+    </section>
+
     <!-- Tools Content -->
     <section class="tools-content">
       <div class="container">
@@ -155,6 +195,49 @@ export default {
   width: 100%;
   background-color: $bg-primary;
   color: $text-primary;
+}
+
+.popular {
+  padding: 22px 0 0;
+
+  h2 {
+    font-size: 1.1rem;
+    margin: 0 0 14px;
+  }
+
+  .popular-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .popular-item {
+    background: $bg-secondary;
+    border: 2px solid rgba($primary-gold, 0.12);
+    border-radius: $radius-2xl;
+    padding: 16px;
+    text-decoration: none;
+    color: $text-primary;
+    transition: all $transition-base;
+
+    &:hover {
+      border-color: $primary-gold;
+      box-shadow: $shadow-lg;
+      transform: translateY(-4px);
+    }
+
+    h3 {
+      margin: 0 0 6px;
+      font-size: 1.05rem;
+    }
+
+    p {
+      margin: 0;
+      color: $text-secondary;
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+  }
 }
 
 // Page Header

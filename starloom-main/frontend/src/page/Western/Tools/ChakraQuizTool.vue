@@ -130,6 +130,7 @@ onMounted(() => {
   align-items: center;
   color: $text-secondary;
   margin-bottom: 12px;
+  font-size: 1.02rem;
 
   a {
     color: $text-secondary;
@@ -171,7 +172,7 @@ onMounted(() => {
 
   label {
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 1.08rem;
   }
 
   select {
@@ -181,6 +182,7 @@ onMounted(() => {
     border: 2px solid rgba($primary-gold, 0.18);
     background: $bg-primary;
     color: $text-primary;
+    font-size: 1.02rem;
   }
 }
 
