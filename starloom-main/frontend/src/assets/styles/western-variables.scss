@@ -2,19 +2,19 @@
 // Western Version Color Variables
 
 // 主色调 - Primary Colors
-$primary-purple: #6B46C1;      // 深紫色 - Deep Purple (Mystical)
-$primary-gold: #F59E0B;        // 金色 - Gold (Luxury, Wisdom)
-$primary-teal: #14B8A6;        // 青绿色 - Teal (Balance, Healing)
-$primary-navy: #0F172A;        // 深蓝色 - Dark Navy (Cosmic Depth)
+$primary-purple: #8B5CF6;      // 深紫色 - Deep Purple (Mystical)
+$primary-gold: #E7C48A;        // 金色 - Gold (Luxury, Wisdom)
+$primary-teal: #2DE2E6;        // 青绿色 - Teal (Balance, Healing)
+$primary-navy: #070A16;        // 深蓝色 - Dark Navy (Cosmic Depth)
 
 // 辅助色 - Secondary Colors
-$secondary-light-purple: #8B5CF6;    // 浅紫色
-$secondary-light-gold: #FBBF24;      // 浅金色
-$secondary-light-teal: #2DD4BF;      // 浅青绿色
-$secondary-dark-navy: #0C0E1A;       // 更深的蓝色
+$secondary-light-purple: #A78BFA;    // 浅紫色
+$secondary-light-gold: #F2D6A2;      // 浅金色
+$secondary-light-teal: #73F7FF;      // 浅青绿色
+$secondary-dark-navy: #040513;       // 更深的蓝色
 
 // 中性色 - Neutral Colors
-$neutral-cream: #F5F3FF;       // 奶油色 - Cream (Text)
+$neutral-cream: #F7F4FF;       // 奶油色 - Cream (Text)
 $neutral-light: #F3F4F6;       // 浅灰色
 $neutral-medium: #9CA3AF;      // 中灰色
 $neutral-dark: #374151;        // 深灰色
@@ -28,14 +28,14 @@ $info-color: #3B82F6;          // 信息 - Info
 
 // 背景色 - Background Colors
 $bg-primary: $primary-navy;    // 主背景
-$bg-secondary: #1A202C;        // 次背景
-$bg-tertiary: #2D3748;         // 三级背景
+$bg-secondary: #0B1024;        // 次背景
+$bg-tertiary: #0F1635;         // 三级背景
 $bg-light: #F9FAFB;            // 浅背景
 
 // 文本色 - Text Colors
 $text-primary: $neutral-cream; // 主文本
-$text-secondary: #D1D5DB;      // 次文本
-$text-tertiary: #9CA3AF;       // 三级文本
+$text-secondary: rgba(247, 244, 255, 0.82);      // 次文本
+$text-tertiary: rgba(247, 244, 255, 0.62);       // 三级文本
 $text-dark: $neutral-black;    // 深色文本
 
 // 边框色 - Border Colors

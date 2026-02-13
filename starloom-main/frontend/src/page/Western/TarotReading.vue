@@ -323,13 +323,63 @@ export default {
   width: 100%;
   background-color: $bg-primary;
   color: $text-primary;
+  position: relative;
+  overflow: hidden;
+}
+
+.tarot-reading::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--tarot-photo-bg, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.22;
+  filter: saturate(1.06) contrast(1.06);
+  transform: scale(1.02);
+  pointer-events: none;
+}
+
+.tarot-reading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(900px 520px at 20% 10%, rgba($secondary-light-purple, 0.16) 0%, rgba($secondary-light-purple, 0) 62%),
+    radial-gradient(900px 520px at 85% 70%, rgba($primary-teal, 0.10) 0%, rgba($primary-teal, 0) 62%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.78));
+  pointer-events: none;
+}
+
+.tarot-reading > * {
+  position: relative;
+  z-index: 1;
 }
 
 // Page Header
 .page-header {
   padding: 40px 0;
-  background: $gradient-purple-gold;
+  background: transparent;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+    border-bottom: 1px solid rgba($primary-gold, 0.14);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    pointer-events: none;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 
   h1 {
     font-size: 1.5rem;

@@ -182,17 +182,56 @@ onMounted(() => {
 
 <style scoped lang="scss">
 @import '../../assets/scss/main.scss';
+@import '../../assets/styles/western-variables.scss';
 
 .page {
   background: $bg-primary;
   color: $text-primary;
   min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--tarot-photo-bg, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.14;
+  filter: saturate(1.05) contrast(1.05);
+  transform: scale(1.02);
+  pointer-events: none;
+}
+
+.page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(900px 520px at 20% 10%, rgba($secondary-light-purple, 0.12) 0%, rgba($secondary-light-purple, 0) 62%),
+    radial-gradient(900px 520px at 85% 70%, rgba($primary-teal, 0.08) 0%, rgba($primary-teal, 0) 62%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.82));
+  pointer-events: none;
+}
+
+.page > * {
+  position: relative;
+  z-index: 1;
 }
 
 .container {
   max-width: 980px;
   margin: 0 auto;
   padding: 22px 16px 60px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.016));
+  border: 1px solid rgba($primary-gold, 0.12);
+  border-radius: 22px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 0 0 1px rgba($secondary-light-purple, 0.05), 0 22px 58px rgba(0, 0, 0, 0.42);
 }
 
 .hero {

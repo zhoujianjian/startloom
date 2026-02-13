@@ -104,7 +104,9 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../assets/styles/western-variables.scss';
+
 .seo-landing {
   padding: 44px 0 64px;
   color: inherit;
@@ -129,6 +131,12 @@ export default {
   line-height: 1.18;
   font-weight: 700;
   margin: 0 0 14px;
+  font-family: $font-family-display;
+  background: linear-gradient(135deg, rgba($secondary-light-purple, 1) 0%, rgba($primary-teal, 1) 45%, rgba($primary-gold, 1) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 26px rgba($secondary-light-purple, 0.18);
 }
 
 .hero-intro {
@@ -136,6 +144,7 @@ export default {
   line-height: 1.75;
   opacity: 0.92;
   margin: 0 0 18px;
+  color: $text-secondary;
 }
 
 .hero-cta {
@@ -146,6 +155,7 @@ export default {
   font-size: 22px;
   font-weight: 700;
   margin: 0 0 14px;
+  letter-spacing: 0.2px;
 }
 
 .highlights,
@@ -172,10 +182,12 @@ export default {
 }
 
 .faq-item {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
-  padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba($primary-gold, 0.18);
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 0 1px rgba($secondary-light-purple, 0.08), 0 16px 40px rgba(0, 0, 0, 0.24);
 }
 
 .faq-q {
@@ -183,6 +195,7 @@ export default {
   font-weight: 600;
   font-size: 16px;
   line-height: 1.5;
+  color: $text-primary;
 }
 
 .faq-a {
@@ -190,6 +203,7 @@ export default {
   line-height: 1.75;
   opacity: 0.9;
   font-size: 16px;
+  color: $text-secondary;
 }
 
 .related-list {
@@ -201,28 +215,33 @@ export default {
 .related-item {
   display: block;
   text-decoration: none;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba($primary-gold, 0.16);
+  border-radius: 16px;
+  padding: 16px 18px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
+  backdrop-filter: blur(10px);
   color: inherit;
+  transition: transform $transition-base, border-color $transition-base, box-shadow $transition-base;
 }
 
 .related-item:hover {
-  border-color: rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba($primary-gold, 0.36);
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px rgba($primary-teal, 0.10), 0 18px 44px rgba(0, 0, 0, 0.28);
 }
 
 .related-title {
   font-weight: 700;
   margin-bottom: 4px;
   font-size: 16px;
+  color: $text-primary;
 }
 
 .related-desc {
   font-size: 15px;
   opacity: 0.88;
   line-height: 1.6;
+  color: $text-secondary;
 }
 
 .cta {
@@ -231,18 +250,33 @@ export default {
   justify-content: center;
   min-height: 44px;
   padding: 0 18px;
-  border-radius: 10px;
+  border-radius: 999px;
   font-weight: 700;
   font-size: 16px;
   text-decoration: none;
-  background: #111827;
-  color: #fff;
+  background: linear-gradient(135deg, rgba($secondary-light-purple, 1) 0%, rgba($primary-teal, 1) 60%, rgba($primary-gold, 1) 100%);
+  color: $neutral-black;
+  box-shadow: 0 0 0 1px rgba($primary-gold, 0.20), 0 14px 44px rgba($secondary-light-purple, 0.16);
+  transition: transform $transition-base, filter $transition-base, box-shadow $transition-base;
+}
+
+.cta:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05) saturate(1.12);
+  box-shadow: 0 0 0 1px rgba($primary-gold, 0.28), 0 18px 54px rgba($primary-teal, 0.18);
 }
 
 .cta.secondary {
-  background: transparent;
-  color: #111827;
-  border: 1px solid rgba(17, 24, 39, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  color: $text-primary;
+  border: 1px solid rgba($primary-gold, 0.20);
+  box-shadow: none;
+  backdrop-filter: blur(10px);
+}
+
+.cta.secondary:hover {
+  transform: translateY(-1px);
+  border-color: rgba($primary-gold, 0.36);
 }
 
 .footer-cta {

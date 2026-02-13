@@ -136,14 +136,28 @@ export default {
 @import '../../assets/styles/western-variables.scss';
 
 .western-header {
-  background: linear-gradient(135deg, $bg-secondary 0%, rgba($primary-purple, 0.1) 100%);
-  border-bottom: 2px solid rgba($primary-gold, 0.2);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.03) 100%);
+  border-bottom: 1px solid rgba($primary-gold, 0.16);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
 
+.western-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(700px 120px at 50% 0%, rgba($secondary-light-purple, 0.16) 0%, rgba($secondary-light-purple, 0) 65%),
+    radial-gradient(500px 120px at 20% 0%, rgba($primary-teal, 0.10) 0%, rgba($primary-teal, 0) 70%);
+  opacity: 0.9;
+}
+
+.western-header {
   .container {
     padding: 0 $spacing-lg;
   }
@@ -169,21 +183,22 @@ export default {
     flex-shrink: 0;
 
     &:hover {
-      transform: scale(1.05);
+      transform: translateY(-1px);
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.25));
     }
 
     .logo-icon {
       font-size: 2rem;
-      animation: float 3s ease-in-out infinite;
+      animation: float 4.6s ease-in-out infinite;
     }
 
     .logo-text {
       font-family: $font-family-display;
-      background: $gradient-purple-gold;
+      background: linear-gradient(135deg, rgba($secondary-light-purple, 1) 0%, rgba($primary-gold, 1) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      letter-spacing: 1px;
+      letter-spacing: 1.4px;
     }
   }
 
@@ -214,34 +229,39 @@ export default {
       padding: 8px 0;
 
       &:hover {
-        color: $primary-gold;
+        color: $text-primary;
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
+        background: linear-gradient(90deg, rgba($primary-teal, 0) 0%, rgba($primary-teal, 0.9) 45%, rgba($primary-gold, 0.0) 100%);
+        transform: scaleX(0);
+        transform-origin: 50% 50%;
+        transition: transform $transition-base, opacity $transition-base;
+        opacity: 0;
+        filter: drop-shadow(0 0 10px rgba($primary-teal, 0.22));
+      }
+
+      &:hover::after {
+        transform: scaleX(1);
+        opacity: 0.65;
       }
 
       &.router-link-active {
         color: $primary-gold;
 
         &::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 2px;
-          background: $gradient-purple-gold;
-          animation: slideIn $transition-base;
+          transform: scaleX(1);
+          opacity: 1;
+          background: linear-gradient(90deg, rgba($secondary-light-purple, 0) 0%, rgba($secondary-light-purple, 0.9) 42%, rgba($primary-gold, 0.0) 100%);
+          filter: drop-shadow(0 0 12px rgba($secondary-light-purple, 0.20));
         }
       }
-    }
-  }
-
-  @keyframes slideIn {
-    from {
-      width: 0;
-      left: 50%;
-    }
-    to {
-      width: 100%;
-      left: 0;
     }
   }
 
@@ -258,10 +278,12 @@ export default {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 8px 12px;
-    background: rgba($primary-gold, 0.05);
+    padding: 7px 10px;
+    background: rgba(255, 255, 255, 0.06);
     border-radius: $radius-lg;
-    border: 1px solid rgba($primary-gold, 0.1);
+    border: 1px solid rgba($primary-gold, 0.14);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 
     .lang-btn {
       background: none;
@@ -275,13 +297,13 @@ export default {
       border-radius: $radius-md;
 
       &:hover {
-        color: $primary-gold;
-        background: rgba($primary-gold, 0.1);
+        color: $text-primary;
+        background: rgba(255, 255, 255, 0.06);
       }
 
       &.active {
         color: $primary-gold;
-        background: rgba($primary-gold, 0.15);
+        background: rgba($primary-gold, 0.12);
       }
     }
 
